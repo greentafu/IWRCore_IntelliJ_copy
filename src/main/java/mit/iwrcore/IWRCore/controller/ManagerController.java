@@ -29,7 +29,6 @@ public class ManagerController {
     private final MaterService materService;
     private final ProCodeService proCodeService;
     private final MemberService memberService;
-    private final MemberRepository memberRepository;
     private final PartnerService partnerService;
 
     @Autowired
@@ -72,7 +71,7 @@ public class ManagerController {
     public String save_member(@RequestParam(required = false) Long mno, @RequestParam String name, @RequestParam String phonenumber,
                             @RequestParam String department, @RequestParam Long role,
                             @RequestParam(required = false) String id, @RequestParam(required = false) String pw){
-        String temp_pw=(pw!=null)?pw:"1111";
+        String temp_pw=(pw!=null && pw!="")?pw:"1111";
         MemberDTO memberDTO=MemberDTO.builder()
                 .mno((mno!=null)?mno:null).name(name).phonenumber(phonenumber)
                 .department(department).id((id!=null)?id:null)
@@ -88,7 +87,7 @@ public class ManagerController {
                              @RequestParam(required = false) String cnumber, @RequestParam(required = false) String cmail, @RequestParam(required = false) String id,
                              @RequestParam(required = false) String pw){
         Long temp_pno=(pno!=null)?pno:null;
-        String temp_pw=(pw!=null)?pw:"1111";
+        String temp_pw=(pw!=null && pw!="")?pw:"1111";
         PartSDTO partSDTO=partCodeService.findPartS(selectPartS);
         PartnerDTO partnerDTO=PartnerDTO.builder()
                 .pno(temp_pno).name(name).registrationNumber(registerNum)

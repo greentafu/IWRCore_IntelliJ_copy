@@ -21,236 +21,146 @@
     <div class="container-xxl flex-grow-1 container-p-y">
       <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">직원 계정 /</span> 직원 정보 수정</h4>
       <div class="row">
-        <form id="formAccountSettings" method="POST" onsubmit="return false">
-        <div class="col-md-12">
-          <div class="card mb-4">
-            <!-- Account -->
-            <hr class="my-0" />
-            <div class="card-body">
-              <div class="mb-3 col-md-6">
-                <label class="form-label">직원번호</label>
-                <input
-                        class="form-control"
-                        type="text"
-                        id="mno"
-                        name="mno"
-                        th:value="${member.mno}"
-                        autofocus
-                />
-              </div>
-              <div class="row">
+        <form id="saveMemberForm" th:action="@{/manager/save_member}" method="POST">
+          <div class="col-md-12">
+            <div class="card mb-4">
+              <!-- Account -->
+              <hr class="my-0" />
+              <div class="card-body">
                 <div class="mb-3 col-md-6">
-                  <label class="form-label">성명</label>
+                  <label class="form-label">직원번호</label>
                   <input
-                          autofocus
                           class="form-control"
-                          name="name"
-                          id="name"
                           type="text"
-                          th:value="${member.name}"
+                          id="mno"
+                          name="mno"
+                          th:value="${member.mno}"
+                          readonly
                   />
                 </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label">전화번호</label>
-                  <div class="input-group input-group-merge">
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">성명</label>
+                    <input
+                            autofocus
+                            class="form-control"
+                            name="name"
+                            id="name"
+                            type="text"
+                            th:value="${member.name}"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">전화번호</label>
+                    <div class="input-group input-group-merge">
+                      <input
+                              class="form-control"
+                              name="phonenumber"
+                              id="phonenumber"
+                              placeholder="000-0000-0000"
+                              type="text"
+                              th:value="${member.phonenumber}"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">소속부서</label>
+                    <select class="select2 form-select" name="department">
+                      <option value="자재부서" th:selected="${member.department == '자재부서'}">자재부서</option>
+                      <option value="개발부서" th:selected="${member.department == '개발부서'}">개발부서</option>
+                      <option value="생산부서" th:selected="${member.department == '생산부서'}">생산부서</option>
+                    </select>
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">접근권한</label>
+                    <select class="select2 form-select" name="role">
+                      <option value="0" th:selected="${member.roleSet.contains(T(mit.iwrcore.IWRCore.entity.MemberRole).MANAGER)}">관리자</option>
+                      <option value="1" th:selected="${member.roleSet.contains(T(mit.iwrcore.IWRCore.entity.MemberRole).DEV_PROD_TEAM)}">생산/개발사원</option>
+                      <option value="2" th:selected="${member.roleSet.contains(T(mit.iwrcore.IWRCore.entity.MemberRole).MATERIAL_TEAM)}">자재사원</option>
+                    </select>
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">아이디</label>
                     <input
                             class="form-control"
-                            name="phonenumber"
-                            id="phonenumber"
-                            placeholder="000-0000-0000"
+                            name="id"
+                            placeholder="ert845dg"
                             type="text"
-                            th:value="${member.phonenumber}"
+                            th:value="${member.id}"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">비밀번호</label>
+                    <input
+                            class="form-control"
+                            name="pw"
+                            placeholder="awe#g32sdf*"
+                            type="text"
+                            th:value="${member.pw}"
                     />
                   </div>
                 </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label">소속부서</label>
-                  <select class="select2 form-select" name="department">
-                    <option value="자재부서" th:selected="${member.department == '자재부서'}">자재부서</option>
-                    <option value="개발부서" th:selected="${member.department == '개발부서'}">개발부서</option>
-                    <option value="생산부서" th:selected="${member.department == '생산부서'}">생산부서</option>
-                  </select>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label">접근권한</label>
-                  <select class="select2 form-select" name="role">
-                    <option value=0 th:selected="${member.roleSet == '[MANAGER]'}">관리자</option>
-                    <option value=1 th:selected="${member.roleSet == '[DEV_PROD_TEAM]'}">생산/개발사원</option>
-                    <option value=2 th:selected="${member.roleSet == '[MATERIAL_TEAM]'}">자재사원</option>
-                  </select>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label">아이디</label>
-                  <input
-                          class="form-control"
-                          name="id"
-                          placeholder="ert845dg"
-                          type="text"
-                          th:value="${member.id}"
-                  />
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label">비밀번호</label>
-                  <input
-                          class="form-control"
-                          name="pw"
-                          placeholder="awe#g32sdf*"
-                          type="text"
-                          th:value="${member.pw}"
-                  />
-                </div>
               </div>
-            </div>
-            <hr class="m-0">
-            <div class="card-body">
-              <select class="form-select mb-3" style="width: fit-content;">
-                <optgroup label="서류">
-                  <option>계약서</option>
-                  <option>발주서</option>
-                  <option>거래명세서</option>
-                </optgroup>
-                <optgroup label="제품/자재">
-                  <option>제품</option>
-                  <option>자재</option>
-                </optgroup>
-                <optgroup label="계획">
-                  <option>생산계획</option>
-                  <option>조달계획</option>
-                  <option>검수계획</option>
-                </optgroup>
-                <optgroup label="입고/반품/출하">
-                  <option>입고</option>
-                  <option>반품</option>
-                  <option>출하</option>
-                </optgroup>
-                <optgroup label="기타">
-                  <option>긴급납품</option>
-                </optgroup>
-              </select>
-              <div class="row">
-                <!-- Vertical Scrollbar -->
-                <div class="col-md-12">
-                  <div class="card shadow-none border border-secondary mb-3" style="height: 600px">
-                    <h5 class="card-header">계약서 목록</h5>
-                    <div class="card-body" id="vertical-example">
-                      <table class="table">
-                        <tr>
-                          <th>날짜</th>
-                          <th>서류명</th>
-                          <th>자재명</th>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                        <tr>
-                          <td>2024.03.06</td>
-                          <td><a th:href="@{/contract/list_contract}">20240306계약서</a></td>
-                          <td>뒷브레이크</td>
-                        </tr>
-                      </table>
+              <hr class="m-0">
+              <div class="card-body">
+                <select class="form-select mb-3" style="width: fit-content;">
+                  <optgroup label="서류">
+                    <option>계약서</option>
+                    <option>발주서</option>
+                    <option>거래명세서</option>
+                  </optgroup>
+                  <optgroup label="제품/자재">
+                    <option>제품</option>
+                    <option>자재</option>
+                  </optgroup>
+                  <optgroup label="계획">
+                    <option>생산계획</option>
+                    <option>조달계획</option>
+                    <option>검수계획</option>
+                  </optgroup>
+                  <optgroup label="입고/반품/출하">
+                    <option>입고</option>
+                    <option>반품</option>
+                    <option>출하</option>
+                  </optgroup>
+                  <optgroup label="기타">
+                    <option>긴급납품</option>
+                  </optgroup>
+                </select>
+                <div class="row">
+                  <!-- Vertical Scrollbar -->
+                  <div class="col-md-12">
+                    <div class="card shadow-none border border-secondary mb-3" style="height: 600px">
+                      <h5 class="card-header">계약서 목록</h5>
+                      <div class="card-body" id="vertical-example">
+                        <table class="table">
+                          <tr>
+                            <th>날짜</th>
+                            <th>서류명</th>
+                            <th>자재명</th>
+                          </tr>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="d-flex justify-content-between w-100">
-                <div class="mt-2">
-                  <button type="submit" class="btn btn-primary me-2">수정</button>
-                  <a th:href="@{/manager/list_member}">
-                    <button type="reset" class="btn btn-outline-secondary">취소</button>
-                  </a>
+                <div class="d-flex justify-content-between w-100">
+                  <div class="mt-2">
+                    <button class="btn btn-primary me-2" onclick="saveMember()">수정</button>
+                    <a th:href="@{/manager/list_member}">
+                      <button type="reset" class="btn btn-outline-secondary">취소</button>
+                    </a>
+                  </div>
+                  <div>
+                    <a data-bs-toggle="modal" href="#modalToggle">
+                      <button type="button" class="btn btn-primary me-2">삭제</button>
+                    </a>
+                  </div>
                 </div>
-                <div>
-                  <a data-bs-toggle="modal" href="#modalToggle">
-                    <button type="button" class="btn btn-primary me-2">삭제</button>
-                  </a>
-                </div>
               </div>
+              <!-- /Account -->
             </div>
-            <!-- /Account -->
           </div>
-        </div>
         </form>
       </div>
     </div>
@@ -303,7 +213,19 @@
     <!--/Modal-->
 
     <!--Script-->
-
+    <script>
+      function saveMember(){
+        var name=document.getElementById('name').value;
+        var phonenumber=document.getElementById('phonenumber').value;
+        if(name.trim()===''){
+          alert('이름을 입력해 주세요.');
+        }else if(phonenumber.trim()===''){
+          alert('핸드폰 번호를 입력해 주세요.');
+        }else {
+          document.getElementById('saveMemberForm').submit();
+        }
+      }
+    </script>
     <!--Script-->
   </span>
 
