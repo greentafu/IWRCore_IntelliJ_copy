@@ -39,14 +39,7 @@ public class MemberServiceTests {
     @Transactional
     @Commit
     public void memberList(){
-        PageRequestDTO pageRequestDTO=PageRequestDTO.builder().page(1).size(2).build();
-        PageResultDTO<MemberDTO, Member> resultDTO=memberService.findMemberList(pageRequestDTO);
-//        for(MemberDTO m:resultDTO.getDtoList()) System.out.println(m);
-        System.out.println("#####"+resultDTO.isPrev()+"/"+resultDTO.isNext()+"/"+resultDTO.getTotalPage());
-        System.out.println("=====================");
-        resultDTO.getDtoList().forEach(System.out::println);
-        System.out.println("=================");
-        resultDTO.getPageList().forEach(System.out::println);
+
     }
     // 직원 삭제
     @Test
@@ -60,16 +53,7 @@ public class MemberServiceTests {
     @Transactional
     @Commit
     public void searchMember(){
-        PageRequestDTO pageRequestDTO=PageRequestDTO.builder()
-                .page(1)
-                .size(2)
-                .department(0)
-                .role(0)
-                .memberSearch("관리")
-                .build();
-        PageResultDTO<MemberDTO, Member> resultDTO=memberService.findMemberList(pageRequestDTO);
-        for(MemberDTO memberDTO:resultDTO.getDtoList()){
-            System.out.println(memberDTO);
-        }
+        PageRequestDTO requestDTO=PageRequestDTO.builder().size(2).page(1).build();
+        System.out.println(memberService.findMemberList(requestDTO));
     }
 }

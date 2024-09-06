@@ -5,15 +5,18 @@ import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 
+import java.util.List;
+
 public interface MemberService {
 
+    // 직원 찾기
     Member findMemberEntity(Long mno, String id);
     MemberDTO findMemberDto(Long mno, String id);
-
+    // 직원 목록
     PageResultDTO<MemberDTO, Member> findMemberList(PageRequestDTO requestDTO);
-
+    // 직원 삽입, 수정
     Integer insertMember(MemberDTO dto, Long role);
-
+    // 직원 삭제
     void deleteMember(Long mno);
 
     default Member memberdtoToEntity(MemberDTO dto){

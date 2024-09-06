@@ -48,9 +48,10 @@ public class PageResultDTO<DTO, EN> {
     }
 
     // 관리자_회원검색
-    private Integer department;
-    private Integer role;
+    private String department;
+    private String role;
     private String memberSearch;
+
     // 협력회사검색
     private Long partL;
     private Long partM;

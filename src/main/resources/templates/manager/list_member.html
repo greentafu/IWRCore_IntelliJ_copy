@@ -31,17 +31,17 @@
                   <div class="mb-3 col-md-2">
                     <select class="select form-select" name="department" id="department">
                       <option value="" th:selected="${member_list.department}==null">전체보기</option>
-                      <option value="0" th:selected="${member_list.department}==0">자재부서</option>
-                      <option value="1" th:selected="${member_list.department}==1">개발부서</option>
-                      <option value="2" th:selected="${member_list.department}==2">생산부서</option>
+                      <option value="자재부서" th:selected="${member_list.department}=='자재부서'">자재부서</option>
+                      <option value="개발부서" th:selected="${member_list.department}=='개발부서'">개발부서</option>
+                      <option value="생산부서" th:selected="${member_list.department}=='생산부서'">생산부서</option>
                     </select>
                   </div>
                   <div class="mb-3 col-md-2">
                     <select class="select form-select" name="role" id="role">
                       <option value="" th:selected="${member_list.role}==null">전체보기</option>
-                      <option value="0" th:selected="${member_list.role}==0">관리자</option>
-                      <option value="1" th:selected="${member_list.role}==1">자재부서</option>
-                      <option value="2" th:selected="${member_list.role}==2">생산/개발부서</option>
+                      <option value="MANAGER" th:selected="${member_list.role}=='MANAGER'">관리자</option>
+                      <option value="MATERIAL_TEAM" th:selected="${member_list.role}=='MATERIAL_TEAM'">자재부서</option>
+                      <option value="DEV_PROD_TEAM" th:selected="${member_list.role}=='DEV_PROD_TEAM'">생산/개발부서</option>
                     </select>
                   </div>
                   <div class="col-md-3">

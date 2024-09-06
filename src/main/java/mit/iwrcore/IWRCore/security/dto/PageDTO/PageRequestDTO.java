@@ -16,7 +16,7 @@ public class PageRequestDTO {
 
     public PageRequestDTO(){
         this.page=1;
-        this.size=10;
+        this.size=2;
     }
 
     public Pageable getPageable(Sort sort){
@@ -27,8 +27,8 @@ public class PageRequestDTO {
     private Long pno;
 
     // 관리자_회원검색
-    private Integer department;
-    private Integer role;
+    private String department;
+    private String role;
     private String memberSearch;
     // 협력회사검색
     private Long partL;
