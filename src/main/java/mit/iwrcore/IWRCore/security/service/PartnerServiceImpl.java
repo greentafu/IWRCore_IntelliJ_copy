@@ -41,19 +41,16 @@ public class PartnerServiceImpl implements PartnerService{
 
     // 회사 목록 찾기
     @Override
-    public PageResultDTO<PartnerDTO, Partner> findPartnerList(PageRequestDTO pageRequestDTO) {
-        Pageable pageable=pageRequestDTO.getPageable(Sort.by("pno").descending());
+    public PageResultDTO<PartnerDTO, Partner> findPartnerList(PageRequestDTO requestDTO) {
+        Page<Partner> partnerList=partnerRepository.findPartnerByCustomQuery(requestDTO);
 
-        BooleanBuilder booleanBuilder=getSearch(pageRequestDTO);
-
-        Page<Partner> partnerList=partnerRepository.findAll(booleanBuilder, pageable);
         Function<Partner, PartnerDTO> fn=(entity->partnerTodto(entity));
-
         PageResultDTO pageResultDTO=new PageResultDTO<>(partnerList, fn);
-        pageResultDTO.setPartL(pageRequestDTO.getPartL());
-        pageResultDTO.setPartM(pageRequestDTO.getPartM());
-        pageResultDTO.setPartS(pageRequestDTO.getPartS());
-        pageResultDTO.setPartnerSearch(pageRequestDTO.getPartnerSearch());
+
+        pageResultDTO.setPartL(requestDTO.getPartL());
+        pageResultDTO.setPartM(requestDTO.getPartM());
+        pageResultDTO.setPartS(requestDTO.getPartS());
+        pageResultDTO.setPartnerSearch(requestDTO.getPartnerSearch());
 
         return pageResultDTO;
     }
@@ -140,51 +137,6 @@ public class PartnerServiceImpl implements PartnerService{
                 .partS(partCodeService.partSdtoToEntity(dto.getPartSDTO()))
                 .build();
         return entity;
-    }
-
-    // 검색조건
-    private BooleanBuilder getSearch(PageRequestDTO requestDTO){
-        Long partL=requestDTO.getPartL();
-        Long partM=requestDTO.getPartM();
-        Long partS= requestDTO.getPartS();
-        String partnerSearch= requestDTO.getPartnerSearch();
-
-        BooleanBuilder booleanBuilder=new BooleanBuilder();
-        QPartner qPartner=QPartner.partner;
-        BooleanExpression expression=qPartner.pno.gt(0L); // pno>0
-
-        booleanBuilder.and(expression);
-
-        if(partL==null && partM==null && partS==null && partnerSearch==null){
-            return booleanBuilder;
-        }
-
-        BooleanBuilder conditionBuilder1=new BooleanBuilder();
-        if(partS!=null){
-            PartS ps=partCodeService.partSdtoToEntity(partCodeService.findPartS(partS));
-            conditionBuilder1.and(qPartner.partS.eq(ps));
-        }else if(partM!=null){
-            List<PartSDTO> sdtoList=partCodeService.findListPartS(null, partCodeService.findPartM(partM),null);
-            List<PartS> sList=sdtoList.stream().map(x->partCodeService.partSdtoToEntity(x)).collect(Collectors.toList());
-            conditionBuilder1.and(qPartner.partS.in(sList));
-        }else if(partL!=null){
-            List<PartSDTO> sdtoList=partCodeService.findListPartS(partCodeService.findPartL(partL), null,null);
-            List<PartS> sList=sdtoList.stream().map(x->partCodeService.partSdtoToEntity(x)).collect(Collectors.toList());
-            conditionBuilder1.and(qPartner.partS.in(sList));
-        }
-
-        BooleanBuilder conditionBuilder2=new BooleanBuilder();
-        if(partnerSearch!=null){
-            conditionBuilder2
-                    .or(qPartner.name.contains(partnerSearch))
-                    .or(qPartner.registrationNumber.contains(partnerSearch))
-                    .or(qPartner.type.contains(partnerSearch))
-                    .or(qPartner.sector.contains(partnerSearch))
-                    .or(qPartner.telNumber.contains(partnerSearch));
-        }
-
-        booleanBuilder.and(conditionBuilder1).and(conditionBuilder2);
-        return booleanBuilder;
     }
 
     @Override

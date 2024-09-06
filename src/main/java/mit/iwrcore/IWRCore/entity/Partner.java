@@ -55,9 +55,6 @@ public class Partner {
     @Builder.Default
     private Set<MemberRole> roleSet = new HashSet<>();
 
-//    @OneToMany(mappedBy = "partner", fetch = FetchType.LAZY)  // Contract와의 1대다 관계
-//    private List<Contract> contracts;  // 이 Partner와 연관된 Contract 목록
-
     @PostPersist
     public void generateId() {
         if (this.id==null || this.id.isEmpty()) {

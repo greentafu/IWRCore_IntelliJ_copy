@@ -39,7 +39,6 @@ public class ManagerController {
         if(pageRequestDTO.getDepartment()==""){ pageRequestDTO.setDepartment(null); }
         if(pageRequestDTO.getRole()==""){ pageRequestDTO.setRole(null); }
         if(pageRequestDTO.getMemberSearch()==""){ pageRequestDTO.setMemberSearch(null); }
-        model.addAttribute("criteria", pageRequestDTO);
         model.addAttribute("member_list", memberService.findMemberList(pageRequestDTO));
     }
     @GetMapping("/add_member")
@@ -51,7 +50,12 @@ public class ManagerController {
         model.addAttribute("member", memberService.findMemberDto(mno, null));
     }
     @GetMapping("/list_partner")
-    public void list_partner(PageRequestDTO pageRequestDTO, Model model){
+    public void list_partner(@ModelAttribute PageRequestDTO pageRequestDTO, Model model){
+        if(pageRequestDTO.getPartL()+""==""){ pageRequestDTO.setPartL(null); }
+        if(pageRequestDTO.getPartM()+""==""){ pageRequestDTO.setPartM(null); }
+        if(pageRequestDTO.getPartS()+""==""){ pageRequestDTO.setPartS(null); }
+        if(pageRequestDTO.getPartnerSearch()==""){ pageRequestDTO.setPartnerSearch(null); }
+
         model.addAttribute("partner_list",partnerService.findPartnerList(pageRequestDTO));
     }
     @GetMapping("/add_partner")
