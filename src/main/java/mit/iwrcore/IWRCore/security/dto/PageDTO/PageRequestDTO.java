@@ -16,7 +16,7 @@ public class PageRequestDTO {
 
     public PageRequestDTO(){
         this.page=1;
-        this.size=2;
+        this.size=10;
     }
 
     public Pageable getPageable(Sort sort){
@@ -35,9 +35,15 @@ public class PageRequestDTO {
     private Long partM;
     private Long partS;
     private String partnerSearch;
+    // 제품검색
+    private Long proL;
+    private Long proM;
+    private Long proS;
+    private String productSearch;
     // 자재검색
     private Long materL;
     private Long materM;
     private Long materS;
     private String materialSearch;
+    private Long box;
 }

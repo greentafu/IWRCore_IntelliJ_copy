@@ -8,7 +8,6 @@ if(document.getElementById('selColor')){
 if(document.getElementById('selColor2')){
     document.getElementById('selColor2').addEventListener('change', function() {
         const selectedValue = this.value;
-        console.log("색색색", selectedValue);
         const inputField = document.getElementById('proColor2');
         inputField.value = selectedValue;
     });

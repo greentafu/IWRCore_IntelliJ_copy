@@ -43,6 +43,7 @@ public class MaterialController {
     @GetMapping("/list_material")
     public void list_material(PageRequestDTO pageRequestDTO, Model model) {
         model.addAttribute("material_list", materialService.findMaterialAll(pageRequestDTO));
+        model.addAttribute("box_list", boxService.list());
     }
 
     @GetMapping("/material")

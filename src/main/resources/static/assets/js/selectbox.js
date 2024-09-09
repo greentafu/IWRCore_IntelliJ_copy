@@ -54,18 +54,6 @@ function directCategory3(category){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 // 단위 초기에 보이기
 document.addEventListener("DOMContentLoaded", function(){
     const selectM=document.getElementById("selectMeasure");
