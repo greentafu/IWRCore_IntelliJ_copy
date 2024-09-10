@@ -165,9 +165,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
         QProM qProM=QProM.proM;
         QProS qProS=QProS.proS;
         QMember qMember=QMember.member;
+        QProPlan qProPlan=QProPlan.proPlan;
 
         BooleanBuilder builder=new BooleanBuilder();
 
+        builder.and(qProPlan.isNull());
+        builder.and(qProduct.mater_check.eq(1L));
         if (requestDTO.getProL() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL())); }
         if (requestDTO.getProM() != null) { builder.and(qProS.proM.proMcode.eq(requestDTO.getProM())); }
         if (requestDTO.getProS() != null) { builder.and(qProS.proScode.eq(requestDTO.getProS())); }
@@ -183,6 +186,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
                 .leftJoin(qProS.proM, qProM)
                 .leftJoin(qProM.proL, qProL)
                 .leftJoin(qProduct.member, qMember)
+                .leftJoin(qProduct.proPlans, qProPlan)
                 .where(builder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -195,6 +199,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
                 .leftJoin(qProS.proM, qProM)
                 .leftJoin(qProM.proL, qProL)
                 .leftJoin(qProduct.member, qMember)
+                .leftJoin(qProduct.proPlans, qProPlan)
                 .where(builder)
                 .fetchCount();
 
