@@ -57,4 +57,17 @@ public class ListController {
 
         return productService.getAllProducts(requestDTO);
     }
+
+    @GetMapping("/nonCheckProductList")
+    public PageResultDTO<ProductDTO, Product> nonCheckProductList(@RequestParam(required = false) int page,
+                                                                  @RequestParam(required = false) Long selectProL,@RequestParam(required = false) Long selectProM,
+                                                                  @RequestParam(required = false) Long selectProS,@RequestParam(required = false) String productSearch){
+        if (productSearch != null && productSearch.trim().isEmpty()) { productSearch = null; }
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch).build();
+
+        return productService.getNonCheckProducts(requestDTO);
+    }
 }

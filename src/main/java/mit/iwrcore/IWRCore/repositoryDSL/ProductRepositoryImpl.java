@@ -68,4 +68,136 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom{
         return new PageImpl<>(productList, pageable, total);
 
     }
+
+    @Override
+    public Page<Product> findProductByCustomQuery2(PageRequestDTO requestDTO){
+        QProduct qProduct=QProduct.product;
+        QProL qProL=QProL.proL;
+        QProM qProM=QProM.proM;
+        QProS qProS=QProS.proS;
+        QMember qMember=QMember.member;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        builder.and(qProduct.mater_imsi.eq(1L));
+        builder.and(qProduct.mater_check.eq(0L));
+        if (requestDTO.getProL() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL())); }
+        if (requestDTO.getProM() != null) { builder.and(qProS.proM.proMcode.eq(requestDTO.getProM())); }
+        if (requestDTO.getProS() != null) { builder.and(qProS.proScode.eq(requestDTO.getProS())); }
+        if (requestDTO.getProductSearch()!=null){
+            builder.and(qProduct.name.containsIgnoreCase(requestDTO.getProductSearch())
+                    .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch())));
+        }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Product> productList = queryFactory
+                .selectFrom(qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .leftJoin(qProduct.member, qMember)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qProduct.manuCode.desc())
+                .fetch();
+
+        long total = queryFactory
+                .selectFrom(qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .leftJoin(qProduct.member, qMember)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(productList, pageable, total);
+    }
+
+    @Override
+    public Page<Product> findProductByCustomQuery3(PageRequestDTO requestDTO){
+        QProduct qProduct=QProduct.product;
+        QProL qProL=QProL.proL;
+        QProM qProM=QProM.proM;
+        QProS qProS=QProS.proS;
+        QMember qMember=QMember.member;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        builder.and(qProduct.mater_check.eq(1L));
+        if (requestDTO.getProL() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL())); }
+        if (requestDTO.getProM() != null) { builder.and(qProS.proM.proMcode.eq(requestDTO.getProM())); }
+        if (requestDTO.getProS() != null) { builder.and(qProS.proScode.eq(requestDTO.getProS())); }
+        if (requestDTO.getProductSearch()!=null){
+            builder.and(qProduct.name.containsIgnoreCase(requestDTO.getProductSearch())
+                    .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch())));
+        }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Product> productList = queryFactory
+                .selectFrom(qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .leftJoin(qProduct.member, qMember)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qProduct.manuCode.desc())
+                .fetch();
+
+        long total = queryFactory
+                .selectFrom(qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .leftJoin(qProduct.member, qMember)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(productList, pageable, total);
+    }
+
+    @Override
+    public Page<Product> findProductByCustomQuery4(PageRequestDTO requestDTO){
+        QProduct qProduct=QProduct.product;
+        QProL qProL=QProL.proL;
+        QProM qProM=QProM.proM;
+        QProS qProS=QProS.proS;
+        QMember qMember=QMember.member;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO.getProL() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL())); }
+        if (requestDTO.getProM() != null) { builder.and(qProS.proM.proMcode.eq(requestDTO.getProM())); }
+        if (requestDTO.getProS() != null) { builder.and(qProS.proScode.eq(requestDTO.getProS())); }
+        if (requestDTO.getProductSearch()!=null){
+            builder.and(qProduct.name.containsIgnoreCase(requestDTO.getProductSearch())
+                    .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch())));
+        }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Product> productList = queryFactory
+                .selectFrom(qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .leftJoin(qProduct.member, qMember)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qProduct.manuCode.desc())
+                .fetch();
+
+        long total = queryFactory
+                .selectFrom(qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .leftJoin(qProduct.member, qMember)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(productList, pageable, total);
+    }
 }

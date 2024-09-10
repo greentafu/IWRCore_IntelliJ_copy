@@ -71,16 +71,14 @@ public class ProductServiceImpl implements ProductService {
     // 임시저장 했으나 최종확인은 하지 않은 제품 리스트
     @Override
     public PageResultDTO<ProductDTO, Product> getNonCheckProducts(PageRequestDTO requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("manuCode").descending());
-        Page<Product> entityPage=productRepository.findNonCheckProduct(pageable);
+        Page<Product> entityPage=productRepository.findProductByCustomQuery2(requestDTO);
         Function<Product, ProductDTO> fn=(entity->productEntityToDto(entity));
         return new PageResultDTO<>(entityPage, fn);
     }
     // 최종확인한 제품 리스트
     @Override
     public PageResultDTO<ProductDTO, Product> getCheckProducts(PageRequestDTO requestDTO) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("manuCode").descending());
-        Page<Product> entityPage=productRepository.findCheckProduct(pageable);
+        Page<Product> entityPage=productRepository.findProductByCustomQuery3(requestDTO);
         Function<Product, ProductDTO> fn=(entity->productEntityToDto(entity));
         return new PageResultDTO<>(entityPage, fn);
     }
