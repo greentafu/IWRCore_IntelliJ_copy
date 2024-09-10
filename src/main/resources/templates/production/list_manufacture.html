@@ -12,9 +12,15 @@
 
   <span id="head">
     <title>제품</title>
-      <!--Style-->
 
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 700px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
   <span id="content">
@@ -55,12 +61,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -71,59 +75,27 @@
         <div class="table-responsive text-nowrap">
           <!-- Outline Dropdowns -->
           <div class="card-body">
-            <table class="table table-bordered mb-4">
-              <thead>
-                <tr>
-                  <th>제품번호</th>
-                  <th>제품명</th>
-                  <th>대분류</th>
-                  <th>중분류</th>
-                  <th>소분류</th>
-                  <th>색상</th>
-                  <th>수정/삭제</th>
-                </tr>
-              </thead>
-              <tbody class="table-border-bottom-0">
-                <tr th:each="list:${product_list.dtoList}">
-                  <td>[[${list.manuCode}]]</td>
-                  <td th:id="'productName'+${list.manuCode}"><strong><a th:href="@{/production/manufacture(manuCode=${list.manuCode})}">[[${list.name}]]</a></strong></td>
-                  <td>[[${list.proSDTO.ProMDTO.proLDTO.Lname}]]</td>
-                  <td>[[${list.proSDTO.ProMDTO.Mname}]]</td>
-                  <td>[[${list.proSDTO.Sname}]]</td>
-                  <td>[[${list.color}]]</td>
-                  <td>
-                    <a th:href="@{/production/modify_manufacture(manuCode=${list.manuCode})}">
-                      <button class="btn btn-primary">수정</button>
-                    </a>
-                    <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" th:value="${list.manuCode}" onclick="deleteBtn(this)">삭제</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div id="content1">
+              <table class="table table-bordered mb-4">
+                <thead>
+                  <tr>
+                    <th>제품번호</th>
+                    <th>제품명</th>
+                    <th>대분류</th>
+                    <th>중분류</th>
+                    <th>소분류</th>
+                    <th>색상</th>
+                    <th>수정/삭제</th>
+                  </tr>
+                </thead>
+                <tbody class="table-border-bottom-0" id="firstTbody"></tbody>
+              </table>
+            </div>
             <div class="mt-3 text-end mb-4">
               <a th:href="@{/production/new_manufacture}">
                 <button type="button" class="btn btn-primary">등록</button>
               </a>
             </div>
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center">
-                <th:block th:if="${product_list.prev}">
-                  <li class="page-item prev">
-                    <a class="page-link" th:href="@{/production/list_manufacture(page=${product_list.start}-1)}"><i class="tf-icon bx bx-chevrons-left"></i></a>
-                  </li>
-                </th:block>
-                <th:block th:each="pagenum:${product_list.pageList}">
-                  <li class="page-item " th:classappend="${product_list.page}==${pagenum}? active">
-                    <a class="page-link" th:href="@{/production/list_manufacture(page=${pagenum})}">[[${pagenum}]]</a>
-                  </li>
-                </th:block>
-                <th:block th:if="${product_list.next}">
-                  <li class="page-item next">
-                    <a class="page-link" th:href="@{/production/list_manufacture(page=${product_list.end}+1)}"><i class="tf-icon bx bx-chevrons-right"></i></a>
-                  </li>
-                </th:block>
-              </ul>
-            </nav>
           </div>
         </div>
       </div>
@@ -166,6 +138,96 @@
     </div>
     <!--/Modal-->
     <!--Script-->
+    <script>
+      let page = 1;
+      let finPage=false;
+
+      let selectProL = null;
+      let selectProM = null;
+      let selectProS = null;
+      let productSearch = null;
+
+      function productSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectProL = (document.getElementById("selectProL").value!=null)?document.getElementById("selectProL").value:null;
+        selectProM = (document.getElementById("selectProM").value!=null)?document.getElementById("selectProM").value:null;
+        selectProS = (document.getElementById("selectProS").value!=null)?document.getElementById("selectProS").value:null;
+        productSearch = (document.getElementById("productSearch").value!=null)?document.getElementById("productSearch").value:null;
+        loadItems();
+      }
+
+      function loadItems() {
+        const content1 = document.getElementById("content1");
+        const firstTbody = document.getElementById("firstTbody");
+
+        $.ajax({
+          url:'/list/checkedProductList',
+          method:'GET',
+          data:{page:page, selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch},
+          success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+              const manuCode=x.manuCode;
+              const name=x.name;
+              const sname=x.proSDTO.sname;
+              const mname=x.proSDTO.proMDTO.mname;
+              const lname=x.proSDTO.proMDTO.proLDTO.lname;
+              const color=x.color;
+
+              const newRow = document.createElement("tr");
+
+              const codeTd=document.createElement("td");
+              codeTd.textContent=manuCode;
+              newRow.appendChild(codeTd);
+
+              const nameTd = document.createElement("td");
+              nameTd.id='productName'+manuCode;
+              nameTd.innerHTML = `<strong><a href="/production/manufacture?manuCode=${manuCode}"> ${name}</a></strong>`;
+              newRow.appendChild(nameTd);
+
+              [lname, mname, sname, color].forEach(text => {
+                const item = document.createElement("td");
+                item.textContent = text;
+                newRow.appendChild(item);
+              });
+
+              const btnTd = document.createElement("td");
+              btnTd.innerHTML=`
+                <a href="/production/modify_manufacture?manuCode=${manuCode}">
+                  <button class="btn btn-primary">수정</button>
+                </a>
+                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${manuCode}" onclick="deleteBtn(this)">삭제</button>
+              `;
+              newRow.appendChild(btnTd);
+
+              firstTbody.appendChild(newRow);
+            });
+          }
+        });
+
+        page++;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems();
+            }
+          }
+        });
+
+        loadItems();
+      });
+    </script>
+
     <script>
       function deleteBtn(button){
         var manuCode=button.value;
