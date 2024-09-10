@@ -1,11 +1,10 @@
 package mit.iwrcore.IWRCore.service;
 
 import jakarta.transaction.Transactional;
-import mit.iwrcore.IWRCore.entity.ProPlan;
-import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.repository.MemberRepository;
 import mit.iwrcore.IWRCore.repository.ProductRepository;
-import mit.iwrcore.IWRCore.repository.ProplanRepository;
+import mit.iwrcore.IWRCore.repository.ProPlanRepository;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
 import mit.iwrcore.IWRCore.security.service.MemberService;
 import mit.iwrcore.IWRCore.security.service.ProductService;
@@ -13,12 +12,9 @@ import mit.iwrcore.IWRCore.security.service.ProplanServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Commit;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @SpringBootTest
 public class ProplanServiceTests {
@@ -27,7 +23,7 @@ public class ProplanServiceTests {
     private ProplanServiceImpl proplanService;
 
     @Autowired
-    private ProplanRepository proPlanRepository;
+    private ProPlanRepository proPlanRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -199,7 +195,7 @@ public class ProplanServiceTests {
 //    }
     @Test
     public void testFindByPlanId() {
-        Pageable pageable=PageRequest.of(0,2);
-
+        PageRequestDTO requestDTO=PageRequestDTO.builder().page(1).size(2).build();
+        System.out.println(proPlanRepository.findProPlanByCustomQuery(requestDTO));
     }
 }

@@ -41,5 +41,7 @@ public class ProPlan extends BaseEntity {
     @NotNull
     private Product product;      // Product 엔티티와의 관계
 
+    @OneToMany(mappedBy = "proPlan")
+    private List<JodalPlan> jodalPlans;
 
 }
