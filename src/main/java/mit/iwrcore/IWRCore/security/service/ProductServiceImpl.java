@@ -48,8 +48,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public PageResultDTO<ProductDTO, Product> getAllProducts(PageRequestDTO requestDTO) {
-        Pageable pageable = requestDTO.getPageable(Sort.by("manuCode").descending());
-        Page<Product> entityPage = productRepository.findAll(pageable);
+        Page<Product> entityPage = productRepository.findProductByCustomQuery(requestDTO);
 
         // Product 엔티티를 ProductDTO로 변환하는 함수
         Function<Product, ProductDTO> fn = (entity -> {

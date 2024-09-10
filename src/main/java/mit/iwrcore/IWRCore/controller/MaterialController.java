@@ -42,7 +42,6 @@ public class MaterialController {
 
     @GetMapping("/list_material")
     public void list_material(PageRequestDTO pageRequestDTO, Model model) {
-        model.addAttribute("material_list", materialService.findMaterialAll(pageRequestDTO));
         model.addAttribute("box_list", boxService.list());
     }
 
@@ -66,13 +65,16 @@ public class MaterialController {
 
     @PostMapping("/register")
     public String aaa(@ModelAttribute MaterialDTO materialDTO, @RequestParam(name = "box") Long box, @RequestParam(name = "materS") Long materS,
-                      @RequestParam("uploadFiles") MultipartFile file) {
+                      @RequestParam("uploadFiles") MultipartFile file,
+                      @RequestParam(name="selboxDirectMeasure") String inputUnit, @RequestParam(name="selboxDirectColor") String inputColor) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
         MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
 
+        materialDTO.setUnit(inputUnit);
+        materialDTO.setColor(inputColor);
         materialDTO.setMemberDTO(memberDTO);
-        materialDTO.setBoxDTO(BoxDTO.builder().boxcode(boxService.getBox(box).getBoxcode()).build()); // 박스 찾는 것 필요
+        materialDTO.setBoxDTO(BoxDTO.builder().boxcode(boxService.getBox(box).getBoxcode()).build());
         materialDTO.setMaterSDTO(materService.findMaterS(materS));
 
         // 파일 저장

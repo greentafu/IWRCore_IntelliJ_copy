@@ -62,6 +62,7 @@ public class PageResultDTO<DTO, EN> {
     private Long proM;
     private Long proS;
     private String productSearch;
+    private Long productImsiCheck;
     // 자재검색
     private Long materL;
     private Long materM;

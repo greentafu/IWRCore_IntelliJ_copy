@@ -94,10 +94,10 @@
                     <select id="selUnit" class="col-form-label form-select" style="width: fit-content;"
                             aria-label="Default select example" name="unit">
                       <option value="">직접입력</option>
-                      <option value="mm">mm</option>
-                      <option value="m">m</option>
-                      <option value="㎡">㎡</option>
-                      <option value="kg">kg</option>
+                      <option value="mm" th:selected="${material.unit}=='mm'">mm</option>
+                      <option value="m" th:selected="${material.unit}=='m'">m</option>
+                      <option value="㎡" th:selected="${material.unit}=='㎡'">㎡</option>
+                      <option value="kg" th:selected="${material.unit}=='kg'">kg</option>
                     </select>&nbsp;
                     <input type="text" class="col-md-10 form-control" style="width: 30%;" id="proUnit"
                            name="selboxDirectMeasure" th:value="${material.unit}">

@@ -16,7 +16,7 @@
     <!--Style-->
     <style>
       #content1 {
-        height: 450px;
+        height: 700px;
         overflow-y: auto; /* 내부 스크롤 활성화 */
       }
     </style>
@@ -72,7 +72,6 @@
                     <div class="row">
                       <span class="col-md-3">대분류</span>
                       <div class="col">
-                        <div id="preMaterL" th:text="${material_list.materL}" style="display: none;"></div>
                         <select class="form-select form-select-sm" name="materL" id="selectMaterL" onchange="updateMaterCode('L')"></select>
                       </div>
                     </div>
@@ -81,7 +80,6 @@
                     <div class="row">
                       <span class="col-md-3">중분류</span>
                       <div class="col">
-                        <div id="preMaterM" th:text="${material_list.materM}" style="display: none;"></div>
                         <select class="form-select form-select-sm" name="materM" id="selectMaterM" onchange="updateMaterCode('M')"></select>
                       </div>
                     </div>
@@ -90,7 +88,6 @@
                     <div class="row">
                       <span class="col-md-3">소분류</span>
                       <div class="col">
-                        <div id="preMaterS" th:text="${material_list.materS}" style="display: none;"></div>
                         <select class="form-select form-select-sm" name="materS" id="selectMaterS" onchange="updateMaterCode('S')"></select>
                       </div>
                     </div>
@@ -102,7 +99,7 @@
                             style="height: 32px; font-size: 12px;"
                             name="materialSearch"
                             id="materialSearch"
-                            th:value="${material_list.materialSearch!=null? material_list.materialSearch : ''}"
+                            value=""
                     >
                   </td>
                   <td>
@@ -229,8 +226,6 @@
         document.getElementById("firstTbody").innerText='';
         loadItems();
       });
-
-
 
       function loadItems() {
         const content1 = document.getElementById("content1");
