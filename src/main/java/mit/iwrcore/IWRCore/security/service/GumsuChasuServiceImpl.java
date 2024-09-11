@@ -108,8 +108,7 @@ public class GumsuChasuServiceImpl implements GumsuChasuService{
 
     @Override
     public PageResultDTO<GumsuChasuContractDTO, Object[]> getAllGumsuChasuContract(PageRequestDTO requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("gcnum").descending());
-        Page<Object[]> entityPage=gumsuChasuRepository.getAllGumsuChasuContract(pageable);
+        Page<Object[]> entityPage=gumsuChasuRepository.findGumsuChasuByCustomQuery(requestDTO);
         return new PageResultDTO<>(entityPage, this::gumsuChasuContractToDTO);
     }
     private GumsuChasuContractDTO gumsuChasuContractToDTO(Object[] objects){

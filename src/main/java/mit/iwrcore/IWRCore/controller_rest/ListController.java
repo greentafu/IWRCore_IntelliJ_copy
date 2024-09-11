@@ -10,10 +10,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuGumsuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractJodalChasuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanContractNumDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.*;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +36,8 @@ public class ListController {
     private BaljuService baljuService;
     @Autowired
     private GumsuService gumsuService;
+    @Autowired
+    private GumsuChasuService gumsuChasuService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -271,5 +270,27 @@ public class ListController {
                 .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch).build();
 
         return gumsuService.couldGumsu(requestDTO);
+    }
+
+    @GetMapping("/gumsuChasuList")
+    public PageResultDTO<GumsuChasuContractDTO, Object[]> gumsuChasuList(@RequestParam(required = false) int page,
+                                                                         @RequestParam(required = false) Long selectPartL, @RequestParam(required = false) Long selectPartM,
+                                                                         @RequestParam(required = false) Long selectPartS, @RequestParam(required = false) String partnerSearch,
+                                                                         @RequestParam(required = false) Long selectProL, @RequestParam(required = false) Long selectProM,
+                                                                         @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch,
+                                                                         @RequestParam(required = false) Long selectMaterL, @RequestParam(required = false) Long selectMaterM,
+                                                                         @RequestParam(required = false) Long selectMaterS, @RequestParam(required = false) String materialSearch){
+
+        if (partnerSearch != null && partnerSearch.trim().isEmpty()) { partnerSearch = null; }
+        if (productSearch != null && productSearch.trim().isEmpty()) { productSearch = null; }
+        if (materialSearch != null && materialSearch.trim().isEmpty()) { materialSearch = null; }
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .partL(selectPartL).partM(selectPartM).partS(selectPartS).partnerSearch(partnerSearch)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
+                .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch).build();
+
+        return gumsuChasuService.getAllGumsuChasuContract(requestDTO);
     }
 }
