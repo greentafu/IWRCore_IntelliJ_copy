@@ -120,8 +120,7 @@ public class ContractServiceImpl implements ContractService {
     }
     @Override
     public PageResultDTO<ContractJodalChasuDTO, Object[]> couldContractMaterial(PageRequestDTO requestDTO) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("joNo").descending());
-        Page<Object[]> entityPage=contractRepository.couldContractMaterial(pageable);
+        Page<Object[]> entityPage=contractRepository.findContractByCustomQuery2(requestDTO);
         return new PageResultDTO<>(entityPage, this::JodalPlanContractToDTO);
     }
     private ContractJodalChasuDTO JodalPlanContractToDTO(Object[] objects){

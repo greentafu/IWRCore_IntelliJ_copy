@@ -127,8 +127,7 @@ public class BaljuServiceImpl implements BaljuService {
 
     @Override
     public PageResultDTO<ContractBaljuDTO, Object[]> finishedContract(PageRequestDTO2 requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("conNo").descending());
-        Page<Object[]> entityPage=baljuRepository.finishContract(pageable);
+        Page<Object[]> entityPage=baljuRepository.findBaljuByCustomQuery(requestDTO);
         return new PageResultDTO<>(entityPage, this::ContractBaljuToDTO);
     }
     @Override

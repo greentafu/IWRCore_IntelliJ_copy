@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.entity.*;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -70,6 +71,102 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
         havingBuilder.and(qJodalChasu.count().ne(0L));
 
         Pageable pageable= PageRequest.of(requestDTO.getPage2()-1, requestDTO.getSize2());
+        List<Tuple> tupleList = queryFactory
+                .select(qJodalPlan, qContract, qJodalChasu, qJodalChasu.jcnum.sum())
+                .from(qJodalPlan)
+                .leftJoin(qJodalPlan.proPlan, qProPlan)
+                .leftJoin(qProPlan.product, qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .leftJoin(qJodalPlan.jodalChasus, qJodalChasu)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qJodalPlan.contracts, qContract)
+                .where(builder)
+                .groupBy(qJodalPlan.joNo)
+                .having(havingBuilder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qJodalPlan.joNo.desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(qJodalPlan)
+                .from(qJodalPlan)
+                .leftJoin(qJodalPlan.proPlan, qProPlan)
+                .leftJoin(qProPlan.product, qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .leftJoin(qJodalPlan.jodalChasus, qJodalChasu)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qJodalPlan.contracts, qContract)
+                .where(builder)
+                .groupBy(qJodalPlan.joNo)
+                .having(havingBuilder)
+                .fetchCount();
+
+        List<Object[]> objectList = tupleList.stream()
+                .map(tuple -> new Object[]{
+                        tuple.get(qJodalPlan),
+                        tuple.get(qContract),
+                        tuple.get(qJodalChasu),
+                        tuple.get(qJodalChasu.jcnum.sum())
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(objectList, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public Page<Object[]> findContractByCustomQuery2(PageRequestDTO requestDTO){
+        QJodalPlan qJodalPlan=QJodalPlan.jodalPlan;
+        QProPlan qProPlan=QProPlan.proPlan;
+        QJodalChasu qJodalChasu=QJodalChasu.jodalChasu;
+        QContract qContract=QContract.contract;
+
+        QMaterial qMaterial=QMaterial.material;
+        QMaterL qMaterL=QMaterL.materL;
+        QMaterM qMaterM=QMaterM.materM;
+        QMaterS qMaterS=QMaterS.materS;
+
+        QProduct qProduct=QProduct.product;
+        QProL qProL=QProL.proL;
+        QProM qProM=QProM.proM;
+        QProS qProS=QProS.proS;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO.getProL() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL())); }
+        if (requestDTO.getProM() != null) { builder.and(qProS.proM.proMcode.eq(requestDTO.getProM())); }
+        if (requestDTO.getProS() != null) { builder.and(qProS.proScode.eq(requestDTO.getProS())); }
+        if (requestDTO.getProductSearch()!=null){
+            builder.and(qProduct.name.containsIgnoreCase(requestDTO.getProductSearch())
+                    .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch())));
+        }
+
+        if (requestDTO.getMaterL() != null) { builder.and(qMaterS.materM.materL.materLcode.eq(requestDTO.getMaterL())); }
+        if (requestDTO.getMaterM() != null) { builder.and(qMaterS.materM.materMcode.eq(requestDTO.getMaterM())); }
+        if (requestDTO.getMaterS() != null) { builder.and(qMaterS.materScode.eq(requestDTO.getMaterS())); }
+        if (requestDTO.getMaterialSearch()!=null){
+            builder.and(qMaterial.name.containsIgnoreCase(requestDTO.getMaterialSearch())
+                    .or(qMaterial.standard.containsIgnoreCase(requestDTO.getMaterialSearch()))
+                    .or(qMaterial.unit.containsIgnoreCase(requestDTO.getMaterialSearch())));
+        }
+
+        builder.and(qContract.isNull());
+
+        BooleanBuilder havingBuilder=new BooleanBuilder();
+        havingBuilder.and(qJodalChasu.count().ne(0L));
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
         List<Tuple> tupleList = queryFactory
                 .select(qJodalPlan, qContract, qJodalChasu, qJodalChasu.jcnum.sum())
                 .from(qJodalPlan)

@@ -12,9 +12,19 @@
 
   <span id="head">
     <title>계약서 목록</title>
-      <!--Style-->
 
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 750px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content2 {
+        height: 400px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
   <span id="content">
@@ -56,12 +66,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -91,12 +99,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="materialSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="materialSearchBtn()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -108,63 +114,27 @@
           <!-- Outline Dropdowns -->
           <div class="card-body">
             <div class="table-responsive text-nowrap">
-              <table class="table table-bordered mb-4">
-                <thead>
-                  <tr>
-                    <th>제품 이름</th>
-                    <th>자재번호</th>
-                    <th>자재명</th>
-                    <th>조달계획 수량</th>
-                    <th>최초조달 예정일</th>
-                    <th>계약서 등록</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr th:each="list2:${yesPlan_list.dtoList}">
-                    <td>[[${list2.jodalPlanDTO.proplanDTO.productDTO.name}]]</td>
-                    <td>[[${list2.jodalPlanDTO.materialDTO.materCode}]]</td>
-                    <td>[[${list2.jodalPlanDTO.materialDTO.name}]]</td>
-                    <td>[[${list2.allNum}]]</td>
-                    <td>[[${#temporals.format(list2.jodalChasuDTO.joDate, 'yyyy-MM-dd')}]]</td>
-                    <td>
-                      <a th:href="@{/contract/new_contract(joNo=${list2.jodalPlanDTO.joNo})}">
-                        <button type="button" class="btn btn-primary">계약서 등록</button>
-                      </a>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div id="content1">
+                <table class="table table-bordered mb-4">
+                  <thead>
+                    <tr>
+                      <th>제품 이름</th>
+                      <th>자재번호</th>
+                      <th>자재명</th>
+                      <th>조달계획 수량</th>
+                      <th>최초조달 예정일</th>
+                      <th>계약서 등록</th>
+                    </tr>
+                  </thead>
+                  <tbody id="firstTbody"></tbody>
+                </table>
+              </div>
             </div>
             <div class="mt-3 text-end mb-4">
               <a th:href="@{/contract/new_contract}">
                 <button type="button" class="btn btn-primary">등록</button>
               </a>
             </div>
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center">
-                <th:block th:if="${yesPlan_list.prev}">
-                  <li class="page-item prev">
-                    <a class="page-link" th:href="@{/contract/list_contract(page=${yesPlan_list.start}-1)}">
-                      <i class="tf-icon bx bx-chevrons-left"></i>
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:each="pagenum:${yesPlan_list.pageList}">
-                  <li class="page-item " th:classappend="${yesPlan_list.page}==${pagenum}? active">
-                    <a class="page-link" th:href="@{/contract/list_contract(page=${pagenum})}">
-                      [[${pagenum}]]
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:if="${yesPlan_list.next}">
-                  <li class="page-item next">
-                    <a class="page-link" th:href="@{/contract/list_contract(page=${yesPlan_list.end}+1)}">
-                      <i class="tf-icon bx bx-chevrons-right"></i>
-                    </a>
-                  </li>
-                </th:block>
-              </ul>
-            </nav>
           </div>
         </div>
       </div>
@@ -204,12 +174,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="partnerSearch2" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn2()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -239,12 +207,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="productSearch2" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn2()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -274,12 +240,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="materialSearch2" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="materialSearchBtn2()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -290,86 +254,31 @@
         <div class="table-responsive text-nowrap">
           <!-- Outline Dropdowns -->
           <div class="card-body"> <!--card의 본문 내용을 담음-->
-            <table class="table table-hover mb-4">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>협력업체명</th>
-                  <th>계약서 파일명</th>
-                  <th>자재명</th>
-                  <th>수량</th>
-                  <th>등록일</th>
-                  <th>다운로드</th>
-                  <th>수정/삭제</th>
-                  <th>
-                    <select class="form-select form-select-sm" style="width: fit-content;">
-                      <option>전체 발주상태</option>
-                      <option>발주요청</option>
-                      <option>발주완료</option>
-                    </select>
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="table-border-bottom-0">
-                <tr th:each="list2:${finContract_list.dtoList}">
-                  <td>[[${list2.contractDTO.conNo}]]</td>
-                  <td th:id="'partnerName'+${list2.contractDTO.conNo}">[[${list2.contractDTO.partnerDTO.name}]]</td>
-                  <td>[[${list2.contractDTO.filename}]]</td>
-                  <td th:id="'materialName'+${list2.contractDTO.conNo}">[[${list2.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
-                  <td th:id="'conNum'+${list2.contractDTO.conNo}">[[${list2.contractDTO.conNum}]]</td>
-                  <td th:id="'regDate'+${list2.contractDTO.conNo}">[[${#temporals.format(list2.contractDTO.regDate, 'yyyy-MM-dd')}]]</td>
-                  <td>
-                    <button type="button" class="btn btn-sm btn-outline-primary">
-                      <span class="bx bx-arrow-to-bottom"></span>
-                    </button>
-                  </td>
-                  <td>
-                    <a th:href="@{/contract/modify_contract(conNo=${list2.contractDTO.conNo})}">
-                      <button class="btn btn-primary">수정</button>
-                    </a>
-                    <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" th:value="${list2.contractDTO.conNo}" onclick="deleteBtn(this)">삭제</button>
-                  </td>
-                  <td>
-                    <th:block th:if="${list2.baljuDTO==null}">
-                      <a th:href="@{/order/new_order2(conNo=${list2.contractDTO.conNo})}">
-                        <button class="btn btn-primary">발주 요청</button>
-                      </a>
-                    </th:block>
-                    <th:block th:if="${list2.baljuDTO!=null}">
-                      <a th:href="@{/order/download_order(baljuNo=${list2.baljuDTO.baljuNo})}">
-                        <button class="btn btn-secondary">발주 완료</button>
-                      </a>
-                    </th:block>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div id="content2">
+              <table class="table table-hover mb-4">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>협력업체명</th>
+                    <th>계약서 파일명</th>
+                    <th>자재명</th>
+                    <th>수량</th>
+                    <th>등록일</th>
+                    <th>다운로드</th>
+                    <th>수정/삭제</th>
+                    <th>
+                      <select class="form-select form-select-sm" style="width: fit-content;" id="baljuProgress2">
+                        <option value="">전체 발주상태</option>
+                        <option value="0">발주 준비</option>
+                        <option value="1">발주 완료</option>
+                      </select>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="table-border-bottom-0" id="secondTbody"></tbody>
+              </table>
+            </div>
             <!-- Modal Backdrop -->
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center">
-                <th:block th:if="${finContract_list.prev}">
-                  <li class="page-item prev">
-                    <a class="page-link" th:href="@{/contract/list_contract(page2=${finContract_list.start}-1)}">
-                      <i class="tf-icon bx bx-chevrons-left"></i>
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:each="pagenum:${finContract_list.pageList}">
-                  <li class="page-item " th:classappend="${finContract_list.page}==${pagenum}? active">
-                    <a class="page-link" th:href="@{/contract/list_contract(page2=${pagenum})}">
-                      [[${pagenum}]]
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:if="${finContract_list.next}">
-                  <li class="page-item next">
-                    <a class="page-link" th:href="@{/contract/list_contract(page2=${finContract_list.end}+1)}">
-                      <i class="tf-icon bx bx-chevrons-right"></i>
-                    </a>
-                  </li>
-                </th:block>
-              </ul>
-            </nav>
           </div>
         </div>
       </div>
@@ -413,6 +322,265 @@
     </div>
     <!--/Modal-->
     <!--Script-->
+    <script>
+      let page = 1;
+      let finPage=false;
+      let selectProL = null;
+      let selectProM = null;
+      let selectProS = null;
+      let productSearch = null;
+      let selectMaterL = null;
+      let selectMaterM = null;
+      let selectMaterS = null;
+      let materialSearch = null;
+
+      let page2 = 1;
+      let finPage2=false;
+      let selectPartL2 = null;
+      let selectPartM2 = null;
+      let selectPartS2 = null;
+      let partnerSearch2 = null;
+      let selectProL2 = null;
+      let selectProM2 = null;
+      let selectProS2 = null;
+      let productSearch2 = null;
+      let selectMaterL2 = null;
+      let selectMaterM2 = null;
+      let selectMaterS2 = null;
+      let materialSearch2 = null;
+      let baljuProgress2 = null;
+
+      function partnerSearchBtn2(){
+        page2 = 1;
+        finPage2=false;
+        document.getElementById("secondTbody").innerText='';
+        selectPartL2 = (document.getElementById("selectPartL2").value!=null)?document.getElementById("selectPartL2").value:null;
+        selectPartM2 = (document.getElementById("selectPartM2").value!=null)?document.getElementById("selectPartM2").value:null;
+        selectPartS2 = (document.getElementById("selectPartS2").value!=null)?document.getElementById("selectPartS2").value:null;
+        partnerSearch2 = (document.getElementById("partnerSearch2").value!=null)?document.getElementById("partnerSearch2").value:null;
+        loadItems2();
+      }
+
+      function productSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectProL = (document.getElementById("selectProL").value!=null)?document.getElementById("selectProL").value:null;
+        selectProM = (document.getElementById("selectProM").value!=null)?document.getElementById("selectProM").value:null;
+        selectProS = (document.getElementById("selectProS").value!=null)?document.getElementById("selectProS").value:null;
+        productSearch = (document.getElementById("productSearch").value!=null)?document.getElementById("productSearch").value:null;
+        loadItems();
+      }
+      function materialSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectMaterL = (document.getElementById("selectMaterL").value!=null)?document.getElementById("selectMaterL").value:null;
+        selectMaterM = (document.getElementById("selectMaterM").value!=null)?document.getElementById("selectMaterM").value:null;
+        selectMaterS = (document.getElementById("selectMaterS").value!=null)?document.getElementById("selectMaterS").value:null;
+        materialSearch = (document.getElementById("materialSearch").value!=null)?document.getElementById("materialSearch").value:null;
+        loadItems();
+      }
+
+      function productSearchBtn2(){
+        page2 = 1;
+        finPage2=false;
+        document.getElementById("secondTbody").innerText='';
+        selectProL2 = (document.getElementById("selectProL2").value!=null)?document.getElementById("selectProL2").value:null;
+        selectProM2 = (document.getElementById("selectProM2").value!=null)?document.getElementById("selectProM2").value:null;
+        selectProS2 = (document.getElementById("selectProS2").value!=null)?document.getElementById("selectProS2").value:null;
+        productSearch2 = (document.getElementById("productSearch2").value!=null)?document.getElementById("productSearch2").value:null;
+        loadItems2();
+      }
+      function materialSearchBtn2(){
+        page2 = 1;
+        finPage2=false;
+        document.getElementById("secondTbody").innerText='';
+        selectMaterL2 = (document.getElementById("selectMaterL2").value!=null)?document.getElementById("selectMaterL2").value:null;
+        selectMaterM2 = (document.getElementById("selectMaterM2").value!=null)?document.getElementById("selectMaterM2").value:null;
+        selectMaterS2 = (document.getElementById("selectMaterS2").value!=null)?document.getElementById("selectMaterS2").value:null;
+        materialSearch2 = (document.getElementById("materialSearch2").value!=null)?document.getElementById("materialSearch2").value:null;
+        loadItems2();
+      }
+
+      document.getElementById('baljuProgress2').addEventListener("change", function(){
+        baljuProgress2=document.getElementById('baljuProgress2').value;
+        page2 = 1;
+        finPage2=false;
+        document.getElementById("secondTbody").innerText='';
+        loadItems2();
+      });
+
+      function loadItems() {
+        const content1 = document.getElementById("content1");
+        const firstTbody = document.getElementById("firstTbody");
+
+        $.ajax({
+          url:'/list/nonContractJodalPlan',
+          method:'GET',
+          data:{page:page, selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
+                selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch},
+          success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+              const joNo=x.jodalPlanDTO.joNo;
+              const productName=x.jodalPlanDTO.proplanDTO.productDTO.name;
+              const materCode=x.jodalPlanDTO.materialDTO.materCode;
+              const materialName=x.jodalPlanDTO.materialDTO.name;
+              const joNum=x.allNum;
+              const startDate=x.jodalChasuDTO.joDate.split('T')[0];
+
+              const newRow = document.createElement("tr");
+
+              [productName, materCode, materialName, joNum, startDate].forEach(text => {
+                const item = document.createElement("td");
+                item.textContent = text;
+                newRow.appendChild(item);
+              });
+
+              const btnTd = document.createElement("td");
+              btnTd.innerHTML=`
+                <a href="/contract/new_contract?joNo=${joNo}">
+                  <button type="button" class="btn btn-primary">계약서 등록</button>
+                </a>
+              `;
+              newRow.appendChild(btnTd);
+
+              firstTbody.appendChild(newRow);
+            });
+          }
+        });
+
+        page++;
+      }
+
+      function loadItems2() {
+        const content2 = document.getElementById("content2");
+        const secondTbody = document.getElementById("secondTbody");
+
+        baljuProgress2=(document.getElementById("baljuProgress2").value!='')?document.getElementById("baljuProgress2").value:null;
+
+        $.ajax({
+          url:'/list/yesContractJodalPlan',
+          method:'GET',
+          data:{page2:page2, selectPartL2:selectPartL2, selectPartM2:selectPartM2, selectPartS2:selectPartS2, partnerSearch2:partnerSearch2,
+                selectProL2:selectProL2, selectProM2:selectProM2, selectProS2:selectProS2, productSearch2:productSearch2,
+                selectMaterL2:selectMaterL2, selectMaterM2:selectMaterM2, selectMaterS2:selectMaterS2, materialSearch2:materialSearch2, baljuProgress2:baljuProgress2},
+          success:function(data){
+            if(data.totalPage<page2) finPage2=true;
+
+            data.dtoList.forEach(x=>{
+              const baljuDTO=x.baljuDTO;
+              const conNo=x.contractDTO.conNo;
+              const partnerName=x.contractDTO.partnerDTO.name;
+              const fileName=x.contractDTO.filename;
+              const materialName=x.contractDTO.jodalPlanDTO.materialDTO.name;
+              const conNum=x.contractDTO.conNum;
+              const regDate=x.contractDTO.regDate.split('T')[0];
+
+              const newRow = document.createElement("tr");
+
+              const conNoTd = document.createElement("td");
+              conNoTd.textContent = conNo;
+              newRow.appendChild(conNoTd);
+
+              const partnerNameTd = document.createElement("td");
+              partnerNameTd.id='partnerName'+conNo;
+              partnerNameTd.textContent = partnerName;
+              newRow.appendChild(partnerNameTd);
+
+              const fileNameTd = document.createElement("td");
+              fileNameTd.textContent = fileName;
+              newRow.appendChild(fileNameTd);
+
+              const materialNameTd = document.createElement("td");
+              materialNameTd.id='materialName'+conNo;
+              materialNameTd.textContent = materialName;
+              newRow.appendChild(materialNameTd);
+
+              const conNumTd = document.createElement("td");
+              conNumTd.id='conNum'+conNo;
+              conNumTd.textContent = conNum;
+              newRow.appendChild(conNumTd);
+
+              const regDateTd = document.createElement("td");
+              regDateTd.id='regDate'+conNo;
+              regDateTd.textContent = regDate;
+              newRow.appendChild(regDateTd);
+
+              const btn0Td = document.createElement("td");
+              btn0Td.innerHTML=`
+                <button type="button" class="btn btn-sm btn-outline-primary">
+                  <span class="bx bx-arrow-to-bottom"></span>
+                </button>
+              `;
+              newRow.appendChild(btn0Td);
+
+              const btn1Td = document.createElement("td");
+              btn1Td.innerHTML=`
+                <a href="/contract/modify_contract?conNo=${conNo}">
+                  <button class="btn btn-primary">수정</button>
+                </a>
+                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${conNo}" onclick="deleteBtn(this)">삭제</button>
+              `;
+              newRow.appendChild(btn1Td);
+
+              const btn2Td = document.createElement("td");
+              if(baljuDTO==null) {
+                btn2Td.innerHTML=`
+                  <a href="/order/new_order2?conNo=${conNo}">
+                    <button class="btn btn-primary">발주 요청</button>
+                  </a>
+                `;
+              }
+              if(baljuDTO!=null) {
+                btn2Td.innerHTML=`
+                  <a href="/order/download_order?baljuNo=${baljuDTO.baljuNo}">
+                    <button class="btn btn-secondary">발주 완료</button>
+                  </a>
+                `;
+              }
+              newRow.appendChild(btn2Td);
+
+              secondTbody.appendChild(newRow);
+            });
+
+          }
+        });
+
+        page2++;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems();
+            }
+          }
+        });
+        content2.addEventListener("scroll", function () {
+          if(finPage2==false){
+            const scrollTop = content2.scrollTop;
+            const scrollHeight = content2.scrollHeight;
+            const clientHeight = content2.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems2();
+            }
+          }
+        });
+
+        loadItems();
+        loadItems2();
+      });
+    </script>
+
     <script>
       function deleteBtn(button){
         var conNo=button.value;

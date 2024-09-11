@@ -1,6 +1,7 @@
 package mit.iwrcore.IWRCore.repository;
 
 import mit.iwrcore.IWRCore.entity.Balju;
+import mit.iwrcore.IWRCore.repositoryDSL.BaljuRepositoryCustom;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface BaljuRepository extends JpaRepository<Balju, Long> {
+public interface BaljuRepository extends JpaRepository<Balju, Long>, BaljuRepositoryCustom {
 
 
     @EntityGraph(attributePaths = {"contract"})
