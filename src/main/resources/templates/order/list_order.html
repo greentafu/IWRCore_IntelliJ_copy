@@ -12,9 +12,18 @@
 
   <span id="head">
     <title>발주서 목록</title>
-      <!--Style-->
-
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 600px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content2 {
+        height: 400px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
   <span id="content">
@@ -55,12 +64,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="partnerSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -90,12 +97,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -125,12 +130,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="materialSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="materialSearchBtn()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -141,65 +144,27 @@
         <div class="table-responsive text-nowrap">
           <!-- Outline Dropdowns -->
           <div class="card-body"> <!--card의 본문 내용을 담음-->
-            <table class="table table-bordered mb-4">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>협력업체명</th>
-                  <th>계약서 파일명</th>
-                  <th>자재명</th>
-                  <th>수량</th>
-                  <th>등록일</th>
-                  <th>발주하기</th>
-                </tr>
-              </thead>
-              <tbody class="table-border-bottom-0">
-                <tr th:each="list1:${couldBalju_list.dtoList}">
-                  <td>[[${list1.contractDTO.conNo}]]</td>
-                  <td>[[${list1.contractDTO.partnerDTO.name}]]</td>
-                  <td>[[${list1.contractDTO.filename}]]</td>
-                  <td>[[${list1.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
-                  <td>[[${list1.contractDTO.jodalPlanDTO.proplanDTO.pronum}]]</td>
-                  <td>[[${#temporals.format(list1.contractDTO.regDate, 'yyyy-MM-dd')}]]</td>
-                  <td>
-                    <a th:href="@{/order/new_order2(conNo=${list1.contractDTO.conNo})}">
-                      <button class="btn btn-primary">발주하기</button>
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div id="content1">
+              <table class="table table-bordered mb-4">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>협력업체명</th>
+                    <th>계약서 파일명</th>
+                    <th>자재명</th>
+                    <th>수량</th>
+                    <th>등록일</th>
+                    <th>발주하기</th>
+                  </tr>
+                </thead>
+                <tbody class="table-border-bottom-0" id="firstTbody"></tbody>
+              </table>
+            </div>
             <div class="mt-3 text-end mb-4">
               <a th:href="@{/order/new_order}">
                 <button type="button" class="btn btn-primary">등록</button>
               </a>
             </div>
-            <!-- Modal Backdrop -->
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                  <th:block th:if="${couldBalju_list.prev}">
-                    <li class="page-item prev">
-                      <a class="page-link" th:href="@{/order/list_order(page=${couldBalju_list.start}-1)}">
-                        <i class="tf-icon bx bx-chevrons-left"></i>
-                      </a>
-                    </li>
-                  </th:block>
-                  <th:block th:each="pagenum:${couldBalju_list.pageList}">
-                    <li class="page-item " th:classappend="${couldBalju_list.page}==${pagenum}? active">
-                      <a class="page-link" th:href="@{/order/list_order(page=${pagenum})}">
-                        [[${pagenum}]]
-                      </a>
-                    </li>
-                  </th:block>
-                  <th:block th:if="${couldBalju_list.next}">
-                    <li class="page-item next">
-                      <a class="page-link" th:href="@{/order/list_order(page=${couldBalju_list.end}+1)}">
-                        <i class="tf-icon bx bx-chevrons-right"></i>
-                      </a>
-                    </li>
-                  </th:block>
-                </ul>
-              </nav>
           </div>
         </div>
       </div>
@@ -237,12 +202,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="partnerSearch2" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn2()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -272,12 +235,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="productSearch2" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn2()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -307,12 +268,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="materialSearch2" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="materialSearchBtn2()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -323,64 +282,22 @@
         <div class="table-responsive text-nowrap">
           <!-- Outline Dropdowns -->
           <div class="card-body">
-            <table class="table table-hover mb-4">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>협력업체명</th>
-                  <th>발주서 파일명</th>
-                  <th>자재명</th>
-                  <th>수량</th>
-                  <th>다운로드</th>
-                  <th>수정/삭제</th>
-                </tr>
-              </thead>
-              <tbody class="table-border-bottom-0">
-                <tr th:each="list2:${didBalju_list.dtoList}">
-                  <td>[[${list2.baljuDTO.baljuNo}]]</td>
-                  <td>[[${list2.contractDTO.partnerDTO.name}]]</td>
-                  <td>[[${list2.baljuDTO.filename}]]</td>
-                  <td th:id="'materialName'+${list2.baljuDTO.baljuNo}">[[${list2.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
-                  <td th:id="'baljuNum'+${list2.baljuDTO.baljuNo}">[[${list2.baljuDTO.baljuNum}]]</td>
-                  <td>
-                    <button type="button" class="btn btn-sm btn-outline-primary">
-                      <span class="bx bx-arrow-to-bottom"></span>
-                    </button>
-                  </td>
-                  <td>
-                    <a th:href="@{/order/modify_order2(baljuNo=${list2.baljuDTO.baljuNo})}">
-                      <button class="btn btn-primary">수정</button>
-                    </a>
-                    <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" th:value="${list2.baljuDTO.baljuNo}" onclick="deleteBtn(this)">삭제</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center">
-                <th:block th:if="${didBalju_list.prev}">
-                  <li class="page-item prev">
-                    <a class="page-link" th:href="@{/order/list_order(page2=${didBalju_list.start}-1)}">
-                      <i class="tf-icon bx bx-chevrons-left"></i>
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:each="pagenum:${didBalju_list.pageList}">
-                  <li class="page-item " th:classappend="${didBalju_list.page}==${pagenum}? active">
-                    <a class="page-link" th:href="@{/order/list_order(page2=${pagenum})}">
-                      [[${pagenum}]]
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:if="${didBalju_list.next}">
-                  <li class="page-item next">
-                    <a class="page-link" th:href="@{/order/list_order(page2=${didBalju_list.end}+1)}">
-                      <i class="tf-icon bx bx-chevrons-right"></i>
-                    </a>
-                  </li>
-                </th:block>
-              </ul>
-            </nav>
+            <div id="content2" class="mb-4">
+              <table class="table table-hover mb-4">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>협력업체명</th>
+                    <th>발주서 파일명</th>
+                    <th>자재명</th>
+                    <th>수량</th>
+                    <th>다운로드</th>
+                    <th>수정/삭제</th>
+                  </tr>
+                </thead>
+                <tbody class="table-border-bottom-0" id="secondTbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -425,6 +342,238 @@
     <!--/Modal-->
 
     <!--Script-->
+    <script>
+      let page = 1;
+      let finPage=false;
+      let selectPartL = null;
+      let selectPartM = null;
+      let selectPartS = null;
+      let partnerSearch = null;
+      let selectProL = null;
+      let selectProM = null;
+      let selectProS = null;
+      let productSearch = null;
+      let selectMaterL = null;
+      let selectMaterM = null;
+      let selectMaterS = null;
+      let materialSearch = null;
+
+      let page2 = 1;
+      let finPage2=false;
+      let selectPartL2 = null;
+      let selectPartM2 = null;
+      let selectPartS2 = null;
+      let partnerSearch2 = null;
+      let selectProL2 = null;
+      let selectProM2 = null;
+      let selectProS2 = null;
+      let productSearch2 = null;
+      let selectMaterL2 = null;
+      let selectMaterM2 = null;
+      let selectMaterS2 = null;
+      let materialSearch2 = null;
+
+      function partnerSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectPartL = (document.getElementById("selectPartL").value!=null)?document.getElementById("selectPartL").value:null;
+        selectPartM = (document.getElementById("selectPartM").value!=null)?document.getElementById("selectPartM").value:null;
+        selectPartS = (document.getElementById("selectPartS").value!=null)?document.getElementById("selectPartS").value:null;
+        partnerSearch = (document.getElementById("partnerSearch").value!=null)?document.getElementById("partnerSearch").value:null;
+        loadItems();
+      }
+      function partnerSearchBtn2(){
+        page2 = 1;
+        finPage2=false;
+        document.getElementById("secondTbody").innerText='';
+        selectPartL2 = (document.getElementById("selectPartL2").value!=null)?document.getElementById("selectPartL2").value:null;
+        selectPartM2 = (document.getElementById("selectPartM2").value!=null)?document.getElementById("selectPartM2").value:null;
+        selectPartS2 = (document.getElementById("selectPartS2").value!=null)?document.getElementById("selectPartS2").value:null;
+        partnerSearch2 = (document.getElementById("partnerSearch2").value!=null)?document.getElementById("partnerSearch2").value:null;
+        loadItems2();
+      }
+
+      function productSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectProL = (document.getElementById("selectProL").value!=null)?document.getElementById("selectProL").value:null;
+        selectProM = (document.getElementById("selectProM").value!=null)?document.getElementById("selectProM").value:null;
+        selectProS = (document.getElementById("selectProS").value!=null)?document.getElementById("selectProS").value:null;
+        productSearch = (document.getElementById("productSearch").value!=null)?document.getElementById("productSearch").value:null;
+        loadItems();
+      }
+      function materialSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectMaterL = (document.getElementById("selectMaterL").value!=null)?document.getElementById("selectMaterL").value:null;
+        selectMaterM = (document.getElementById("selectMaterM").value!=null)?document.getElementById("selectMaterM").value:null;
+        selectMaterS = (document.getElementById("selectMaterS").value!=null)?document.getElementById("selectMaterS").value:null;
+        materialSearch = (document.getElementById("materialSearch").value!=null)?document.getElementById("materialSearch").value:null;
+        loadItems();
+      }
+
+      function productSearchBtn2(){
+        page2 = 1;
+        finPage2=false;
+        document.getElementById("secondTbody").innerText='';
+        selectProL2 = (document.getElementById("selectProL2").value!=null)?document.getElementById("selectProL2").value:null;
+        selectProM2 = (document.getElementById("selectProM2").value!=null)?document.getElementById("selectProM2").value:null;
+        selectProS2 = (document.getElementById("selectProS2").value!=null)?document.getElementById("selectProS2").value:null;
+        productSearch2 = (document.getElementById("productSearch2").value!=null)?document.getElementById("productSearch2").value:null;
+        loadItems2();
+      }
+      function materialSearchBtn2(){
+        page2 = 1;
+        finPage2=false;
+        document.getElementById("secondTbody").innerText='';
+        selectMaterL2 = (document.getElementById("selectMaterL2").value!=null)?document.getElementById("selectMaterL2").value:null;
+        selectMaterM2 = (document.getElementById("selectMaterM2").value!=null)?document.getElementById("selectMaterM2").value:null;
+        selectMaterS2 = (document.getElementById("selectMaterS2").value!=null)?document.getElementById("selectMaterS2").value:null;
+        materialSearch2 = (document.getElementById("materialSearch2").value!=null)?document.getElementById("materialSearch2").value:null;
+        loadItems2();
+      }
+
+      function loadItems() {
+        const content1 = document.getElementById("content1");
+        const firstTbody = document.getElementById("firstTbody");
+
+        $.ajax({
+          url:'/list/nonBaljuContract',
+          method:'GET',
+          data:{page:page, selectPartL:selectPartL, selectPartM:selectPartM, selectPartS:selectPartS, partnerSearch:partnerSearch,
+                selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
+                selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch},
+          success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+              const conNo=x.contractDTO.conNo;
+              const partnerName=x.contractDTO.partnerDTO.name;
+              const fileName=x.contractDTO.filename;
+              const materialName=x.contractDTO.jodalPlanDTO.materialDTO.name;
+              const pronum=x.contractDTO.jodalPlanDTO.proplanDTO.pronum;
+              const regDate=x.contractDTO.regDate.split('T')[0];
+
+              const newRow = document.createElement("tr");
+
+              [conNo, partnerName, fileName, materialName, pronum, regDate].forEach(text => {
+                const item = document.createElement("td");
+                item.textContent = text;
+                newRow.appendChild(item);
+              });
+
+              const btnTd = document.createElement("td");
+              btnTd.innerHTML=`
+                <a href="/order/new_order2?conNo=${conNo}">
+                  <button class="btn btn-primary">발주하기</button>
+                </a>
+              `;
+              newRow.appendChild(btnTd);
+
+              firstTbody.appendChild(newRow);
+            });
+          }
+        });
+
+        page++;
+      }
+
+      function loadItems2() {
+        const content2 = document.getElementById("content2");
+        const secondTbody = document.getElementById("secondTbody");
+
+        $.ajax({
+          url:'/list/yesBaljuContract',
+          method:'GET',
+          data:{page2:page2, selectPartL2:selectPartL2, selectPartM2:selectPartM2, selectPartS2:selectPartS2, partnerSearch2:partnerSearch2,
+                selectProL2:selectProL2, selectProM2:selectProM2, selectProS2:selectProS2, productSearch2:productSearch2,
+                selectMaterL2:selectMaterL2, selectMaterM2:selectMaterM2, selectMaterS2:selectMaterS2, materialSearch2:materialSearch2},
+          success:function(data){
+            if(data.totalPage<page2) finPage2=true;
+
+            data.dtoList.forEach(x=>{
+              const baljuNo=x.baljuDTO.baljuNo;
+              const partnerName=x.contractDTO.partnerDTO.name;
+              const fileName=x.baljuDTO.filename;
+              const materialName=x.contractDTO.jodalPlanDTO.materialDTO.name;
+              const baljuNum=x.baljuDTO.baljuNum;
+
+              const newRow = document.createElement("tr");
+
+              [baljuNo, partnerName, fileName].forEach(text => {
+                const item = document.createElement("td");
+                item.textContent = text;
+                newRow.appendChild(item);
+              });
+
+              const materialNameTd = document.createElement("td");
+              materialNameTd.id='materialName'+baljuNo;
+              materialNameTd.textContent = materialName;
+              newRow.appendChild(materialNameTd);
+
+              const baljuNumTd = document.createElement("td");
+              baljuNumTd.id='baljuNum'+baljuNo;
+              baljuNumTd.textContent = baljuNum;
+              newRow.appendChild(baljuNumTd);
+
+              const btn0Td = document.createElement("td");
+              btn0Td.innerHTML=`
+                <button type="button" class="btn btn-sm btn-outline-primary">
+                  <span class="bx bx-arrow-to-bottom"></span>
+                </button>
+              `;
+              newRow.appendChild(btn0Td);
+
+              const btn1Td = document.createElement("td");
+              btn1Td.innerHTML=`
+                <a href="/order/modify_order2?baljuNo=${baljuNo}">
+                  <button class="btn btn-primary">수정</button>
+                </a>
+                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${baljuNo}" onclick="deleteBtn(this)">삭제</button>
+              `;
+              newRow.appendChild(btn1Td);
+
+              secondTbody.appendChild(newRow);
+            });
+
+          }
+        });
+
+        page2++;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems();
+            }
+          }
+        });
+        content2.addEventListener("scroll", function () {
+          if(finPage2==false){
+            const scrollTop = content2.scrollTop;
+            const scrollHeight = content2.scrollHeight;
+            const clientHeight = content2.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems2();
+            }
+          }
+        });
+
+        loadItems();
+        loadItems2();
+      });
+    </script>
+
     <script>
       function deleteBtn(button){
         var baljuNo=button.value;

@@ -118,12 +118,6 @@ public class BaljuServiceImpl implements BaljuService {
         Function<Balju, BaljuDTO> fn=(entity->convertToDTO(entity));
         return new PageResultDTO<>(entityPage, fn);
     }
-    @Override
-    public PageResultDTO<ContractBaljuDTO, Object[]> finBaljuPage(PageRequestDTO2 requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("baljuNo").descending());
-        Page<Object[]> entityPage=baljuRepository.finBaljuPage(pageable);
-        return new PageResultDTO<>(entityPage, this::ContractBaljuToDTO);
-    }
 
     @Override
     public PageResultDTO<ContractBaljuDTO, Object[]> finishedContract(PageRequestDTO2 requestDTO){
@@ -132,8 +126,12 @@ public class BaljuServiceImpl implements BaljuService {
     }
     @Override
     public PageResultDTO<ContractBaljuDTO, Object[]> couldBalju(PageRequestDTO requestDTO) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("conNo").descending());
-        Page<Object[]> entityPage=baljuRepository.couldBalju(pageable);
+        Page<Object[]> entityPage=baljuRepository.findBaljuByCustomQuery2(requestDTO);
+        return new PageResultDTO<>(entityPage, this::ContractBaljuToDTO);
+    }
+    @Override
+    public PageResultDTO<ContractBaljuDTO, Object[]> finBaljuPage(PageRequestDTO2 requestDTO){
+        Page<Object[]> entityPage=baljuRepository.findBaljuByCustomQuery3(requestDTO);
         return new PageResultDTO<>(entityPage, this::ContractBaljuToDTO);
     }
     private ContractBaljuDTO ContractBaljuToDTO(Object[] objects){
