@@ -5,10 +5,13 @@ import mit.iwrcore.IWRCore.entity.Material;
 import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.security.dto.MaterialDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanContractNumDTO;
 import mit.iwrcore.IWRCore.security.service.MaterialService;
 import mit.iwrcore.IWRCore.security.service.ProductService;
+import mit.iwrcore.IWRCore.security.service.ProplanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +26,8 @@ public class ListController {
     private MaterialService materialService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ProplanService proplanService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -95,5 +100,20 @@ public class ListController {
                 .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch).build();
 
         return productService.getNonPlanProducts(requestDTO);
+    }
+
+    @GetMapping("/proPlanList")
+    public PageResultDTO<ProPlanContractNumDTO, Object[]> proPlanList(@RequestParam(required = false) int page2,
+                                                                      @RequestParam(required = false) Long selectProL2,@RequestParam(required = false) Long selectProM2,
+                                                                      @RequestParam(required = false) Long selectProS2,@RequestParam(required = false) String productSearch2,
+                                                                      @RequestParam(required = false) Long proplanProgress2){
+        if (productSearch2 != null && productSearch2.trim().isEmpty()) { productSearch2 = null; }
+
+        PageRequestDTO2 requestDTO=PageRequestDTO2.builder()
+                .page2(page2).size2(15)
+                .proL2(selectProL2).proM2(selectProM2).proS2(selectProS2).productSearch2(productSearch2)
+                .proplanProgress2(proplanProgress2).build();
+
+        return proplanService.proplanList2(requestDTO);
     }
 }

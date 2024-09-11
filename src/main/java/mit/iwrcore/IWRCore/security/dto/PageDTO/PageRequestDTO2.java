@@ -23,6 +23,9 @@ public class PageRequestDTO2 {
         return PageRequest.of(page2-1, size2, sort);
     }
 
+    // 협력회사 번호
+    private Long pno2;
+
     // 관리자_회원검색
     private Integer department2;
     private Integer role2;
@@ -32,9 +35,18 @@ public class PageRequestDTO2 {
     private Long partM2;
     private Long partS2;
     private String partnerSearch2;
+    // 제품검색
+    private Long proL2;
+    private Long proM2;
+    private Long proS2;
+    private String productSearch2;
+    private Long productImsiCheck2;
     // 자재검색
     private Long materL2;
     private Long materM2;
     private Long materS2;
     private String materialSearch2;
+    private Long box2;
+    // 생산계획 진행
+    private Long proplanProgress2;
 }

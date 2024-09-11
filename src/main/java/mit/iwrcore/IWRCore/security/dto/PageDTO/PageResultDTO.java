@@ -69,5 +69,7 @@ public class PageResultDTO<DTO, EN> {
     private Long materS;
     private String materialSearch;
     private Long box;
+    // 생산계획 진행
+    private Long proplanProgress2;
 
 }

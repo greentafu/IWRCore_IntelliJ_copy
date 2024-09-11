@@ -5,6 +5,7 @@ import mit.iwrcore.IWRCore.repository.MemberRepository;
 import mit.iwrcore.IWRCore.repository.ProductRepository;
 import mit.iwrcore.IWRCore.repository.ProPlanRepository;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
 import mit.iwrcore.IWRCore.security.service.MemberService;
 import mit.iwrcore.IWRCore.security.service.ProductService;
@@ -195,7 +196,7 @@ public class ProplanServiceTests {
 //    }
     @Test
     public void testFindByPlanId() {
-        PageRequestDTO requestDTO=PageRequestDTO.builder().page(1).size(2).build();
+        PageRequestDTO2 requestDTO=PageRequestDTO2.builder().page2(1).size2(2).build();
         System.out.println(proPlanRepository.findProPlanByCustomQuery(requestDTO));
     }
 }

@@ -59,8 +59,7 @@ public class ProplanServiceImpl implements ProplanService{
     }
     @Override
     public PageResultDTO<ProPlanContractNumDTO, Object[]> proplanList2(PageRequestDTO2 requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("proplanNo").descending());
-        Page<Object[]> entityPage=proPlanRepository.findproPlanList(pageable);
+        Page<Object[]> entityPage=proPlanRepository.findProPlanByCustomQuery(requestDTO);
         return new PageResultDTO<>(entityPage, this::exProplan);
     }
     private ProPlanContractNumDTO exProplan(Object[] objects){

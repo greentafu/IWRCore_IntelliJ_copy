@@ -6,13 +6,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.entity.*;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import javax.sql.rowset.Predicate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class ProPlanRepositoryImpl implements ProPlanRepositoryCustom{
 
     @Override
     @Transactional
-    public Page<Object[]> findProPlanByCustomQuery(PageRequestDTO requestDTO){
+    public Page<Object[]> findProPlanByCustomQuery(PageRequestDTO2 requestDTO){
         QProPlan qProPlan=QProPlan.proPlan;
         QProduct qProduct=QProduct.product;
         QProL qProL=QProL.proL;
@@ -39,15 +40,23 @@ public class ProPlanRepositoryImpl implements ProPlanRepositoryCustom{
 
         BooleanBuilder builder=new BooleanBuilder();
 
-        if (requestDTO.getProL() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL())); }
-        if (requestDTO.getProM() != null) { builder.and(qProS.proM.proMcode.eq(requestDTO.getProM())); }
-        if (requestDTO.getProS() != null) { builder.and(qProS.proScode.eq(requestDTO.getProS())); }
-        if (requestDTO.getProductSearch()!=null){
-            builder.and(qProduct.name.containsIgnoreCase(requestDTO.getProductSearch())
-                    .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch())));
+        if (requestDTO.getProL2() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL2())); }
+        if (requestDTO.getProM2() != null) { builder.and(qProS.proM.proMcode.eq(requestDTO.getProM2())); }
+        if (requestDTO.getProS2() != null) { builder.and(qProS.proScode.eq(requestDTO.getProS2())); }
+        if (requestDTO.getProductSearch2()!=null){
+            builder.and(qProduct.name.containsIgnoreCase(requestDTO.getProductSearch2())
+                    .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch2())));
         }
 
-        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        BooleanBuilder havingBuilder=new BooleanBuilder();
+
+        if (requestDTO.getProplanProgress2() != null) {
+            if (requestDTO.getProplanProgress2() == 0) { havingBuilder.and(qContract.count().eq(0L)).and(qJodalChasu.count().eq(0L)); }
+            if (requestDTO.getProplanProgress2() == 1) { havingBuilder.and(qContract.count().eq(0L)).and(qJodalChasu.count().ne(0L)); }
+            if (requestDTO.getProplanProgress2() == 2) { havingBuilder.and(qContract.count().ne(0L)); }
+        }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage2()-1, requestDTO.getSize2());
         List<Tuple> tupleList = queryFactory
                 .select(qProPlan, qContract.count(), qJodalChasu.count())
                 .from(qProPlan)
@@ -60,6 +69,7 @@ public class ProPlanRepositoryImpl implements ProPlanRepositoryCustom{
                 .leftJoin(qJodalPlan.jodalChasus, qJodalChasu)
                 .where(builder)
                 .groupBy(qProPlan.proplanNo)
+                .having(havingBuilder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(qProPlan.proplanNo.desc())
@@ -76,6 +86,8 @@ public class ProPlanRepositoryImpl implements ProPlanRepositoryCustom{
                 .leftJoin(qJodalPlan.contracts, qContract)
                 .leftJoin(qJodalPlan.jodalChasus, qJodalChasu)
                 .where(builder)
+                .groupBy(qProPlan.proplanNo)
+                .having(havingBuilder)
                 .fetchCount();
 
         List<Object[]> objectList = tupleList.stream()
