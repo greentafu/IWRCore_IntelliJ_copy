@@ -1,7 +1,7 @@
 package mit.iwrcore.IWRCore.service;
 
 import jakarta.transaction.Transactional;
-import mit.iwrcore.IWRCore.repository.GumsuReposetory;
+import mit.iwrcore.IWRCore.repository.GumsuRepository;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.GumsuDTO;
 import mit.iwrcore.IWRCore.security.service.BaljuService;
@@ -14,8 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Commit;
 
-import java.time.LocalDateTime;
-
 @SpringBootTest
 public class GumsuServiceTests {
     @Autowired
@@ -25,7 +23,7 @@ public class GumsuServiceTests {
     @Autowired
     private GumsuService gumsuService;
     @Autowired
-    private GumsuReposetory gumsuReposetory;
+    private GumsuRepository gumsuRepository;
 
     @Test
     @Transactional
@@ -45,7 +43,7 @@ public class GumsuServiceTests {
     @Commit
     public void test1(){
         Pageable pageable= PageRequest.of(0,2);
-        gumsuReposetory.couldGumsu(pageable).forEach(System.out::println);
+        gumsuRepository.couldGumsu(pageable).forEach(System.out::println);
     }
     @Test
     @Transactional

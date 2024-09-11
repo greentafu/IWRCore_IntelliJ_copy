@@ -12,8 +12,14 @@
 
   <span id="head">
     <title>검수일정 미정목록</title>
-    <!--Style-->
 
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 600px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
     <!--/Style-->
   </span>
 
@@ -53,12 +59,43 @@
                     </div>
                   </td>
                   <td>
+                    <input type="text" class="form-control" id="partnerSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn()">검색</button>
+                  </td>
+                </tr>
+                <tr>
+                  <th class="bg-label-primary">제품</th>
+                  <td>
                     <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
+                      <span class="col-md-3">대분류</span>
+                      <div class="col">
+                        <select class="form-select form-select-sm" id="selectProL" onchange="updateProCode('L')"></select>
                       </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
                     </div>
+                  </td>
+                  <td>
+                    <div class="row">
+                      <span class="col-md-3">중분류</span>
+                      <div class="col">
+                        <select class="form-select form-select-sm" id="selectProM" onchange="updateProCode('M')"></select>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="row">
+                      <span class="col-md-3">소분류</span>
+                      <div class="col">
+                        <select class="form-select form-select-sm" id="selectProS" onchange="updateProCode('S')"></select>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -88,12 +125,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="materialSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="materialSearchBtn()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -103,68 +138,28 @@
         <!--/검색-->
         <div class="table-responsive text-nowrap">
           <div class="card-body">
-            <table class="table table-bordered mb-4">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>발주일</th>
-                  <th>협력업체명</th>
-                  <th>발주서 파일명</th>
-                  <th>제품명</th>
-                  <th>자재명</th>
-                  <th>수량</th>
-                  <th>진척검수일 등록</th>
-                </tr>
-              </thead>
-              <tbody class="table-border-bottom-0">
-                <tr th:each="list:${list.dtoList}">
-                  <td>[[${list.baljuDTO.baljuNo}]]</td>
-                  <td>[[${#temporals.format(list.baljuDTO.regDate, 'yyyy-MM-dd')}]]</td>
-                  <td>[[${list.baljuDTO.contractDTO.partnerDTO.name}]]</td>
-                  <td>
-                    <a th:href="@{/order/download_order(baljuNo=${list.baljuDTO.baljuNo})}">[[${list.baljuDTO.filename}]]</a>
-                  </td>
-                  <td>[[${list.baljuDTO.contractDTO.jodalPlanDTO.proplanDTO.productDTO.name}]]</td>
-                  <td>[[${list.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
-                  <td>[[${list.baljuDTO.contractDTO.conNum}]]</td>
-                  <td>
-                    <a th:href="@{/progress/add_progress(baljuNo=${list.baljuDTO.baljuNo})}">
-                      <button class="btn btn-primary">진척검수일 등록</button>
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div id="content1">
+              <table class="table table-bordered mb-4">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>발주일</th>
+                    <th>협력업체명</th>
+                    <th>발주서 파일명</th>
+                    <th>제품명</th>
+                    <th>자재명</th>
+                    <th>수량</th>
+                    <th>진척검수일 등록</th>
+                  </tr>
+                </thead>
+                <tbody class="table-border-bottom-0" id="firstTbody"></tbody>
+              </table>
+            </div>
             <div class="mt-3 text-end mb-4">
               <a th:href="@{/progress/add_progress}">
                 <button type="button" class="btn btn-primary">등록</button>
               </a>
             </div>
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center">
-                <th:block th:if="${list.prev}">
-                  <li class="page-item prev">
-                    <a class="page-link" th:href="@{/progress/requiring_progress(page=${list.start}-1)}">
-                      <i class="tf-icon bx bx-chevrons-left"></i>
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:each="pagenum:${list.pageList}">
-                  <li class="page-item " th:classappend="${list.page}==${pagenum}? active">
-                    <a class="page-link" th:href="@{/progress/requiring_progress(page=${pagenum})}">
-                      [[${pagenum}]]
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:if="${list.next}">
-                  <li class="page-item next">
-                    <a class="page-link" th:href="@{/progress/requiring_progress(page=${list.end}+1)}">
-                      <i class="tf-icon bx bx-chevrons-right"></i>
-                    </a>
-                  </li>
-                </th:block>
-              </ul>
-            </nav>
           </div>
         </div>
       </div>
@@ -174,7 +169,115 @@
 
     <!--/Modal-->
     <!--Script-->
+    <script>
+      let page = 1;
+      let finPage=false;
+      let selectPartL = null;
+      let selectPartM = null;
+      let selectPartS = null;
+      let partnerSearch = null;
+      let selectProL = null;
+      let selectProM = null;
+      let selectProS = null;
+      let productSearch = null;
+      let selectMaterL = null;
+      let selectMaterM = null;
+      let selectMaterS = null;
+      let materialSearch = null;
 
+      function partnerSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectPartL = (document.getElementById("selectPartL").value!=null)?document.getElementById("selectPartL").value:null;
+        selectPartM = (document.getElementById("selectPartM").value!=null)?document.getElementById("selectPartM").value:null;
+        selectPartS = (document.getElementById("selectPartS").value!=null)?document.getElementById("selectPartS").value:null;
+        partnerSearch = (document.getElementById("partnerSearch").value!=null)?document.getElementById("partnerSearch").value:null;
+        loadItems();
+      }
+      function productSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectProL = (document.getElementById("selectProL").value!=null)?document.getElementById("selectProL").value:null;
+        selectProM = (document.getElementById("selectProM").value!=null)?document.getElementById("selectProM").value:null;
+        selectProS = (document.getElementById("selectProS").value!=null)?document.getElementById("selectProS").value:null;
+        productSearch = (document.getElementById("productSearch").value!=null)?document.getElementById("productSearch").value:null;
+        loadItems();
+      }
+      function materialSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectMaterL = (document.getElementById("selectMaterL").value!=null)?document.getElementById("selectMaterL").value:null;
+        selectMaterM = (document.getElementById("selectMaterM").value!=null)?document.getElementById("selectMaterM").value:null;
+        selectMaterS = (document.getElementById("selectMaterS").value!=null)?document.getElementById("selectMaterS").value:null;
+        materialSearch = (document.getElementById("materialSearch").value!=null)?document.getElementById("materialSearch").value:null;
+        loadItems();
+      }
+
+      function loadItems() {
+        const content1 = document.getElementById("content1");
+        const firstTbody = document.getElementById("firstTbody");
+
+        $.ajax({
+          url:'/list/nonGumsuBalju',
+          method:'GET',
+          data:{page:page, selectPartL:selectPartL, selectPartM:selectPartM, selectPartS:selectPartS, partnerSearch:partnerSearch,
+                selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
+                selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch},
+          success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+              const baljuNo=x.baljuDTO.baljuNo;
+              const regDate=x.baljuDTO.regDate.split('T')[0];
+              const partnerName=x.baljuDTO.contractDTO.partnerDTO.name;
+              const fileName=x.baljuDTO.filename;
+              const productName=x.baljuDTO.contractDTO.jodalPlanDTO.proplanDTO.productDTO.name;
+              const materialName=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name;
+              const conNum=x.baljuDTO.contractDTO.conNum;
+
+              const newRow = document.createElement("tr");
+
+              [baljuNo, regDate, partnerName, fileName, productName, materialName, conNum].forEach(text => {
+                const item = document.createElement("td");
+                item.textContent = text;
+                newRow.appendChild(item);
+              });
+
+              const btnTd = document.createElement("td");
+              btnTd.innerHTML=`
+                <a href="/progress/add_progress?baljuNo=${baljuNo}">
+                  <button class="btn btn-primary">진척검수일 등록</button>
+                </a>
+              `;
+              newRow.appendChild(btnTd);
+
+              firstTbody.appendChild(newRow);
+            });
+          }
+        });
+
+        page++;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems();
+            }
+          }
+        });
+
+        loadItems();
+      });
+    </script>
     <!--Script-->
   </span>
 

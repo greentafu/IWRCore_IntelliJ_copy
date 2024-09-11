@@ -2,29 +2,26 @@ package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
 import mit.iwrcore.IWRCore.entity.*;
-import mit.iwrcore.IWRCore.repository.GumsuReposetory;
+import mit.iwrcore.IWRCore.repository.GumsuRepository;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
-import mit.iwrcore.IWRCore.security.dto.ContractDTO;
 import mit.iwrcore.IWRCore.security.dto.GumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.JodalChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuGumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuJodalChasuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class GumsuServiceImpl implements GumsuService{
-    private final GumsuReposetory gumsuReposetory;
+    private final GumsuRepository gumsuRepository;
     private final BaljuService baljuService;
     private final MemberService memberService;
     private final JodalChasuService jodalChasuService;
@@ -57,52 +54,51 @@ public class GumsuServiceImpl implements GumsuService{
     @Override
     public GumsuDTO createGumsu(GumsuDTO gumsuDTO) {
         Gumsu gumsu = convertToEntity(gumsuDTO);
-        Gumsu savedGumsu = gumsuReposetory.save(gumsu);
+        Gumsu savedGumsu = gumsuRepository.save(gumsu);
         return convertToDTO(savedGumsu);
     }
 
     @Override
     public GumsuDTO getGumsuById(Long id) {
-        List<Object[]> list=gumsuReposetory.getGumsuFromBalju(id);
+        List<Object[]> list= gumsuRepository.getGumsuFromBalju(id);
         Gumsu gumsu=(Gumsu) list.get(0)[0];
         return convertToDTO(gumsu);
     }
 
     @Override
     public GumsuDTO getGumsuByBalju(Long baljuNo){
-        return convertToDTO(gumsuReposetory.findGumsuByBalju(baljuNo));
+        return convertToDTO(gumsuRepository.findGumsuByBalju(baljuNo));
     }
 
     @Override
     public GumsuDTO updateGumsu(Long id, GumsuDTO gumsuDTO) {
-        if (!gumsuReposetory.existsById(id)) {
+        if (!gumsuRepository.existsById(id)) {
             throw new RuntimeException("ID가 " + id + "인 GumsuDTO를 찾을 수 없습니다.");
         }
         Gumsu gumsu = convertToEntity(gumsuDTO);
         gumsu.setGumsuNo(id); // 수정할 때 ID를 설정합니다.
-        Gumsu updatedGumsu = gumsuReposetory.save(gumsu);
+        Gumsu updatedGumsu = gumsuRepository.save(gumsu);
         return convertToDTO(updatedGumsu);
     }
 
     @Override
     public void deleteGumsu(Long id) {
-        if (!gumsuReposetory.existsById(id)) {
+        if (!gumsuRepository.existsById(id)) {
             throw new RuntimeException("ID가 " + id + "인 GumsuDTO를 찾을 수 없습니다.");
         }
-        gumsuReposetory.deleteById(id);
+        gumsuRepository.deleteById(id);
     }
 
     @Override
     public List<GumsuDTO> getAllGumsus() {
-        return gumsuReposetory.findAll().stream()
+        return gumsuRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public PageResultDTO<BaljuGumsuDTO, Object[]> couldGumsu(PageRequestDTO requestDTO) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("baljuNo").descending());
-        Page<Object[]> entityPage=gumsuReposetory.couldGumsu(pageable);
+        Page<Object[]> entityPage= gumsuRepository.findGumsuByCustomQuery(requestDTO);
         return new PageResultDTO<>(entityPage, this::BaljuGumsuToDTO);
     }
     private BaljuGumsuDTO BaljuGumsuToDTO(Object[] objects){
@@ -115,15 +111,15 @@ public class GumsuServiceImpl implements GumsuService{
 
     @Override
     public Long getQuantityMake(Long baljuNo){
-        return gumsuReposetory.quantityMake(baljuNo);
+        return gumsuRepository.quantityMake(baljuNo);
     }
 
     @Override
-    public List<Partner> getNonGumsuPartner(){return gumsuReposetory.getNonGumsuPartner();}
+    public List<Partner> getNonGumsuPartner(){return gumsuRepository.getNonGumsuPartner();}
 
     @Override
     public List<BaljuJodalChasuDTO> getNoneGumsuBalju(Long pno){
-        List<Object[]> list=gumsuReposetory.getNoneGumsu(pno);
+        List<Object[]> list= gumsuRepository.getNoneGumsu(pno);
         List<BaljuJodalChasuDTO> dtoList=list.stream().map(this::baljuJodalChasuToDTO).toList();
         return dtoList;
     }
@@ -136,7 +132,7 @@ public class GumsuServiceImpl implements GumsuService{
     }
     @Override
     public List<BaljuJodalChasuDTO> modifyGumsu(Long baljuNo){
-        List<Object[]> list=gumsuReposetory.modifyGumsu(baljuNo);
+        List<Object[]> list= gumsuRepository.modifyGumsu(baljuNo);
         List<BaljuJodalChasuDTO> dtoList=list.stream().map(this::baljuJodalChasuToDTO).toList();
         return dtoList;
     }

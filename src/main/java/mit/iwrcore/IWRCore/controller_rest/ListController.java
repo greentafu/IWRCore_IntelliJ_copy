@@ -10,6 +10,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuGumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractJodalChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanContractNumDTO;
@@ -36,6 +37,8 @@ public class ListController {
     private ContractService contractService;
     @Autowired
     private BaljuService baljuService;
+    @Autowired
+    private GumsuService gumsuService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -227,13 +230,13 @@ public class ListController {
 
     @GetMapping("/yesBaljuContract")
     public PageResultDTO<ContractBaljuDTO, Object[]> yesBaljuContract(@RequestParam(required = false) int page2,
-                                                                          @RequestParam(required = false) Long selectPartL2, @RequestParam(required = false) Long selectPartM2,
-                                                                          @RequestParam(required = false) Long selectPartS2, @RequestParam(required = false) String partnerSearch2,
-                                                                          @RequestParam(required = false) Long selectProL2, @RequestParam(required = false) Long selectProM2,
-                                                                          @RequestParam(required = false) Long selectProS2, @RequestParam(required = false) String productSearch2,
-                                                                          @RequestParam(required = false) Long selectMaterL2, @RequestParam(required = false) Long selectMaterM2,
-                                                                          @RequestParam(required = false) Long selectMaterS2, @RequestParam(required = false) String materialSearch2,
-                                                                          @RequestParam(required = false) Long baljuProgress2){
+                                                                      @RequestParam(required = false) Long selectPartL2, @RequestParam(required = false) Long selectPartM2,
+                                                                      @RequestParam(required = false) Long selectPartS2, @RequestParam(required = false) String partnerSearch2,
+                                                                      @RequestParam(required = false) Long selectProL2, @RequestParam(required = false) Long selectProM2,
+                                                                      @RequestParam(required = false) Long selectProS2, @RequestParam(required = false) String productSearch2,
+                                                                      @RequestParam(required = false) Long selectMaterL2, @RequestParam(required = false) Long selectMaterM2,
+                                                                      @RequestParam(required = false) Long selectMaterS2, @RequestParam(required = false) String materialSearch2,
+                                                                      @RequestParam(required = false) Long baljuProgress2){
         if (partnerSearch2 != null && partnerSearch2.trim().isEmpty()) { partnerSearch2 = null; }
         if (productSearch2 != null && productSearch2.trim().isEmpty()) { productSearch2 = null; }
         if (materialSearch2 != null && materialSearch2.trim().isEmpty()) { materialSearch2 = null; }
@@ -246,5 +249,27 @@ public class ListController {
                 .baljuProgress2(baljuProgress2).build();
 
         return baljuService.finBaljuPage(requestDTO);
+    }
+
+    @GetMapping("/nonGumsuBalju")
+    public PageResultDTO<BaljuGumsuDTO, Object[]> nonGumsuBalju(@RequestParam(required = false) int page,
+                                                                @RequestParam(required = false) Long selectPartL, @RequestParam(required = false) Long selectPartM,
+                                                                @RequestParam(required = false) Long selectPartS, @RequestParam(required = false) String partnerSearch,
+                                                                @RequestParam(required = false) Long selectProL, @RequestParam(required = false) Long selectProM,
+                                                                @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch,
+                                                                @RequestParam(required = false) Long selectMaterL, @RequestParam(required = false) Long selectMaterM,
+                                                                @RequestParam(required = false) Long selectMaterS, @RequestParam(required = false) String materialSearch){
+
+        if (partnerSearch != null && partnerSearch.trim().isEmpty()) { partnerSearch = null; }
+        if (productSearch != null && productSearch.trim().isEmpty()) { productSearch = null; }
+        if (materialSearch != null && materialSearch.trim().isEmpty()) { materialSearch = null; }
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .partL(selectPartL).partM(selectPartM).partS(selectPartS).partnerSearch(partnerSearch)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
+                .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch).build();
+
+        return gumsuService.couldGumsu(requestDTO);
     }
 }

@@ -1,15 +1,11 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.GumsuChasuRepository;
-import mit.iwrcore.IWRCore.repository.GumsuReposetory;
-import mit.iwrcore.IWRCore.repository.MemberRepository;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.GumsuChasuContractDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.QuantityDateDTO;
 import org.slf4j.Logger;
@@ -23,7 +19,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
