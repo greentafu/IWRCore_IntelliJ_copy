@@ -84,9 +84,7 @@ public class JodalPlanServiceTests {
     public void test1231(){
         Pageable pageable= PageRequest.of(0,2);
         PageRequestDTO requestDTO=PageRequestDTO.builder().size(2).page(1).build();
-//        jodalPlanRepository.nonPlanMaterial2(pageable).forEach(System.out::println);
-//        System.out.println(jodalPlanRepository.noContract(pageable));
-        System.out.println(jodalPlanService.noContract(requestDTO));
+        System.out.println(jodalPlanRepository.findJodalPlanByCustomQuery(requestDTO));
     }
     @Test
     @Transactional

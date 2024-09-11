@@ -16,26 +16,31 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ProPlanRepositoryImpl implements ProPlanRepositoryCustom{
+public class ContractRepositoryImpl implements ContractRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Autowired
-    ProPlanRepositoryImpl(EntityManager entityManager){
+    ContractRepositoryImpl(EntityManager entityManager){
         this.queryFactory=new JPAQueryFactory(entityManager);
     }
 
     @Override
     @Transactional
-    public Page<Object[]> findProPlanByCustomQuery(PageRequestDTO2 requestDTO){
+    public Page<Object[]> findContractByCustomQuery(PageRequestDTO2 requestDTO){
+        QJodalPlan qJodalPlan=QJodalPlan.jodalPlan;
         QProPlan qProPlan=QProPlan.proPlan;
+        QJodalChasu qJodalChasu=QJodalChasu.jodalChasu;
+        QContract qContract=QContract.contract;
+
+        QMaterial qMaterial=QMaterial.material;
+        QMaterL qMaterL=QMaterL.materL;
+        QMaterM qMaterM=QMaterM.materM;
+        QMaterS qMaterS=QMaterS.materS;
+
         QProduct qProduct=QProduct.product;
         QProL qProL=QProL.proL;
         QProM qProM=QProM.proM;
         QProS qProS=QProS.proS;
-
-        QContract qContract=QContract.contract;
-        QJodalPlan qJodalPlan=QJodalPlan.jodalPlan;
-        QJodalChasu qJodalChasu=QJodalChasu.jodalChasu;
 
         BooleanBuilder builder=new BooleanBuilder();
 
@@ -47,53 +52,71 @@ public class ProPlanRepositoryImpl implements ProPlanRepositoryCustom{
                     .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch2())));
         }
 
-        BooleanBuilder havingBuilder=new BooleanBuilder();
-
-        if (requestDTO.getProplanProgress2() != null) {
-            if (requestDTO.getProplanProgress2() == 0) { havingBuilder.and(qContract.count().eq(0L)).and(qJodalChasu.count().eq(0L)); }
-            if (requestDTO.getProplanProgress2() == 1) { havingBuilder.and(qContract.count().eq(0L)).and(qJodalChasu.count().ne(0L)); }
-            if (requestDTO.getProplanProgress2() == 2) { havingBuilder.and(qContract.count().ne(0L)); }
+        if (requestDTO.getMaterL2() != null) { builder.and(qMaterS.materM.materL.materLcode.eq(requestDTO.getMaterL2())); }
+        if (requestDTO.getMaterM2() != null) { builder.and(qMaterS.materM.materMcode.eq(requestDTO.getMaterM2())); }
+        if (requestDTO.getMaterS2() != null) { builder.and(qMaterS.materScode.eq(requestDTO.getMaterS2())); }
+        if (requestDTO.getMaterialSearch2()!=null){
+            builder.and(qMaterial.name.containsIgnoreCase(requestDTO.getMaterialSearch2())
+                    .or(qMaterial.standard.containsIgnoreCase(requestDTO.getMaterialSearch2()))
+                    .or(qMaterial.unit.containsIgnoreCase(requestDTO.getMaterialSearch2())));
         }
+
+        if(requestDTO.getProgressContract2()!=null){
+            if(requestDTO.getProgressContract2()==0) { builder.and(qContract.isNull()); }
+            if(requestDTO.getProgressContract2()==1) { builder.and(qContract.isNotNull()); }
+        }
+
+        BooleanBuilder havingBuilder=new BooleanBuilder();
+        havingBuilder.and(qJodalChasu.count().ne(0L));
 
         Pageable pageable= PageRequest.of(requestDTO.getPage2()-1, requestDTO.getSize2());
         List<Tuple> tupleList = queryFactory
-                .select(qProPlan, qContract.count(), qJodalChasu.count())
-                .from(qProPlan)
+                .select(qJodalPlan, qContract, qJodalChasu, qJodalChasu.jcnum.sum())
+                .from(qJodalPlan)
+                .leftJoin(qJodalPlan.proPlan, qProPlan)
                 .leftJoin(qProPlan.product, qProduct)
                 .leftJoin(qProduct.proS, qProS)
                 .leftJoin(qProS.proM, qProM)
                 .leftJoin(qProM.proL, qProL)
-                .leftJoin(qProPlan.jodalPlans, qJodalPlan)
-                .leftJoin(qJodalPlan.contracts, qContract)
                 .leftJoin(qJodalPlan.jodalChasus, qJodalChasu)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qJodalPlan.contracts, qContract)
                 .where(builder)
-                .groupBy(qProPlan.proplanNo)
+                .groupBy(qJodalPlan.joNo)
                 .having(havingBuilder)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
-                .orderBy(qProPlan.proplanNo.desc())
+                .orderBy(qJodalPlan.joNo.desc())
                 .fetch();
 
         long total = queryFactory
-                .select(qProPlan, qContract.count(), qJodalChasu.count())
-                .from(qProPlan)
+                .select(qJodalPlan)
+                .from(qJodalPlan)
+                .leftJoin(qJodalPlan.proPlan, qProPlan)
                 .leftJoin(qProPlan.product, qProduct)
                 .leftJoin(qProduct.proS, qProS)
                 .leftJoin(qProS.proM, qProM)
                 .leftJoin(qProM.proL, qProL)
-                .leftJoin(qProPlan.jodalPlans, qJodalPlan)
-                .leftJoin(qJodalPlan.contracts, qContract)
                 .leftJoin(qJodalPlan.jodalChasus, qJodalChasu)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qJodalPlan.contracts, qContract)
                 .where(builder)
-                .groupBy(qProPlan.proplanNo)
+                .groupBy(qJodalPlan.joNo)
                 .having(havingBuilder)
                 .fetchCount();
 
         List<Object[]> objectList = tupleList.stream()
                 .map(tuple -> new Object[]{
-                        tuple.get(qProPlan),        // Adjust according to your actual selection
-                        tuple.get(qContract.count()),
-                        tuple.get(qJodalChasu.count())
+                        tuple.get(qJodalPlan),
+                        tuple.get(qContract),
+                        tuple.get(qJodalChasu),
+                        tuple.get(qJodalChasu.jcnum.sum())
                 })
                 .collect(Collectors.toList());
 

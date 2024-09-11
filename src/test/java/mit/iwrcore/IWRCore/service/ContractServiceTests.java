@@ -101,9 +101,9 @@ public class ContractServiceTests {
     }
     @Test
     public void test5566(){
-        PageRequestDTO requestDTO=PageRequestDTO.builder().page(1).size(2).build();
+        PageRequestDTO2 requestDTO=PageRequestDTO2.builder().page2(1).size2(2).build();
         Pageable pageable= PageRequest.of(0,2);
-//        System.out.println(contractRepository.noContractPage(pageable));
+        System.out.println(contractRepository.findContractByCustomQuery(requestDTO));
     }
 
 }

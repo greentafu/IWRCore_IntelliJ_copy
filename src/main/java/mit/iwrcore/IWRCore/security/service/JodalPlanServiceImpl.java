@@ -114,10 +114,10 @@ public class JodalPlanServiceImpl implements JodalPlanService {
         return new PageResultDTO<>(entityPage, fn);
     }
     @Override
-    public PageResultDTO<JodalPlanDTO, Object[]> nonJodalplanMaterial2(PageRequestDTO requestDTO){
-        Pageable pageable = requestDTO.getPageable(Sort.by("joNo").descending());
-        Page<Object[]> entityPage = jodalPlanRepository.nonPlanMaterial2(pageable);
-        return new PageResultDTO<>(entityPage, this::exJodalPlan);
+    public PageResultDTO<JodalPlanDTO, JodalPlan> nonJodalplanMaterial2(PageRequestDTO requestDTO){
+        Page<JodalPlan> entityPage = jodalPlanRepository.findJodalPlanByCustomQuery(requestDTO);
+        Function<JodalPlan, JodalPlanDTO> fn = (entity -> entityToDTO(entity));
+        return new PageResultDTO<>(entityPage, fn);
     }
     private JodalPlanDTO exJodalPlan(Object[] objects){
         JodalPlan jodalPlan=(JodalPlan) objects[0];

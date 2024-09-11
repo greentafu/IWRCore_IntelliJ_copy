@@ -49,4 +49,6 @@ public class PageRequestDTO2 {
     private Long box2;
     // 생산계획 진행
     private Long proplanProgress2;
+    // 계약서 진행
+    private Long progressContract2;
 }

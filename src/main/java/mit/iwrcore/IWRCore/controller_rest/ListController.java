@@ -1,17 +1,18 @@
 package mit.iwrcore.IWRCore.controller_rest;
 
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.JodalPlan;
 import mit.iwrcore.IWRCore.entity.Material;
 import mit.iwrcore.IWRCore.entity.Product;
+import mit.iwrcore.IWRCore.security.dto.JodalPlanDTO;
 import mit.iwrcore.IWRCore.security.dto.MaterialDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractJodalChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanContractNumDTO;
-import mit.iwrcore.IWRCore.security.service.MaterialService;
-import mit.iwrcore.IWRCore.security.service.ProductService;
-import mit.iwrcore.IWRCore.security.service.ProplanService;
+import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,10 @@ public class ListController {
     private ProductService productService;
     @Autowired
     private ProplanService proplanService;
+    @Autowired
+    private JodalPlanService jodalPlanService;
+    @Autowired
+    private ContractService contractService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -115,5 +120,43 @@ public class ListController {
                 .proplanProgress2(proplanProgress2).build();
 
         return proplanService.proplanList2(requestDTO);
+    }
+
+    @GetMapping("/nonChasuJodalPlan")
+    public PageResultDTO<JodalPlanDTO, JodalPlan> nonChasuJodalPlan(@RequestParam(required = false) int page,
+                                                                    @RequestParam(required = false) Long selectProL, @RequestParam(required = false) Long selectProM,
+                                                                    @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch,
+                                                                    @RequestParam(required = false) Long selectMaterL, @RequestParam(required = false) Long selectMaterM,
+                                                                    @RequestParam(required = false) Long selectMaterS, @RequestParam(required = false) String materialSearch){
+
+        if (productSearch != null && productSearch.trim().isEmpty()) { productSearch = null; }
+        if (materialSearch != null && materialSearch.trim().isEmpty()) { materialSearch = null; }
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
+                .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch).build();
+
+        return jodalPlanService.nonJodalplanMaterial2(requestDTO);
+    }
+
+    @GetMapping("/yesChasuJodalPlan")
+    public PageResultDTO<ContractJodalChasuDTO, Object[]> yesChasuJodalPlan(@RequestParam(required = false) int page2,
+                                                                            @RequestParam(required = false) Long selectProL2, @RequestParam(required = false) Long selectProM2,
+                                                                            @RequestParam(required = false) Long selectProS2, @RequestParam(required = false) String productSearch2,
+                                                                            @RequestParam(required = false) Long selectMaterL2, @RequestParam(required = false) Long selectMaterM2,
+                                                                            @RequestParam(required = false) Long selectMaterS2, @RequestParam(required = false) String materialSearch2,
+                                                                            @RequestParam(required = false) Long progressContract2){
+
+        if (productSearch2 != null && productSearch2.trim().isEmpty()) { productSearch2 = null; }
+        if (materialSearch2 != null && materialSearch2.trim().isEmpty()) { materialSearch2 = null; }
+
+        PageRequestDTO2 requestDTO=PageRequestDTO2.builder()
+                .page2(page2).size2(10)
+                .proL2(selectProL2).proM2(selectProM2).proS2(selectProS2).productSearch2(productSearch2)
+                .materL2(selectMaterL2).materM2(selectMaterM2).materS2(selectMaterS2).materialSearch2(materialSearch2)
+                .progressContract2(progressContract2).build();
+
+        return contractService.yesJodalplanMaterial(requestDTO);
     }
 }

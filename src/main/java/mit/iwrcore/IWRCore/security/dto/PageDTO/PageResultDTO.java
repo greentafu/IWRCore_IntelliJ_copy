@@ -71,5 +71,7 @@ public class PageResultDTO<DTO, EN> {
     private Long box;
     // 생산계획 진행
     private Long proplanProgress2;
+    // 계약서 진행
+    private Long progressContract2;
 
 }

@@ -19,7 +19,7 @@ public interface JodalPlanService {
 
     // 조달차수 없는(조달계획 필요한) 자재
     PageResultDTO<JodalPlanDTO, JodalPlan> nonJodalplanMaterial(PageRequestDTO requestDTO);
-    PageResultDTO<JodalPlanDTO, Object[]> nonJodalplanMaterial2(PageRequestDTO requestDTO);
+    PageResultDTO<JodalPlanDTO, JodalPlan> nonJodalplanMaterial2(PageRequestDTO requestDTO);
 
     List<ProPlanSturctureDTO> newJodalChasu(Long proplanNo);
 

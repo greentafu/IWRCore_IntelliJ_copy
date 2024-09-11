@@ -2,6 +2,7 @@ package mit.iwrcore.IWRCore.repository;
 
 import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.entity.Contract;
+import mit.iwrcore.IWRCore.repositoryDSL.ContractRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -10,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ContractRepository extends JpaRepository<Contract, Long> {
+public interface ContractRepository extends JpaRepository<Contract, Long>, ContractRepositoryCustom {
 
     @Query("select c, p, pp from Contract c " +
             "join Product p on (c.jodalPlan.proPlan.product.manuCode=p.manuCode) " +
