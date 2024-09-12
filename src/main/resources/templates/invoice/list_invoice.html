@@ -296,24 +296,7 @@
                     <th>수정/삭제</th>
                   </tr>
                 </thead>
-                <tbody class="table-border-bottom-0" id="secondTbody">
-                  <tr th:each="list2:${fin_list.dtoList}">
-                    <td>[[${list2.invoiceDTO.tranNO}]]</td>
-                    <td>[[${list2.partnerDTO.name}]]</td>
-                    <td>[[${#temporals.format(list2.invoiceDTO.dateCreated, 'yyyy-MM-dd')}]]</td>
-                    <td>
-                      <button type="button" class="btn btn-sm btn-outline-primary">
-                        <span class="bx bx-arrow-to-bottom"></span>
-                      </button>
-                    </td>
-                    <td>
-                      <a th:href="@{/invoice/modify_invoice(tranNO=${list2.invoiceDTO.tranNO})}">
-                        <button class="btn btn-primary">수정</button>
-                      </a>
-                      <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle">삭제</button>
-                    </td>
-                  </tr>
-                </tbody>
+                <tbody class="table-border-bottom-0" id="secondTbody"></tbody>
               </table>
             </div>
             <!-- Modal Backdrop -->
@@ -436,9 +419,6 @@
 
             data.dtoList.forEach(x=>{
               const shipNO=x.shipNO;
-
-              console.log("shipNO: ", shipNO);
-
               const receipt=x.receipt.split('T')[0];
               const productName=x.baljuDTO.contractDTO.jodalPlanDTO.proplanDTO.productDTO.name;
               const materCode=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.materCode;
@@ -484,29 +464,17 @@
             if(data.totalPage<page2) finPage2=true;
 
             data.dtoList.forEach(x=>{
-              const baljuNo=x.baljuDTO.baljuNo;
-              const partnerName=x.contractDTO.partnerDTO.name;
-              const fileName=x.baljuDTO.filename;
-              const materialName=x.contractDTO.jodalPlanDTO.materialDTO.name;
-              const baljuNum=x.baljuDTO.baljuNum;
+              const tranNO=x.invoiceDTO.tranNO;
+              const partnerName=x.partnerDTO.name;
+              const regDate=x.invoiceDTO.dateCreated.split('T')[0];
 
               const newRow = document.createElement("tr");
 
-              [baljuNo, partnerName, fileName].forEach(text => {
+              [tranNO, partnerName, regDate].forEach(text => {
                 const item = document.createElement("td");
                 item.textContent = text;
                 newRow.appendChild(item);
               });
-
-              const materialNameTd = document.createElement("td");
-              materialNameTd.id='materialName'+baljuNo;
-              materialNameTd.textContent = materialName;
-              newRow.appendChild(materialNameTd);
-
-              const baljuNumTd = document.createElement("td");
-              baljuNumTd.id='baljuNum'+baljuNo;
-              baljuNumTd.textContent = baljuNum;
-              newRow.appendChild(baljuNumTd);
 
               const btn0Td = document.createElement("td");
               btn0Td.innerHTML=`
@@ -518,10 +486,10 @@
 
               const btn1Td = document.createElement("td");
               btn1Td.innerHTML=`
-                <a href="/order/modify_order2?baljuNo=${baljuNo}">
+                <a href="/invoice/modify_invoice?tranNO=${tranNO}">
                   <button class="btn btn-primary">수정</button>
                 </a>
-                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${baljuNo}" onclick="deleteBtn(this)">삭제</button>
+                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle">삭제</button>
               `;
               newRow.appendChild(btn1Td);
 

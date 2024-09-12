@@ -273,8 +273,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public PageResultDTO<InvoicePartnerDTO, Object[]> pageFinInvoice(PageRequestDTO2 requestDTO2){
-        Pageable pageable=requestDTO2.getPageable(Sort.by("tranNO").descending());
-        Page<Object[]> entityPage=shipmentRepository.finInvoicePage(pageable);
+        Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery4(requestDTO2);
         return new PageResultDTO<>(entityPage, this::invoicePartnerToDTO);
     }
     private InvoicePartnerDTO invoicePartnerToDTO(Object[] objects){

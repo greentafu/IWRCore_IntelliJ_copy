@@ -1,6 +1,7 @@
 package mit.iwrcore.IWRCore.repositoryDSL;
 
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import org.springframework.data.domain.Page;
 
 public interface ShipmentRepositoryCustom {
@@ -10,4 +11,6 @@ public interface ShipmentRepositoryCustom {
     Page<Object[]> findShipmentByCustomQuery2(PageRequestDTO requestDTO);
     // 거래명세서 전 목록
     Page<Object[]> findShipmentByCustomQuery3(PageRequestDTO requestDTO);
+    // 거래명세서 목록
+    Page<Object[]> findShipmentByCustomQuery4(PageRequestDTO2 requestDTO);
 }

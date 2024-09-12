@@ -37,4 +37,7 @@ public class Invoice extends BaseEntity {
     @NotNull
     private Member writer;                  // 작성자
 
+    @OneToMany(mappedBy = "invoice")
+    private List<Shipment> shipments;
+
 }
