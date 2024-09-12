@@ -2,6 +2,8 @@ package mit.iwrcore.IWRCore.repositoryDSL;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.NumberTemplate;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -53,6 +55,8 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom{
         QPartM qPartM=QPartM.partM;
         QPartS qPartS=QPartS.partS;
 
+        QShipment qSubShipment=QShipment.shipment;
+
         BooleanBuilder builder=new BooleanBuilder();
 
         if (requestDTO.getPartL() != null) { builder.and(qPartS.partM.partL.partLcode.eq(requestDTO.getPartL())); }
@@ -84,7 +88,13 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom{
 
         Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
         List<Tuple> tupleList = queryFactory
-                .select(qShipment, qGumsu, qShipment.shipNum.sum(), qReturns.reNO)
+                .select(qShipment, qGumsu,
+                        JPAExpressions
+                                .select(qShipment.shipNum.sum())
+                                .from(qShipment)
+                                .where(qShipment.receiveCheck.eq(1L), qShipment.balju.baljuNo.eq(qBalju.baljuNo))
+                                .groupBy(qShipment.balju.baljuNo)
+                        , qReturns.reNO)
                 .from(qShipment)
                 .leftJoin(qShipment.returns, qReturns)
                 .leftJoin(qShipment.balju, qBalju)
@@ -112,7 +122,13 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom{
                 .fetch();
 
         long total = queryFactory
-                .select(qShipment, qGumsu, qShipment.shipNum.sum(), qReturns.reNO)
+                .select(qShipment, qGumsu,
+                        JPAExpressions
+                                .select(qShipment.shipNum.sum())
+                                .from(qShipment)
+                                .where(qShipment.receiveCheck.eq(1L), qShipment.balju.baljuNo.eq(qBalju.baljuNo))
+                                .groupBy(qShipment.balju.baljuNo)
+                        , qReturns.reNO)
                 .from(qShipment)
                 .leftJoin(qShipment.returns, qReturns)
                 .leftJoin(qShipment.balju, qBalju)
@@ -140,7 +156,11 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom{
                 .map(tuple -> new Object[]{
                         tuple.get(qShipment),
                         tuple.get(qGumsu),
-                        tuple.get(qShipment.shipNum.sum()),
+                        tuple.get(JPAExpressions
+                                .select(qShipment.shipNum.sum())
+                                .from(qShipment)
+                                .where(qShipment.receiveCheck.eq(1L), qShipment.balju.baljuNo.eq(qBalju.baljuNo))
+                                .groupBy(qShipment.balju.baljuNo)),
                         tuple.get(qReturns.reNO)
                 })
                 .collect(Collectors.toList());
