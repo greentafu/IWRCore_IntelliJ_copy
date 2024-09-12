@@ -8,4 +8,6 @@ public interface ShipmentRepositoryCustom {
     Page<Object[]> findShipmentByCustomQuery(PageRequestDTO requestDTO);
     // 메인화면 수령 목록
     Page<Object[]> findShipmentByCustomQuery2(PageRequestDTO requestDTO);
+    // 거래명세서 전 목록
+    Page<Object[]> findShipmentByCustomQuery3(PageRequestDTO requestDTO);
 }

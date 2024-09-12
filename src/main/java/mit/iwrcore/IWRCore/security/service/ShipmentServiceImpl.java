@@ -262,8 +262,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public PageResultDTO<ShipmentDTO, Object[]> noneInvoiceShipment(PageRequestDTO requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("shipNO").descending());
-        Page<Object[]> entityPage=shipmentRepository.noneInvoiceShipment(pageable);
+        Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery3(requestDTO);
         return new PageResultDTO<>(entityPage, this::shipmentContractToDTO);
     }
     private ShipmentDTO shipmentContractToDTO(Object[] objects){
