@@ -86,6 +86,127 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom{
                     .or(qMaterial.unit.containsIgnoreCase(requestDTO.getMaterialSearch())));
         }
 
+        if (requestDTO.getBaljuFin() != null ) { builder.and(qBalju.finCheck.eq(requestDTO.getBaljuFin())); }
+        if (requestDTO.getReceiveReturn() != null){
+            if(requestDTO.getReceiveReturn()==0) { builder.and(qShipment.receipt.isNull()); }
+            if(requestDTO.getReceiveReturn()==1) { builder.and(qShipment.receipt.isNotNull()).and(qShipment.receiveCheck.eq(0L)).and(qShipment.returns.isNull()); }
+            if(requestDTO.getReceiveReturn()==2) { builder.and(qShipment.receipt.isNotNull()).and(qShipment.receiveCheck.eq(1L)).and(qShipment.returns.isNull()); }
+            if(requestDTO.getReceiveReturn()==3) { builder.and(qShipment.receipt.isNotNull()).and(qShipment.receiveCheck.eq(0L)).and(qShipment.returns.isNotNull()); }
+        }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Tuple> tupleList = queryFactory
+                .select(qShipment, qGumsu,
+                        JPAExpressions
+                                .select(qShipment.shipNum.sum())
+                                .from(qShipment)
+                                .where(qShipment.receiveCheck.eq(1L), qShipment.balju.baljuNo.eq(qBalju.baljuNo))
+                                .groupBy(qShipment.balju.baljuNo)
+                        , qReturns.reNO)
+                .from(qShipment)
+                .leftJoin(qShipment.returns, qReturns)
+                .leftJoin(qShipment.balju, qBalju)
+                .leftJoin(qBalju.gumsu, qGumsu)
+                .leftJoin(qBalju.contract, qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .leftJoin(qPartner.partS, qPartS)
+                .leftJoin(qPartS.partM, qPartM)
+                .leftJoin(qPartM.partL, qPartL)
+                .leftJoin(qContract.jodalPlan, qJodalPlan)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qJodalPlan.proPlan, qProPlan)
+                .leftJoin(qProPlan.product, qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .where(builder)
+                .groupBy(qShipment.shipNO)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qShipment.shipNO.desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(qShipment, qGumsu,
+                        JPAExpressions
+                                .select(qShipment.shipNum.sum())
+                                .from(qShipment)
+                                .where(qShipment.receiveCheck.eq(1L), qShipment.balju.baljuNo.eq(qBalju.baljuNo))
+                                .groupBy(qShipment.balju.baljuNo)
+                        , qReturns.reNO)
+                .from(qShipment)
+                .leftJoin(qShipment.returns, qReturns)
+                .leftJoin(qShipment.balju, qBalju)
+                .leftJoin(qBalju.gumsu, qGumsu)
+                .leftJoin(qBalju.contract, qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .leftJoin(qPartner.partS, qPartS)
+                .leftJoin(qPartS.partM, qPartM)
+                .leftJoin(qPartM.partL, qPartL)
+                .leftJoin(qContract.jodalPlan, qJodalPlan)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qJodalPlan.proPlan, qProPlan)
+                .leftJoin(qProPlan.product, qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .where(builder)
+                .groupBy(qShipment.shipNO)
+                .fetchCount();
+
+        List<Object[]> objectList = tupleList.stream()
+                .map(tuple -> new Object[]{
+                        tuple.get(qShipment),
+                        tuple.get(qGumsu),
+                        tuple.get(JPAExpressions
+                                .select(qShipment.shipNum.sum())
+                                .from(qShipment)
+                                .where(qShipment.receiveCheck.eq(1L), qShipment.balju.baljuNo.eq(qBalju.baljuNo))
+                                .groupBy(qShipment.balju.baljuNo)),
+                        tuple.get(qReturns.reNO)
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(objectList, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public Page<Object[]> findShipmentByCustomQuery2(PageRequestDTO requestDTO){
+        QJodalPlan qJodalPlan=QJodalPlan.jodalPlan;
+        QContract qContract=QContract.contract;
+        QProPlan qProPlan=QProPlan.proPlan;
+        QBalju qBalju=QBalju.balju;
+        QGumsu qGumsu=QGumsu.gumsu;
+        QShipment qShipment=QShipment.shipment;
+        QReturns qReturns=QReturns.returns;
+
+        QMaterial qMaterial=QMaterial.material;
+        QMaterL qMaterL=QMaterL.materL;
+        QMaterM qMaterM=QMaterM.materM;
+        QMaterS qMaterS=QMaterS.materS;
+
+        QProduct qProduct=QProduct.product;
+        QProL qProL=QProL.proL;
+        QProM qProM=QProM.proM;
+        QProS qProS=QProS.proS;
+
+        QPartner qPartner=QPartner.partner;
+        QPartL qPartL=QPartL.partL;
+        QPartM qPartM=QPartM.partM;
+        QPartS qPartS=QPartS.partS;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        builder.and(qShipment.receipt.isNull());
+        if(requestDTO.getBaljuProductName()!=null){ builder.and(qProduct.manuCode.eq(requestDTO.getBaljuProductName())); }
+
         Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
         List<Tuple> tupleList = queryFactory
                 .select(qShipment, qGumsu,

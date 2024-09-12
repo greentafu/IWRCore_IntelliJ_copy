@@ -57,6 +57,7 @@ public class LoginController {
     private final ShipmentService shipmentService;
     private final PartnerService partnerService;
     private final PartnerRepository partnerRepository;
+    private final BaljuService baljuService;
 
     @GetMapping("/login")
     @Transactional
@@ -126,6 +127,8 @@ public class LoginController {
         model.addAttribute("newNoneChasu", jodalPlanService.newNoneJodalChasuCount());
         model.addAttribute("newShipment", shipmentService.mainShipNum());
         model.addAttribute("newRequest", requestService.mainRequestCount());
+
+        model.addAttribute("baljuProductList", baljuService.baljuProduct());
 
         model.addAttribute("shipment_list", shipmentService.mainShipment(requestDTO));
     }

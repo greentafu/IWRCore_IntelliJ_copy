@@ -38,27 +38,6 @@ public class BaljuServiceTests {
     @Autowired
     private ContractService contractService;
 
-
-    @Test
-    @Transactional
-    @Commit
-    public void insert(){
-//        Optional<ContractDTO> optionalContractDTO = contractService.getContractById(1L);
-//
-//        // BaljuDTO를 생성
-//        BaljuDTO dto = BaljuDTO.builder()
-//                .baljuNum(100L)
-//                .baljuDate(LocalDateTime.of(2024, 8, 20, 10, 20))
-//                .baljuWhere("집앞")
-//                .baljuPlz("조용히")
-//                .filename("avc")
-//                .memberDTO(memberService.findMemberDto(1L, null))
-//                .contractDTO(optionalContractDTO.orElse(null)) // Optional에서 값을 추출
-//                .build();
-//
-//
-//        baljuService.createBalju(dto);
-    }
     @Test
     @Transactional
     @Commit
@@ -70,54 +49,7 @@ public class BaljuServiceTests {
     @Transactional
     @Commit
     public void test12(){
-        BaljuDTO baljuDTO=BaljuDTO.builder()
-                .baljuNum(2000L)
-                .baljuDate(LocalDateTime.now().plusDays(6L))
-                .baljuWhere("경기도 수원시")
-                .baljuPlz("잘")
-                .filename("")
-                .memberDTO(memberService.findMemberDto(1L, null))
-                .contractDTO(contractService.getContractById(1L))
-                .build();
-        baljuService.createBalju(baljuDTO);
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test1234(){
-        PageRequestDTO2 requestDTO=PageRequestDTO2.builder().page2(1).size2(2).build();
-        System.out.println(baljuService.finishedBalju(requestDTO));
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test11(){
-        PageRequestDTO requestDTO=PageRequestDTO.builder().page(1).size(2).pno(2L).build();
-        System.out.println(baljuService.partnerBaljuList(requestDTO));
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test22(){
-        System.out.println(baljuRepository.partListBalju(2L));
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test456(){
-//        Pageable pageable=PageRequest.of(0,2);
-//        System.out.println(baljuRepository.finishBalju(pageable));
-        PageRequestDTO2 requestDTO2=PageRequestDTO2.builder().size2(2).page2(1).build();
-        System.out.println(baljuService.finishedBalju(requestDTO2));
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test22222(){
-//        PageRequestDTO2 requestDTO2=PageRequestDTO2.builder().size2(2).page2(1).build();
-//        System.out.println(baljuService.finBaljuPage(requestDTO2));
-        PageRequestDTO2 requestDTO=PageRequestDTO2.builder().size2(2).page2(1).build();
-        System.out.println(baljuService.finBaljuPage(requestDTO));
+        System.out.println(baljuService.baljuProduct());
     }
 
 }

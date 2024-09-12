@@ -236,9 +236,15 @@ public class ShipmentServiceImpl implements ShipmentService {
         return shipmentRepository.findShipment(shipNo);
     }
 
+
     @Override
     public PageResultDTO<ShipmentGumsuDTO, Object[]> pageShipment(PageRequestDTO requestDTO){
         Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery(requestDTO);
+        return new PageResultDTO<>(entityPage, this::shipmentGumsuToDTO);
+    }
+    @Override
+    public PageResultDTO<ShipmentGumsuDTO, Object[]> mainShipment(PageRequestDTO requestDTO){
+        Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery2(requestDTO);
         return new PageResultDTO<>(entityPage, this::shipmentGumsuToDTO);
     }
     private ShipmentGumsuDTO shipmentGumsuToDTO(Object[] objects){
@@ -252,12 +258,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         reNo=(reNo!=null)?reNo:0L;
         return new ShipmentGumsuDTO(shipmentDTO, gumsuDTO, totalShipment, reNo);
     }
-    @Override
-    public PageResultDTO<ShipmentGumsuDTO, Object[]> mainShipment(PageRequestDTO requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("shipNO").descending());
-        Page<Object[]> entityPage=shipmentRepository.mainShipment(pageable);
-        return new PageResultDTO<>(entityPage, this::shipmentGumsuToDTO);
-    }
+
 
     @Override
     public PageResultDTO<ShipmentDTO, Object[]> noneInvoiceShipment(PageRequestDTO requestDTO){

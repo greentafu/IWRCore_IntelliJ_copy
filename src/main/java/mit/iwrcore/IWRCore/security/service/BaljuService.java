@@ -2,10 +2,12 @@ package mit.iwrcore.IWRCore.security.service;
 
 
 import mit.iwrcore.IWRCore.entity.Balju;
+import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.ProductDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.NewOrderDTO;
 
@@ -49,4 +51,7 @@ public interface BaljuService {
 
     // 발주한 하는 목록(협력회사로 묶음)
     List<NewOrderDTO> modifyBalju(Long pno);
+
+    // 발주한 제품 목록
+    List<ProductDTO> baljuProduct();
 }

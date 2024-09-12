@@ -1,6 +1,8 @@
 package mit.iwrcore.IWRCore.repository;
 
+import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.entity.Balju;
+import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.repositoryDSL.BaljuRepositoryCustom;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
 import org.springframework.data.domain.Page;
@@ -67,4 +69,11 @@ public interface BaljuRepository extends JpaRepository<Balju, Long>, BaljuReposi
             "left join JodalChasu jc on (c.jodalPlan.joNo=jc.jodalPlan.joNo) " +
             "where b.baljuNo is not null and b.finCheck=0 and c.partner.pno=:pno")
     List<Object[]> modifyBalju(Long pno);
+
+    @Transactional
+    @EntityGraph(attributePaths = {"contract"})
+    @Query("select distinct b.contract.jodalPlan.proPlan.product from Balju b " +
+            "left join Contract c on (b.contract.conNo=c.conNo) " +
+            "where b.finCheck=0")
+    List<Object[]> baljuProductList();
 }

@@ -47,4 +47,10 @@ public class PageRequestDTO {
     private Long materS;
     private String materialSearch;
     private Long box;
+    // 발주완료여부
+    private Long baljuFin;
+    // 입고반품상태
+    private Long receiveReturn;
+    // 발주중 제품
+    private Long baljuProductName;
 }

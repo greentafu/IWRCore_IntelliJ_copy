@@ -29,7 +29,7 @@ public class BaljuServiceImpl implements BaljuService {
     private final MemberService memberService; // Member 엔티티를 위한 리포지토리
     private final ContractService contractService; // Contract 엔티티를 위한 리포지토리
     private final JodalChasuService jodalChasuService;
-
+    private final ProductService productService;
 
     // DTO를 엔티티로 변환
     @Override
@@ -197,5 +197,17 @@ public class BaljuServiceImpl implements BaljuService {
             }
         }
         return newOrderDTOList;
+    }
+
+    @Override
+    public List<ProductDTO> baljuProduct(){
+        List<Object[]> entityList=baljuRepository.baljuProductList();
+        List<ProductDTO> dtoList=entityList.stream().map(this::ObjectToProductDTO).toList();
+        return dtoList;
+    }
+    private ProductDTO ObjectToProductDTO(Object[] objects){
+        Product product=(Product) objects[0];
+        ProductDTO productDTO=(product!=null)?productService.productEntityToDto(product):null;
+        return productDTO;
     }
 }

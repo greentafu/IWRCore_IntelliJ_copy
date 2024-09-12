@@ -146,15 +146,23 @@
                     <th rowspan="2">자재명</th>
                     <th colspan="4" class="text-center">수량</th>
                     <th rowspan="2">
-                      <select class="form-select form-select-sm" style="width: fit-content;">
-                        <option>전체 입고상태</option>
-                        <option>완료</option>
-                        <option>미완료</option>
+                      <select class="form-select form-select-sm" style="width: fit-content;" id="baljuFin">
+                        <option value="">전체 입고상태</option>
+                        <option value="0">미완료</option>
+                        <option value="1">완료</option>
                       </select>
                     </th>
                     <th rowspan="2">업체명</th>
                     <th rowspan="2">다운로드</th>
-                    <th rowspan="2">반품/입고</th>
+                    <th rowspan="2">
+                      <select class="form-select form-select-sm" style="width: fit-content;" id="receiveReturn">
+                        <option value="">전체 상태</option>
+                        <option value="0">수령 준비</option>
+                        <option value="1">검수 중</option>
+                        <option value="2">입고 상태</option>
+                        <option value="3">반품 상태</option>
+                      </select>
+                    </th>
                     <th rowspan="2">추가 요청</th>
                   </tr>
                   <tr>
@@ -246,6 +254,8 @@
       let selectMaterM = null;
       let selectMaterS = null;
       let materialSearch = null;
+      let baljuFin = null;
+      let receiveReturn = null;
 
       function partnerSearchBtn(){
         page = 1;
@@ -278,16 +288,36 @@
         loadItems();
       }
 
+      document.getElementById('baljuFin').addEventListener("change", function(){
+        baljuFin=document.getElementById('baljuFin').value;
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        loadItems();
+      });
+
+      document.getElementById('receiveReturn').addEventListener("change", function(){
+        receiveReturn=document.getElementById('receiveReturn').value;
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        loadItems();
+      });
+
       function loadItems() {
         const content1 = document.getElementById("content1");
         const firstTbody = document.getElementById("firstTbody");
+
+        baljuFin=(document.getElementById("baljuFin").value!='')?document.getElementById("baljuFin").value:null;
+        receiveReturn=(document.getElementById("receiveReturn").value!='')?document.getElementById("receiveReturn").value:null;
 
         $.ajax({
           url:'/list/shipmentList',
           method:'GET',
           data:{page:page, selectPartL:selectPartL, selectPartM:selectPartM, selectPartS:selectPartS, partnerSearch:partnerSearch,
                 selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
-                selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch},
+                selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch,
+                baljuFin:baljuFin, receiveReturn:receiveReturn},
           success:function(data){
             if(data.totalPage<page) finPage=true;
 

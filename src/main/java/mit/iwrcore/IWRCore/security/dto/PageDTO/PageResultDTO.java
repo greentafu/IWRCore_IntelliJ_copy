@@ -75,5 +75,11 @@ public class PageResultDTO<DTO, EN> {
     private Long progressContract2;
     // 발주 진행
     private Long baljuProgress2;
+    // 발주완료여부
+    private Long baljuFin;
+    // 입고반품상태
+    private Long receiveReturn;
+    // 발주중 제품
+    private Long baljuProductName;
 
 }
