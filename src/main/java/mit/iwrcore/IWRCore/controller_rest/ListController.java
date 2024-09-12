@@ -38,6 +38,8 @@ public class ListController {
     private GumsuService gumsuService;
     @Autowired
     private GumsuChasuService gumsuChasuService;
+    @Autowired
+    private ShipmentService shipmentService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -292,5 +294,27 @@ public class ListController {
                 .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch).build();
 
         return gumsuChasuService.getAllGumsuChasuContract(requestDTO);
+    }
+
+    @GetMapping("/shipmentList")
+    public PageResultDTO<ShipmentGumsuDTO, Object[]> shipmentList(@RequestParam(required = false) int page,
+                                                                       @RequestParam(required = false) Long selectPartL, @RequestParam(required = false) Long selectPartM,
+                                                                       @RequestParam(required = false) Long selectPartS, @RequestParam(required = false) String partnerSearch,
+                                                                       @RequestParam(required = false) Long selectProL, @RequestParam(required = false) Long selectProM,
+                                                                       @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch,
+                                                                       @RequestParam(required = false) Long selectMaterL, @RequestParam(required = false) Long selectMaterM,
+                                                                       @RequestParam(required = false) Long selectMaterS, @RequestParam(required = false) String materialSearch){
+
+        if (partnerSearch != null && partnerSearch.trim().isEmpty()) { partnerSearch = null; }
+        if (productSearch != null && productSearch.trim().isEmpty()) { productSearch = null; }
+        if (materialSearch != null && materialSearch.trim().isEmpty()) { materialSearch = null; }
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .partL(selectPartL).partM(selectPartM).partS(selectPartS).partnerSearch(partnerSearch)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
+                .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch).build();
+
+        return shipmentService.pageShipment(requestDTO);
     }
 }

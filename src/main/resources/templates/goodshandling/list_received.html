@@ -13,7 +13,12 @@
   <span id="head">
     <title>입고 목록</title>
     <!--Style-->
-
+    <style>
+      #content1 {
+        height: 650px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
     <!--/Style-->
   </span>
 
@@ -53,12 +58,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="partnerSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -88,12 +91,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn()">검색</button>
                   </td>
                 </tr>
                 <tr>
@@ -123,12 +124,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="materialSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="materialSearchBtn()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -138,148 +137,36 @@
         <!--/검색-->
         <div class="card-body">
           <div class="table-responsive text-nowrap">
-            <table class="table table-bordered mb-4">
-              <thead>
-                <tr>
-                  <th rowspan="2">수령일자</th>
-                  <th rowspan="2">자재번호</th>
-                  <th rowspan="2">자재명</th>
-                  <th colspan="4" class="text-center">수량</th>
-                  <th rowspan="2">
-                    <select class="form-select form-select-sm" style="width: fit-content;">
-                      <option>전체 입고상태</option>
-                      <option>완료</option>
-                      <option>미완료</option>
-                    </select>
-                  </th>
-                  <th rowspan="2">업체명</th>
-                  <th rowspan="2">다운로드</th>
-                  <th rowspan="2">반품/입고</th>
-                  <th rowspan="2">추가 요청</th>
-                </tr>
-                <tr>
-                  <th>요청</th>
-                  <th>총입고</th>
-                  <th>필요</th>
-                  <th>검수량</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="list:${list.dtoList}">
-                  <td>
-                    <th:block th:if="${list.shipmentDTO.receipt}==null">배송중</th:block>
-                    <th:block th:if="${list.shipmentDTO.receipt}!=null">[[${#temporals.format(list.shipmentDTO.receipt, 'yyyy-MM-dd')}]]</th:block>
-                  </td>
-                  <td>
-                    <i class="fab fa-bootstrap fa-lg text-primary me-3"></i>
-                    <strong>[[${list.shipmentDTO.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.materCode}]]</strong>
-                  </td>
-                  <td>
-                    <a th:href="@{/goodshandling/view_received(shipNO=${list.shipmentDTO.shipNO})}">
-                      [[${list.shipmentDTO.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}]]
-                    </a>
-                  </td>
-                  <td>[[${list.shipmentDTO.baljuDTO.baljuNum}]]</td>
-                  <td>[[${list.totalShipment}]]</td>
-                  <td>[[${list.shipmentDTO.baljuDTO.baljuNum-list.totalShipment}]]</td>
-                  <td>
-                    <th:block th:if="${list.shipmentDTO.receipt==null}">
-                      <button
-                              type="button"
-                              class="btn btn-outline-primary btn-sm"
-                              data-bs-toggle="modal"
-                              data-bs-target="#modalCenter2"
-                              th:shipNum="${list.shipmentDTO.shipNum}"
-                              th:shipNo="${list.shipmentDTO.shipNO}"
-                              onclick="receivebutton(this)"
-                      >
-                        수령
-                      </button>
-                    </th:block>
-                    <th:block th:if="${list.shipmentDTO.receipt!=null}">
-                      <th:block th:if="${list.shipmentDTO.receiveCheck==1}">
-                        <span style="color: green;">[[${list.shipmentDTO.shipNum}]] (입고)</span>
-                      </th:block>
-                      <th:block th:if="${list.reNo!=0}">
-                        <span style="color: red;">[[${list.shipmentDTO.shipNum}]] (반품)</span>
-                      </th:block>
-                      <th:block th:if="${list.shipmentDTO.receiveCheck==0 && list.reNo==0}">
-                        [[${list.shipmentDTO.shipNum}]] (입고대기)
-                      </th:block>
-                    </th:block>
-                  </td>
-                  <td>
-                    <th:block th:if="${list.shipmentDTO.baljuDTO.baljuNum-list.totalShipment}==0">
-                      <span style="color: green;">완료</span>
-                    </th:block>
-                    <th:block th:if="${list.shipmentDTO.baljuDTO.baljuNum-list.totalShipment}!=0">
-                      <span style="color: red;">미완료</span>
-                    </th:block>
-                  </td>
-                  <td>[[${list.shipmentDTO.baljuDTO.contractDTO.partnerDTO.name}]]</td>
-                  <td>
-                    <button type="button" class="btn btn-outline-primary">
-                      <span class="bx bx-download"></span>
-                    </button>
-                  </td>
-
-                  <td>
-                    <th:block th:if="${list.shipmentDTO.receipt!=null && list.reNo==0 && list.shipmentDTO.receiveCheck==0}">
-                      <a th:href="@{/goodshandling/return_received(shipNo=${list.shipmentDTO.shipNO})}">
-                        <button class="btn btn-primary">반품</button>
-                      </a>
-                      <button
-                              type="button"
-                              class="btn btn-secondary"
-                              data-bs-toggle="modal"
-                              data-bs-target="#modalCenter"
-                              th:shipNum="${list.shipmentDTO.shipNum}"
-                              th:shipNo="${list.shipmentDTO.shipNO}"
-                              onclick="receiveConfirm(this)"
-                      >
-                        입고
-                      </button>
-                    </th:block>
-                    <th:block th:if="${list.shipmentDTO.receiveCheck==1}">
-                      <a href="javascript:void(0);" class="menu-link" onclick="alert('이미 완료된 작업 입니다.');">
-                        <button  class="btn btn-secondary">입고완료</button>
-                      </a>
-                    </th:block>
-                    <th:block th:if="${list.reNo!=0}">
-                      <a href="javascript:void(0);" class="menu-link" onclick="alert('이미 완료된 작업 입니다.');">
-                        <button  class="btn btn-secondary">반품완료</button>
-                      </a>
-                    </th:block>
-                  </td>
-
-                  <td>
-                    <button onclick="showOptions()" class="btn btn-outline-primary">요청</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center">
-                <th:block th:if="${list.prev}">
-                  <li class="page-item prev">
-                    <a class="page-link"
-                       th:href="@{/goodshandling/list_received(page=${list.start}-1)}"><i class="tf-icon bx bx-chevrons-left"></i></a>
-                  </li>
-                </th:block>
-                <th:block th:each="pagenum:${list.pageList}">
-                  <li class="page-item " th:classappend="${list.page}==${pagenum}? active">
-                    <a class="page-link"
-                       th:href="@{/goodshandling/list_received(page=${pagenum})}">[[${pagenum}]]</a>
-                  </li>
-                </th:block>
-                <th:block th:if="${list.next}">
-                  <li class="page-item next">
-                    <a class="page-link"
-                       th:href="@{/goodshandling/list_received(page=${list.end}+1)}"><i class="tf-icon bx bx-chevrons-right"></i></a>
-                  </li>
-                </th:block>
-              </ul>
-            </nav>
+            <div id="content1" class="mb-4">
+              <table class="table table-bordered mb-4">
+                <thead>
+                  <tr>
+                    <th rowspan="2">수령일자</th>
+                    <th rowspan="2">자재번호</th>
+                    <th rowspan="2">자재명</th>
+                    <th colspan="4" class="text-center">수량</th>
+                    <th rowspan="2">
+                      <select class="form-select form-select-sm" style="width: fit-content;">
+                        <option>전체 입고상태</option>
+                        <option>완료</option>
+                        <option>미완료</option>
+                      </select>
+                    </th>
+                    <th rowspan="2">업체명</th>
+                    <th rowspan="2">다운로드</th>
+                    <th rowspan="2">반품/입고</th>
+                    <th rowspan="2">추가 요청</th>
+                  </tr>
+                  <tr>
+                    <th>요청</th>
+                    <th>총입고</th>
+                    <th>필요</th>
+                    <th>검수량</th>
+                  </tr>
+                </thead>
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -344,6 +231,187 @@
     <!--/Modal-->
 
     <!--Script-->
+    <script>
+      let page = 1;
+      let finPage=false;
+      let selectPartL = null;
+      let selectPartM = null;
+      let selectPartS = null;
+      let partnerSearch = null;
+      let selectProL = null;
+      let selectProM = null;
+      let selectProS = null;
+      let productSearch = null;
+      let selectMaterL = null;
+      let selectMaterM = null;
+      let selectMaterS = null;
+      let materialSearch = null;
+
+      function partnerSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectPartL = (document.getElementById("selectPartL").value!=null)?document.getElementById("selectPartL").value:null;
+        selectPartM = (document.getElementById("selectPartM").value!=null)?document.getElementById("selectPartM").value:null;
+        selectPartS = (document.getElementById("selectPartS").value!=null)?document.getElementById("selectPartS").value:null;
+        partnerSearch = (document.getElementById("partnerSearch").value!=null)?document.getElementById("partnerSearch").value:null;
+        loadItems();
+      }
+      function productSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectProL = (document.getElementById("selectProL").value!=null)?document.getElementById("selectProL").value:null;
+        selectProM = (document.getElementById("selectProM").value!=null)?document.getElementById("selectProM").value:null;
+        selectProS = (document.getElementById("selectProS").value!=null)?document.getElementById("selectProS").value:null;
+        productSearch = (document.getElementById("productSearch").value!=null)?document.getElementById("productSearch").value:null;
+        loadItems();
+      }
+      function materialSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectMaterL = (document.getElementById("selectMaterL").value!=null)?document.getElementById("selectMaterL").value:null;
+        selectMaterM = (document.getElementById("selectMaterM").value!=null)?document.getElementById("selectMaterM").value:null;
+        selectMaterS = (document.getElementById("selectMaterS").value!=null)?document.getElementById("selectMaterS").value:null;
+        materialSearch = (document.getElementById("materialSearch").value!=null)?document.getElementById("materialSearch").value:null;
+        loadItems();
+      }
+
+      function loadItems() {
+        const content1 = document.getElementById("content1");
+        const firstTbody = document.getElementById("firstTbody");
+
+        $.ajax({
+          url:'/list/shipmentList',
+          method:'GET',
+          data:{page:page, selectPartL:selectPartL, selectPartM:selectPartM, selectPartS:selectPartS, partnerSearch:partnerSearch,
+                selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
+                selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch},
+          success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+              const shipNum=x.shipmentDTO.shipNum;
+              const shipNO=x.shipmentDTO.shipNO;
+              const receiveCheck=x.shipmentDTO.receiveCheck;
+              const reNo=x.reNo;
+              const partnerName=x.shipmentDTO.baljuDTO.contractDTO.partnerDTO.name;
+              const receipt=x.shipmentDTO.receipt;
+              const materCode=x.shipmentDTO.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.materCode;
+              const materialName=x.shipmentDTO.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name;
+              const baljuNum=x.shipmentDTO.baljuDTO.baljuNum;
+              const totalShipment=x.totalShipment;
+
+              const newRow = document.createElement("tr");
+
+              const receiptTd = document.createElement("td");
+              if(receipt==null) { receiptTd.textContent = '배송중'; }
+              if(receipt!=null) { receiptTd.textContent = receipt.split('T')[0]; }
+              newRow.appendChild(receiptTd);
+
+              const materCodeTd = document.createElement("td");
+              materCodeTd.innerHTML=`
+                <i class="fab fa-bootstrap fa-lg text-primary me-3"></i>
+                <strong>${materCode}</strong>
+              `;
+              newRow.appendChild(materCodeTd);
+
+              const materialNameTd = document.createElement("td");
+              materialNameTd.innerHTML=`
+                <a href="/goodshandling/view_received?shipNO=${shipNO}">${materialName}</a>
+              `;
+              newRow.appendChild(materialNameTd);
+
+              [baljuNum, totalShipment, baljuNum-totalShipment].forEach(text => {
+                const item = document.createElement("td");
+                item.textContent = text;
+                newRow.appendChild(item);
+              });
+
+              const recieveBtnTd = document.createElement("td");
+              if(receipt==null) { recieveBtnTd.innerHTML=`
+                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCenter2" shipNum="${shipNum}" shipNo="${shipNO}" onclick="receivebutton(this)">
+                  수령
+                </button>
+              `; }
+              if(receipt!=null) {
+                if(receiveCheck==1) { recieveBtnTd.innerHTML=`<span style="color: green;">${shipNum} (입고)</span>`; }
+                if(reNo!=0) { recieveBtnTd.innerHTML=`<span style="color: red;">${shipNum} (반품)</span>`; }
+                if(receiveCheck==0 && reNo==0) { recieveBtnTd.textContent = shipNum+' (입고대기)'; }
+              }
+              newRow.appendChild(recieveBtnTd);
+
+              const totalRecieveTd = document.createElement("td");
+              if(baljuNum-totalShipment==0) { totalRecieveTd.innerHTML=`<span style="color: green;">완료</span>`; }
+              if(baljuNum-totalShipment!=0) { totalRecieveTd.innerHTML=`<span style="color: red;">미완료</span>`; }
+              newRow.appendChild(totalRecieveTd);
+
+              const partnerNameTd = document.createElement("td");
+              partnerNameTd.textContent = partnerName;
+              newRow.appendChild(partnerNameTd);
+
+              const btn0Td = document.createElement("td");
+              btn0Td.innerHTML=`
+                <button type="button" class="btn btn-outline-primary">
+                  <span class="bx bx-download"></span>
+                </button>
+              `;
+              newRow.appendChild(btn0Td);
+
+              const receiveReturnTd = document.createElement("td");
+              if(receipt!=null && reNo==0 && receiveCheck==0) { receiveReturnTd.innerHTML=`
+                <a href="/goodshandling/return_received?shipNo=${shipNO}">
+                  <button class="btn btn-primary">반품</button>
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalCenter" shipNum="${shipNum}" shipNo="${shipNO}" onclick="receiveConfirm(this)">
+                  입고
+                </button>
+              `;
+              }
+              if(receiveCheck==1) { receiveReturnTd.innerHTML=`
+                <a href="javascript:void(0);" class="menu-link" onclick="alert('이미 완료된 작업 입니다.');">
+                  <button  class="btn btn-secondary">입고완료</button>
+                </a>
+              `;
+              }
+              if(reNo!=0) { receiveReturnTd.innerHTML=`
+                <a href="javascript:void(0);" class="menu-link" onclick="alert('이미 완료된 작업 입니다.');">
+                  <button  class="btn btn-secondary">반품완료</button>
+                </a>
+              `;
+              }
+              newRow.appendChild(receiveReturnTd);
+
+              const btn2Td = document.createElement("td");
+              btn2Td.innerHTML=`<button onclick="showOptions()" class="btn btn-outline-primary">요청</button>`;
+              newRow.appendChild(btn2Td);
+
+              firstTbody.appendChild(newRow);
+            });
+          }
+        });
+
+        page++;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems();
+            }
+          }
+        });
+
+        loadItems();
+      });
+    </script>
+
     <script>
       function receivebutton(button){
         var shipNum=button.getAttribute('shipNum');

@@ -1,6 +1,7 @@
 package mit.iwrcore.IWRCore.repository;
 
 import mit.iwrcore.IWRCore.entity.*;
+import mit.iwrcore.IWRCore.repositoryDSL.ShipmentRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-public interface ShipmentRepository extends JpaRepository<Shipment,Long> {
+public interface ShipmentRepository extends JpaRepository<Shipment,Long>, ShipmentRepositoryCustom {
     @Query("select s from Shipment s where s.balju.baljuNo=:baljuNo")
     List<Shipment> getShipmentByBalju(Long baljuNo);
 

@@ -72,13 +72,6 @@ public class JodalChasuServiceImpl implements JodalChasuService {
     public JodalChasuDTO updateJodalChasu(JodalChasuDTO dto) {
         JodalChasuDTO jodalChasuDTO=createJodalChasu(dto);
         return jodalChasuDTO;
-//        if (!jodalChasuRepository.existsById(id)) {
-//            throw new RuntimeException("ID가 " + id + "인 JodalChasuDTO를 찾을 수 없습니다.");
-//        }
-//        JodalChasu entity = convertToEntity(dto);
-//        entity.setJoNum(id); // 수정할 때 ID를 설정합니다.
-//        JodalChasu updatedEntity = jodalChasuRepository.save(entity);
-//        return convertToDTO(updatedEntity);
     }
 
     @Override
@@ -119,7 +112,9 @@ public class JodalChasuServiceImpl implements JodalChasuService {
         long entire1= ChronoUnit.DAYS.between(baljuDate, list.get(0).getDueDate()); // 전체 일수
         long current1= ChronoUnit.DAYS.between(baljuDate, now); // 현재까지의 일수
         Float temp1=Float.parseFloat(String.format("%.2f", current1*100f/entire1));
-        if(current1==0L) temp1=100.0f;
+        if(current1==0L) temp1=0.0f;
+        long nowBalju=ChronoUnit.DAYS.between(now, list.get(0).getDueDate());
+        if(nowBalju<=0L) temp1=100.0f;
 
         if(temp1<0) list.get(0).setPercent(0f);
         else if(temp1>100) list.get(0).setPercent(100f);

@@ -238,8 +238,7 @@ public class ShipmentServiceImpl implements ShipmentService {
 
     @Override
     public PageResultDTO<ShipmentGumsuDTO, Object[]> pageShipment(PageRequestDTO requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("shipNO").descending());
-        Page<Object[]> entityPage=shipmentRepository.shipmentPage(pageable);
+        Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery(requestDTO);
         return new PageResultDTO<>(entityPage, this::shipmentGumsuToDTO);
     }
     private ShipmentGumsuDTO shipmentGumsuToDTO(Object[] objects){
