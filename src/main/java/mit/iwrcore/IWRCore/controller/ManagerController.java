@@ -110,6 +110,12 @@ public class ManagerController {
                              @RequestParam(required = false) String pw){
         Long temp_pno=(pno!=null)?pno:null;
         String temp_pw=(pw!=null && pw!="")?pw:"1111";
+        String temp_id=null;
+        if(id!=null && id!="") temp_id=id;
+        else if(pno!=null && (id==null || id=="")){
+            temp_id="partner" + pno + "_" + registerNum.substring(7);
+        }
+
         PartSDTO partSDTO=partCodeService.findPartS(selectPartS);
         PartnerDTO partnerDTO=PartnerDTO.builder()
                 .pno(temp_pno).name(name).registrationNumber(registerNum)
@@ -117,7 +123,7 @@ public class ManagerController {
                 .telNumber(phonenumber).faxNumber(faxnumber).email(email)
                 .partSDTO(partSDTO)
                 .contacter(cname).contacterNumber(cnumber).contacterEmail(cmail)
-                .id((id!=null)?id:null).pw(temp_pw).password(passwordEncoder.encode(temp_pw)).build();
+                .id(temp_id).pw(temp_pw).password(passwordEncoder.encode(temp_pw)).build();
         partnerService.insertPartner(partnerDTO);
         return "redirect:/manager/list_partner";
     }
@@ -125,6 +131,11 @@ public class ManagerController {
     public String delete_member(@RequestParam(required = false) Long mno){
         memberService.deleteMember(mno);
         return "redirect:/manager/list_member";
+    }
+    @GetMapping("/delete_partner")
+    public String delete_partner(@RequestParam(required = false) Long pno){
+        partnerService.deletePartner(pno);
+        return "redirect:/manager/list_partner";
     }
 
 }

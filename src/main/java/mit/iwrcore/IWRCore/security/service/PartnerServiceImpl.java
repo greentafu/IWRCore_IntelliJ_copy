@@ -59,25 +59,52 @@ public class PartnerServiceImpl implements PartnerService{
     @Override
     public Integer insertPartner(PartnerDTO dto) {
         if(dto.getId()!=null){
-            if(findPartnerDto(null, dto.getId(), null)!=null)
-                return 2;
-            else if(findPartnerEntity(null, null, dto.getRegistrationNumber())!=null){
-                return 1;
+            Partner existPartnerID=findPartnerEntity(null, dto.getId(), null);
+            Partner existPartnerReg=findPartnerEntity(null, null, dto.getRegistrationNumber());
+
+            if(existPartnerReg==null){
+                if(existPartnerID==null){
+                    Partner partner=partnerDtoToEntity(dto);
+                    partner.setPartnerRole(MemberRole.PARTNER);
+                    partnerRepository.save(partner);
+                    return 0;
+                }else return 2;
             }else{
+                if(dto.getPno()==null) return 1;
+                else{
+                    if(existPartnerReg.getPno().equals(dto.getPno())){
+                        if(existPartnerID==null){
+                            Partner partner=partnerDtoToEntity(dto);
+                            partner.setPartnerRole(MemberRole.PARTNER);
+                            partnerRepository.save(partner);
+                            return 0;
+                        }else{
+                            if(existPartnerID.getPno().equals(dto.getPno())){
+                                Partner partner=partnerDtoToEntity(dto);
+                                partner.setPartnerRole(MemberRole.PARTNER);
+                                partnerRepository.save(partner);
+                                return 0;
+                            }else return 2;
+                        }
+                    }else return 1;
+                }
+            }
+        }else{
+            Partner existPartnerReg=findPartnerEntity(null, null, dto.getRegistrationNumber());
+
+            if(existPartnerReg==null){
                 Partner partner=partnerDtoToEntity(dto);
                 partner.setPartnerRole(MemberRole.PARTNER);
                 partnerRepository.save(partner);
                 return 0;
+            }else{
+                if(existPartnerReg.getPno().equals(dto.getPno())){
+                    Partner partner=partnerDtoToEntity(dto);
+                    partner.setPartnerRole(MemberRole.PARTNER);
+                    partnerRepository.save(partner);
+                    return 0;
+                }else return 1;
             }
-        }
-        else{
-            if(findPartnerEntity(null, null, dto.getRegistrationNumber())!=null){
-                return 1;
-            }
-            Partner partner=partnerDtoToEntity(dto);
-            partner.setPartnerRole(MemberRole.PARTNER);
-            partnerRepository.save(partner);
-            return 0;
         }
     }
 

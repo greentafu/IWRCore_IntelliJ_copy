@@ -56,4 +56,25 @@ public class InputController {
 
         return result;
     }
+
+    @GetMapping("/regNum")
+    public Long regNum(@RequestParam(required = false) Long pno, @RequestParam(required = false) String registerNum){
+        PartnerDTO partnerDTOPno=null;
+        PartnerDTO partnerDTOReg=null;
+        if(pno!=null){ partnerDTOPno=partnerService.findPartnerDto(pno, null, null); }
+        if(registerNum!=null){ partnerDTOReg=partnerService.findPartnerDto(null, null, registerNum); }
+
+        Long result=0L;
+
+        if(partnerDTOPno==null){
+            if(partnerDTOReg==null) result=0L;
+            else result=1L;
+        }else {
+            if(partnerDTOReg==null) result=0L;
+            else if(partnerDTOPno.getPno().equals(partnerDTOReg.getPno())) result=2L;
+            else result=1L;
+        }
+
+        return result;
+    }
 }

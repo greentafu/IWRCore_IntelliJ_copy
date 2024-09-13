@@ -1,20 +1,18 @@
 $(document).ready(function(){
-    var Lcode = $('#prePartL').text();
-    var Mcode = $('#prePartM').text();
-    var Scode = $('#prePartS').text();
+    var Lcode = $('#selectPartL').val();
+    var Mcode = $('#selectPartM').val();
+    var Scode = $('#selectPartS').val();
 
     Lcode=(Lcode==="")?null:Lcode;
     Mcode=(Mcode==="")?null:Mcode;
     Scode=(Scode==="")?null:Scode;
 
-    console.log(Lcode+"/"+Mcode+"/"+Scode);
+    console.log("PART: "+Lcode+"/"+Mcode+"/"+Scode);
 
     if(Lcode===null && Mcode===null && Scode===null){
-        console.log("비었다")
         initPart1();
     }
     else{
-        console.log("채웠다")
         searchPartCode(Lcode, Mcode, Scode);
     }
     initPart2();
@@ -36,6 +34,7 @@ function initPart1(){
                     $('<option></option>')
                         .attr('value', partL.partLcode)
                         .text(partL.lname)
+                        .prop('selected', partL.partLcode == data.l)
                 );
             });
             data.partMDTOs.forEach(function(partM) {
@@ -43,6 +42,7 @@ function initPart1(){
                     $('<option></option>')
                         .attr('value', partM.partMcode)
                         .text(partM.mname)
+                        .prop('selected', partM.partMcode == data.m)
                 );
             });
             data.partSDTOs.forEach(function(partS) {
@@ -50,6 +50,7 @@ function initPart1(){
                     $('<option></option>')
                         .attr('value', partS.partScode)
                         .text(partS.sname)
+                        .prop('selected', partS.partScode == data.s)
                 );
             });
 
@@ -76,6 +77,7 @@ function initPart2(){
                     $('<option></option>')
                         .attr('value', partL.partLcode)
                         .text(partL.lname)
+                        .prop('selected', partL.partLcode == data.l)
                 );
             });
             data.partMDTOs.forEach(function(partM) {
@@ -83,6 +85,7 @@ function initPart2(){
                     $('<option></option>')
                         .attr('value', partM.partMcode)
                         .text(partM.mname)
+                        .prop('selected', partM.partMcode == data.m)
                 );
             });
             data.partSDTOs.forEach(function(partS) {
@@ -90,6 +93,7 @@ function initPart2(){
                     $('<option></option>')
                         .attr('value', partS.partScode)
                         .text(partS.sname)
+                        .prop('selected', partS.partScode == data.s)
                 );
             });
         }

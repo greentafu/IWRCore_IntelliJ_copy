@@ -7,14 +7,10 @@ $(document).ready(function(){
     Mcode=(Mcode==="")?null:Mcode;
     Scode=(Scode==="")?null:Scode;
 
-    console.log("######"+Lcode+"/"+Mcode+"/"+Scode);
-
     if(Lcode===null && Mcode===null && Scode===null){
-        console.log("비었다")
         initMater1();
     }
     else{
-        console.log("채웠다")
         searchMaterCode(Lcode, Mcode, Scode);
     }
 
