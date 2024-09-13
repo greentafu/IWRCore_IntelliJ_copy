@@ -35,6 +35,7 @@
                             class="form-control"
                             name="name"
                             id="name"
+                            placeholder="실명 입력"
                             type="text"
                     />
                   </div>
@@ -62,8 +63,8 @@
                     <label class="form-label">접근권한</label>
                     <select class="select2 form-select" name="role">
                       <option value=0>관리자</option>
-                      <option value=1>생산/개발사원</option>
-                      <option value=2>자재사원</option>
+                      <option value=1>자재사원</option>
+                      <option value=2>생산/개발사원</option>
                     </select>
                   </div>
                   <div class="mb-3 col-md-6">
@@ -71,6 +72,7 @@
                     <input
                             class="form-control"
                             name="id"
+                            id="id"
                             placeholder="ert845dg"
                             type="text"
                     />
@@ -84,6 +86,7 @@
                             type="text"
                     />
                   </div>
+                  <div id="idCheck" class="mb-2"></div>
                 </div>
                 <!--뒤로가기,등록 버튼 세트-->
                 <div class="d-flex justify-content-between w-100">
@@ -105,17 +108,55 @@
 
     <!--Script-->
     <script>
+      let checkID=false;
+
       function saveMember(){
         var name=document.getElementById('name').value;
         var phonenumber=document.getElementById('phonenumber').value;
-        if(name.trim()===''){
+        if(checkID==true){
+          alert('존재하는 아이디입니다. 아이디를 변경해 주세요.');
+        }else if(name.trim()===''){
           alert('이름을 입력해 주세요.');
         }else if(phonenumber.trim()===''){
           alert('핸드폰 번호를 입력해 주세요.');
-        }else {
-          document.getElementById('saveMemberForm').submit();
+        }else if(phonenumber.trim()!=''){
+          const parts=phonenumber.split('-');
+          const size = parts.length;
+          if(size!=3 || parts[0].length!=3 || parts[1].length!=4 || parts[2].length!=4){
+            alert('핸드폰 번호를 지정된 형식으로 입력해 주세요.');
+          }else if(isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])){
+            alert('핸드폰 번호에 숫자만 입력해 주세요.');
+          }else{
+            document.getElementById('saveMemberForm').submit();
+          }
         }
       }
+
+      document.getElementById('id').addEventListener("input", function(){
+        let mno = null;
+        let pno = null;
+        let id = document.getElementById('id').value;
+
+        let inputMno=document.getElementById('mno');
+        let inputPno=document.getElementById('pno');
+        mno=(inputMno!=null)?inputMno.value:null;
+        pno=(inputPno!=null)?inputPno.value:null;
+
+        $.ajax({
+          url:'/input/id',
+          method:'GET',
+          data:{mno:mno, pno:pno, id:id},
+          success:function(data){
+            if(data==1){
+              checkID=true;
+              document.getElementById('idCheck').innerHTML=`<span style="color: red;">존재하는 아이디입니다.</span>`;
+            }else{
+              checkID=false;
+              document.getElementById('idCheck').innerHTML=``;
+            }
+          }
+        });
+      });
     </script>
     <!--Script-->
   </span>

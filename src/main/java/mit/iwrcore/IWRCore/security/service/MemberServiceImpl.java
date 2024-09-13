@@ -38,7 +38,9 @@ public class MemberServiceImpl implements MemberService{
     }
     @Override
     public MemberDTO findMemberDto(Long mno, String id) {
-        return memberTodto(memberRepository.findMember(mno, id));
+        Member member=memberRepository.findMember(mno, id);
+        if(member!=null) return memberTodto(member);
+        else return null;
     }
 
     // 직원 리스트
@@ -59,9 +61,19 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public Integer insertMember(MemberDTO dto, Long role) {
         if(dto.getId()!=null){
-            if(findMemberEntity(null, dto.getId())!=null)
-                return 0;
-            else{
+            Member existMember=findMemberEntity(null, dto.getId());
+
+            if(existMember!=null){
+                if(dto.getMno()==null) return 0;
+                else if(existMember.getMno().equals(dto.getMno())){
+                    Member member=memberdtoToEntity(dto);
+                    if(role==0) member.changeMemberRole(MemberRole.MANAGER);
+                    if(role==1) member.changeMemberRole(MemberRole.MATERIAL_TEAM);
+                    if(role==2) member.changeMemberRole(MemberRole.DEV_PROD_TEAM);
+                    memberRepository.save(member);
+                    return 1;
+                }else return 0;
+            }else{
                 Member member=memberdtoToEntity(dto);
                 if(role==0) member.changeMemberRole(MemberRole.MANAGER);
                 if(role==1) member.changeMemberRole(MemberRole.MATERIAL_TEAM);
@@ -69,8 +81,7 @@ public class MemberServiceImpl implements MemberService{
                 memberRepository.save(member);
                 return 1;
             }
-        }
-        else{
+        }else{
             Member member=memberdtoToEntity(dto);
             if(role==0) member.changeMemberRole(MemberRole.MANAGER);
             if(role==1) member.changeMemberRole(MemberRole.MATERIAL_TEAM);

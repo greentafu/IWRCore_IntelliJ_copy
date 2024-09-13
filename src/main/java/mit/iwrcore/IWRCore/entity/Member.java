@@ -38,7 +38,7 @@ public class Member extends BaseEntity{
 
     @PostPersist
     public void generateId(){
-        if(this.id==null || this.id.isEmpty()){
+        if(this.id==null || this.id.isEmpty() || this.id==""){
             String tempId=headId(department)+mno+"_"+phonenumber.substring(9);
             this.id=tempId;
         }

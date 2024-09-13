@@ -1,6 +1,7 @@
 package mit.iwrcore.IWRCore.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.Member;
 import mit.iwrcore.IWRCore.entity.MemberRole;
 import mit.iwrcore.IWRCore.repository.MemberRepository;
@@ -23,6 +24,7 @@ import java.util.Set;
 @Controller
 @RequestMapping("/manager")
 @RequiredArgsConstructor
+@Log4j2
 public class ManagerController {
 
     private final PartCodeService partCodeService;
@@ -80,11 +82,23 @@ public class ManagerController {
                             @RequestParam String department, @RequestParam Long role,
                             @RequestParam(required = false) String id, @RequestParam(required = false) String pw){
         String temp_pw=(pw!=null && pw!="")?pw:"1111";
+        String temp_id=null;
+        if(id!=null && id!="") temp_id=id;
+        else if(mno!=null && (id==null || id=="")){
+            String head="";
+            switch(department) {
+                case "자재부서": head="mate"; break;
+                case "개발부서": head="deve"; break;
+                case "생산부서": head="prod";
+            }
+            temp_id=head+mno+"_"+phonenumber.substring(9);
+        }
+
         MemberDTO memberDTO=MemberDTO.builder()
-                .mno((mno!=null)?mno:null).name(name).phonenumber(phonenumber)
-                .department(department).id((id!=null)?id:null)
-                .pw(temp_pw).password(passwordEncoder.encode(temp_pw)).build();
+                .mno((mno!=null)?mno:null).name(name).phonenumber(phonenumber).department(department)
+                .id(temp_id).pw(temp_pw).password(passwordEncoder.encode(temp_pw)).build();
         memberService.insertMember(memberDTO, role);
+
         return "redirect:/manager/list_member";
     }
     @GetMapping ("/save_partner")
@@ -106,6 +120,11 @@ public class ManagerController {
                 .id((id!=null)?id:null).pw(temp_pw).password(passwordEncoder.encode(temp_pw)).build();
         partnerService.insertPartner(partnerDTO);
         return "redirect:/manager/list_partner";
+    }
+    @GetMapping("/delete_member")
+    public String delete_member(@RequestParam(required = false) Long mno){
+        memberService.deleteMember(mno);
+        return "redirect:/manager/list_member";
     }
 
 }
