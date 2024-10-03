@@ -2,6 +2,7 @@ package mit.iwrcore.IWRCore.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.Structure;
 import mit.iwrcore.IWRCore.repository.MaterialRepository;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.MaterQuantityDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveProductDTO;
@@ -20,7 +21,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 @RequestMapping("/development")
@@ -57,7 +61,7 @@ public class DevelopmentController {
         model.addAttribute("structure_list", structureService.findByProduct_ManuCode(manuCode));
     }
     @PostMapping("/saveProduct")
-    public String saveProduct(@RequestBody SaveProductDTO saveProductDTO){
+    public Long saveProduct(@RequestBody SaveProductDTO saveProductDTO){
         ProductDTO productDTO=ProductDTO.builder()
                 .manuCode((saveProductDTO.getManuCode()!=null)? saveProductDTO.getManuCode():null)
                 .name(saveProductDTO.getProductName())
@@ -69,14 +73,9 @@ public class DevelopmentController {
                 .mater_check(0L)
                 .build();
         if(saveProductDTO.getSel()==1) productDTO.setMater_imsi(1L);
-        if(saveProductDTO.getSel()==2) {
+        if(saveProductDTO.getSel()==2 || saveProductDTO.getSel()==3) {
             productDTO.setMater_imsi(1L);
             productDTO.setMater_check(1L);
-        }
-
-        if(saveProductDTO.getManuCode()!=null){
-            List<StructureDTO> list=structureService.findByProduct_ManuCode(saveProductDTO.getManuCode());
-            list.forEach(x->structureService.deleteById(x.getSno()));
         }
 
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
@@ -86,26 +85,96 @@ public class DevelopmentController {
 
         ProSDTO proSDTO=proCodeService.findProS(saveProductDTO.getSelectProS());
         productDTO.setProSDTO(proSDTO);
-        System.out.println("@@@@@@#############"+productDTO);
         ProductDTO savedProductDTO=productService.addProduct(productDTO);
-        System.out.println("@@@@@@"+savedProductDTO);
 
-        for(MaterQuantityDTO materQuantityDTO:saveProductDTO.getMaterQuantityDTOs()){
-            MaterialDTO materialDTO=materialService.findM(materQuantityDTO.getCode());
-            System.out.println("#####"+materialDTO);
-
-            StructureDTO structureDTO=StructureDTO.builder()
-                    .productDTO(savedProductDTO)
-                    .materialDTO(materialDTO)
-                    .quantity(materQuantityDTO.getQuantity())
-                    .build();
-            structureService.save(structureDTO);
+        List<StructureDTO> stlist=null;
+        if(saveProductDTO.getManuCode()!=null){
+            stlist=new ArrayList<>(structureService.findByProduct_ManuCode(saveProductDTO.getManuCode()));
+            if(stlist.isEmpty()) stlist=null;
         }
-        return "redirect:/development/list_dev";
+        List<MaterQuantityDTO> quantityList=saveProductDTO.getMaterQuantityDTOs();
+        if(quantityList.isEmpty()) quantityList=null;
+
+        if(stlist==null && quantityList!=null){
+            // 새로운 structure 저장
+            quantityList.forEach(x->addStructure(savedProductDTO, x, x.getSno()));
+        }else if(stlist!=null && quantityList==null){
+            // 기존 structure 삭제
+            stlist.forEach(x->structureService.deleteById(x.getSno()));
+        }else if(stlist!=null && quantityList!=null){
+            Iterator<StructureDTO> iterator1 = stlist.iterator();
+            Iterator<MaterQuantityDTO> iterator2 = quantityList.iterator();
+            // 동일한 sno 갖는 structure 저장
+            while (iterator1.hasNext()) {
+                StructureDTO structure = iterator1.next();
+                while (iterator2.hasNext()){
+                    MaterQuantityDTO materQuantityDTO=iterator2.next();
+                    if (structure.getSno().equals(materQuantityDTO.getSno())) {
+                        addStructure(savedProductDTO, materQuantityDTO, materQuantityDTO.getSno());
+                        iterator1.remove();
+                        iterator2.remove();
+                        break;
+                    }
+                }
+            }
+            if(stlist.isEmpty()) stlist=null;
+            if(quantityList.isEmpty()) quantityList=null;
+
+            // 동일 sno 갖는 structure 저장 후
+            if(stlist==null && quantityList!=null) {
+                // 남은 새로운 structure 저장
+                quantityList.forEach(x->addStructure(savedProductDTO, x, x.getSno()));
+            }else if(stlist!=null && quantityList==null) {
+                // 남은 기존 structure 삭제
+                stlist.forEach(x->structureService.deleteById(x.getSno()));
+            }else if(stlist!=null && quantityList!=null) {
+                // 기존 structure가 많거나 같을 경우
+                iterator1 = stlist.iterator();
+                iterator2 = quantityList.iterator();
+                if(stlist.size()>=quantityList.size()){
+                    while (iterator2.hasNext()) {
+                        MaterQuantityDTO materQuantityDTO=iterator2.next();
+                        while (iterator1.hasNext()){
+                            StructureDTO structure = iterator1.next();
+                            addStructure(savedProductDTO, materQuantityDTO, structure.getSno());
+                            iterator1.remove();
+                            iterator2.remove();
+                            break;
+                        }
+                    }
+                    if(stlist!=null) stlist.forEach(x->structureService.deleteById(x.getSno()));
+                // 기존 structure가 적을 경우
+                }else if(stlist.size()<quantityList.size()){
+                    while (iterator1.hasNext()) {
+                        StructureDTO structure = iterator1.next();
+                        while (iterator2.hasNext()){
+                            MaterQuantityDTO materQuantityDTO=iterator2.next();
+                            addStructure(savedProductDTO, materQuantityDTO, structure.getSno());
+                            iterator1.remove();
+                            iterator2.remove();
+                            break;
+                        }
+                    }
+                    quantityList.forEach(x->addStructure(savedProductDTO, x, x.getSno()));
+                }
+            }
+        }
+
+        return saveProductDTO.getSel();
     }
+    private void addStructure(ProductDTO productDTO, MaterQuantityDTO materQuantityDTO, Long sno){
+        MaterialDTO materialDTO=materialService.findM(materQuantityDTO.getCode());
+        StructureDTO structureDTO=StructureDTO.builder()
+                .sno(sno)
+                .productDTO(productDTO)
+                .materialDTO(materialDTO)
+                .quantity(materQuantityDTO.getQuantity())
+                .build();
+        structureService.save(structureDTO);
+    }
+
     @GetMapping("/delete_product")
     public String delete_product(@RequestParam(required = false) Long manuCode){
-        System.out.println("@@@@@@@@@@@@@@@@@@@@"+manuCode);
         List<StructureDTO> structureDTOList=structureService.findByProduct_ManuCode(manuCode);
         structureDTOList.forEach(x->structureService.deleteById(x.getSno()));
         productService.deleteProduct(manuCode);

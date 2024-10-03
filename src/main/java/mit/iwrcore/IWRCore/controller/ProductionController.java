@@ -66,7 +66,7 @@ public class ProductionController {
         model.addAttribute("structure_list", structureService.findByProduct_ManuCode(manuCode));
     }
     @PostMapping("/finalSaveProduct")
-    public String saveProduct(@RequestBody SaveProductDTO saveProductDTO){
+    public Long saveProduct(@RequestBody SaveProductDTO saveProductDTO){
         ProductDTO productDTO=ProductDTO.builder()
                 .manuCode(saveProductDTO.getManuCode())
                 .name(saveProductDTO.getProductName())
@@ -78,6 +78,11 @@ public class ProductionController {
                 .mater_check(1L)
                 .build();
 
+        if(saveProductDTO.getManuCode()!=null){
+            List<StructureDTO> list=structureService.findByProduct_ManuCode(saveProductDTO.getManuCode());
+            list.forEach(x->structureService.deleteById(x.getSno()));
+        }
+
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
         MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
@@ -85,7 +90,6 @@ public class ProductionController {
 
         ProSDTO proSDTO=proCodeService.findProS(saveProductDTO.getSelectProS());
         productDTO.setProSDTO(proSDTO);
-
         ProductDTO savedProductDTO=productService.addProduct(productDTO);
 
         for(MaterQuantityDTO materQuantityDTO:saveProductDTO.getMaterQuantityDTOs()){
@@ -99,7 +103,7 @@ public class ProductionController {
                     .build();
             structureService.save(structureDTO);
         }
-        return "redirect:/production/list_newProduct";
+        return 0L;
     }
     @PostMapping("/delete_product")
     public void delete_product(){

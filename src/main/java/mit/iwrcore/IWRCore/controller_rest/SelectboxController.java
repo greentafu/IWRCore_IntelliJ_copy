@@ -2,10 +2,13 @@ package mit.iwrcore.IWRCore.controller_rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.Material;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.NoneGumsuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.NoneGumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.PartDTO.PartCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.ProDTO.ProCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterLDTO;
@@ -209,8 +212,18 @@ public class SelectboxController {
     }
 
     @GetMapping("/materialList")
-    public List<MaterialDTO> materialList(){
-        return materialService.materialList();
+    public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
+                                                             @RequestParam(required = false) List<Long> longList,
+                                                             @RequestParam(required = false) Long selectMaterL,
+                                                             @RequestParam(required = false) Long selectMaterM,
+                                                             @RequestParam(required = false) Long selectMaterS,
+                                                             @RequestParam(required = false) String materialSearch){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch)
+                .materials(longList).build();
+
+        return materialService.productMaterialList(requestDTO);
     }
 
     @GetMapping("/selectedController")

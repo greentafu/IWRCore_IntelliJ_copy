@@ -11,15 +11,20 @@
 <th:block th:replace="~{layout/mainlayout::all(~{this::#head} ,~{this::#content})}">
 
   <span id="head">
-    <title>신규 제품 확인</title>
+    <title>제품 정보 수정</title>
     <!--Style-->
-
+    <style>
+      #content1 {
+        height: 500px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
     <!--/Style-->
   </span>
 
-  <span id="content">
+    <span id="content">
     <div class="container-xxl flex-grow-1 container-p-y">
-      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">자재부서 /</span> 신규 제품 확인</h4>
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">제품관리 /</span> 제품 정보 수정</h4>
       <form>
         <div class="card">
           <div class="card-body">
@@ -105,10 +110,10 @@
               <div class="col-md-6">
                 <div class="row">
                   <div class="col-md-6">
-                    <input type="text" class="form-control mb-1" name="materialSearch" id="materialSearch">
+                    <input type="text" class="form-control mb-1" name="materialSearch" id="materialSearch2">
                   </div>
                   <div class="col-md-4">
-                    <button type="button" class="btn btn-outline-primary col-md-5" style="width: fit-content;" >검색</button>
+                    <button type="button" class="btn btn-outline-primary col-md-5" style="width: fit-content;" onclick="materialSearchBtn()">검색</button>
                   </div>
                 </div>
               </div>
@@ -116,14 +121,10 @@
             <label class="form-label">자재 목록</label>
             <div class="row mb-2">
               <div class="col-md-7">
-                <div class="card border overflow-hidden mb-4" style="height: 500px">
-                  <div id="vertical-example">
-                    <table class="table" id="materialList">
-                      <tbody id="mater">
-                        <tr th:each="list:${material_list.dtoList}"></tr>
-                      </tbody>
-                    </table>
-                  </div>
+                <div id="content1" style="border: 2px solid #e0e0e0;">
+                  <table class="table" id="materialList">
+                    <tbody class="table-border-bottom-0" id="firstTbody"></tbody>
+                  </table>
                 </div>
               </div>
               <div class="col-md-5" style="position: relative;">
@@ -167,7 +168,7 @@
                 <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
               </a>
               <div class="text-end mb-4">
-                <button class="btn btn-primary" onclick="saveToLowerTable(2)">저장</button>
+                <button class="btn btn-primary" onclick="finalCheckNewProduct(2)">수정 완료</button>
               </div>
             </div>
           </div>
@@ -275,7 +276,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="saveMaterial2()">등록</button>
+            <button type="button" class="btn btn-primary" onclick="saveMaterial2()">등록</button>
           </div>
         </div>
       </div>
@@ -287,241 +288,25 @@
     <script src="../assets/js/product-addStructure.js"></script>
 
     <script>
-      $(document).ready(function(){
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems();
+            }
+          }
+        });
+
         initStructure();
 
         setTimeout(function() {
-          initMaterial();
+          loadItems();
         }, 200);
       });
-
-      function initMaterial(){
-        $.ajax({
-          url:'/select/materialList',
-          method:'GET',
-          success:function(data){
-            var insertTbody=document.getElementById('mater');
-            insertTbody.innerHTML='';
-
-            data.forEach(x=>{
-              var materCode=x.materCode;
-
-              var temp=document.getElementById('quantity'+materCode);
-              if(temp==null){
-                var name=x.name;
-                var Lname=x.materSDTO.materMDTO.materLDTO.lname;
-                var Mname=x.materSDTO.materMDTO.mname;
-                var Sname=x.materSDTO.sname;
-                var standard=x.standard;
-                var unit=x.unit;
-                var color=x.color;
-                var boxName=x.boxDTO.boxname;
-                var file=x.file;
-
-                var newRow = document.createElement('tr');
-
-                var inputTd = document.createElement('td');
-                var input = document.createElement('input');
-                input.type = 'checkbox';
-                input.id = 'checkbox'+materCode;
-                input.class='form-check-input';
-                inputTd.appendChild(input);
-                newRow.appendChild(inputTd);
-
-                [materCode, name].forEach(function(text) {
-                  var td = document.createElement('td');
-                  td.innerText = text;
-                  newRow.appendChild(td);
-                });
-                [Lname, Mname, Sname].forEach(function(text) {
-                  var td = document.createElement('td');
-                  td.innerText = text;
-                  td.style.display = 'none';
-                  newRow.appendChild(td);
-                });
-                [standard, unit, color].forEach(function(text) {
-                  var td = document.createElement('td');
-                  td.innerText = text;
-                  newRow.appendChild(td);
-                });
-                [boxName, file].forEach(function(text) {
-                  var td = document.createElement('td');
-                  td.innerText = text;
-                  td.style.display = 'none';
-                  newRow.appendChild(td);
-                });
-
-                insertTbody.appendChild(newRow);
-              }
-            });
-
-          }
-        });
-
-      }
-      function initStructure(){
-        const manuCode=$('#productCode').text();
-        $.ajax({
-          url:'/select/selectedController',
-          method:'GET',
-          data:{manuCode:manuCode},
-          success:function(data){
-            console.log(data);
-            const materialSelTable=document.querySelector('#materialSel');
-
-            data.forEach(x=>{
-
-              const code=x.materialDTO.materCode;
-              const name=x.materialDTO.name;
-              const matL=x.materialDTO.materSDTO.materMDTO.materLDTO.lname;
-              const matM=x.materialDTO.materSDTO.materMDTO.mname;
-              const matS=x.materialDTO.materSDTO.sname;
-              const standard=x.materialDTO.standard;
-              const unit=x.materialDTO.unit;
-              const color=x.materialDTO.color;
-              const box=x.materialDTO.boxDTO.boxname;
-              const file=x.materialDTO.file;
-              const quantity=x.quantity
-
-              const newRow = document.createElement('tr');
-
-              [code, name].forEach(text => {
-                  const td = document.createElement('td');
-                  td.innerText = text;
-                  newRow.appendChild(td);
-              });
-
-              const inputTd = document.createElement('td');
-              const input = document.createElement('input');
-              input.type = 'number';
-              input.min='0';
-              input.style.border = '0px';
-              input.style.width = '80px';
-              input.id = `quantity${code}`;
-              input.value=quantity;
-              inputTd.appendChild(input);
-              newRow.appendChild(inputTd);
-
-              [matL, matM, matS, standard, unit, color, box, file].forEach(text => {
-                  const td = document.createElement('td');
-                  td.innerText = text;
-                  newRow.appendChild(td);
-              });
-
-              const deleteTd = document.createElement('td');
-              const button = document.createElement('button');
-              button.type = 'button';
-              button.className = 'btn btn-sm btn-secondary';
-              button.innerText = '삭제';
-              button.onclick = function() {
-                  newRow.remove(); // Remove the row when the button is clicked
-                  initMaterial();
-              };
-              deleteTd.appendChild(button);
-              newRow.appendChild(deleteTd);
-
-              const tdEmpty = document.createElement('td');
-              tdEmpty.innerText = '';
-              tdEmpty.style.display = 'none';
-              newRow.appendChild(tdEmpty);
-
-              const tdEmpty1 = document.createElement('td');
-              tdEmpty1.innerText = '';
-              tdEmpty1.style.display = 'none';
-              newRow.appendChild(tdEmpty1);
-
-              materialSelTable.appendChild(newRow);
-
-            });
-
-
-          }
-        });
-
-      }
-
-
-      $('form').on('submit', function(event) {
-        event.preventDefault();
-      });
-
-      function saveToLowerTable(whatButton){
-        const manuCode=$('#productCode').text();
-        const person=$('#person').val();
-        const productName=$('#productName').val();
-        const selectProS=$('#selectProS').val();
-        const proColor=$('#proColor2').val();
-        const proFile=$('#proFile').val();
-        const proText=$('#proText').val();
-        const sel=whatButton;
-
-        const materialSelTable=document.querySelector('#materialSel');
-        const materialRows=materialSelTable.querySelectorAll('tr');
-
-        const materData=[];
-
-        materialRows.forEach(x=>{
-           const cells=x.querySelectorAll('td');
-
-           const code=cells[0].innerText;
-           const inputId='quantity'+code;
-
-           const inputElement=document.querySelector('#'+inputId);
-           const quantity=inputElement.value;
-
-           materData.push({code:code, quantity:quantity});
-        });
-
-        $.ajax({
-          url:'/development/saveProduct',
-          method:'POST',
-          contentType:'application/json',
-          data: JSON.stringify({
-            manuCode:manuCode,
-            person:person,
-            productName:productName,
-            selectProS:parseFloat(selectProS),
-            proColor:proColor,
-            proFile:proFile,
-            proText:proText,
-            materQuantityDTOs:materData,
-            sel:sel
-          }),
-          success: function(response) {
-            console.log("성공");
-            window.location.href = '/production/list_manufacture';
-          },
-          error: function(xhr, status, error) {
-            console.log("실패");
-            window.location.href = '/production/list_manufacture';
-          }
-        });
-
-      }
-
-      function saveMaterial2(){
-        const name=document.getElementById('materialName').value;
-        const file=document.getElementById('inputGroupFile045').value;
-        const materS=document.getElementById('selectMaterS').value;
-        const standard=document.getElementById('standard').value;
-        const unit=document.getElementById('proUnit').value;
-        const color=document.getElementById('proColor').value;
-        $.ajax({
-          url:'/material/saveSimpleMaterial',
-          method:'GET',
-          data:{name:name, file:file, materS:materS, standard:standard, unit:unit, color:color},
-          success:function(data){
-            initMaterial();
-            document.getElementById('materialName').value='';
-            document.getElementById('inputGroupFile045').value='';
-            document.getElementById('selectMaterS').value='';
-            document.getElementById('standard').value='';
-            document.getElementById('proUnit').value='';
-            document.getElementById('proColor').value='';
-          }
-        });
-
-      }
     </script>
     <!--Script-->
   </span>

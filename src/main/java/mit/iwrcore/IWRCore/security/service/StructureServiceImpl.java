@@ -3,6 +3,7 @@ package mit.iwrcore.IWRCore.security.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.Material;
 import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.entity.Structure;
 import mit.iwrcore.IWRCore.repository.MaterialRepository;
@@ -62,6 +63,12 @@ public class StructureServiceImpl implements StructureService {
         StructureDTO structureDTO=(structure!=null)?structureTodto(structure):null;
         return structureDTO;
     }
+
+    @Override
+    public StructureDTO findById(Long sno){
+        Structure structure=structureRepository.findById(sno).get();
+        return structureTodto(structure);
+    };
 
     // dto를 entity로
     @Override

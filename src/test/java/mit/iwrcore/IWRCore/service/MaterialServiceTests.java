@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Commit;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
@@ -47,6 +48,9 @@ public class MaterialServiceTests {
     @Commit
     public void insertMaterial() {
         PageRequestDTO requestDTO=new PageRequestDTO();
-        System.out.println(materialService.findMaterialAll(requestDTO));
+        List<Long> longs=new ArrayList<>();
+        longs.add(1L); longs.add(2L);
+        requestDTO.setMaterials(longs);
+        System.out.println(materialService.productMaterialList(requestDTO));
     }
 }

@@ -73,6 +73,12 @@ public class MaterialServiceImpl implements MaterialService {
 
         return pageResultDTO;
     }
+    @Override
+    public PageResultDTO<MaterialDTO, Material> productMaterialList(PageRequestDTO requestDTO) {
+        Page<Material> entityPage = materialRepository.findMaterialByCustomQuery2(requestDTO);
+        Function<Material, MaterialDTO> fn = (entity -> materTodto(entity));
+        return new PageResultDTO<>(entityPage, fn);
+    }
 
     @Override
     public List<Material> findMaterialPart(Long boxcode, Long materscode) {

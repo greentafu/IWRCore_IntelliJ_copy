@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MaterialRepositoryImpl implements MaterialRepositoryCustom{
@@ -87,6 +88,56 @@ public class MaterialRepositoryImpl implements MaterialRepositoryCustom{
                 .leftJoin(qProduct.proS, qProS)
                 .leftJoin(qProS.proM, qProM)
                 .leftJoin(qProM.proL, qProL)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(materialList, pageable, total);
+    }
+
+    @Override
+    public Page<Material> findMaterialByCustomQuery2(PageRequestDTO requestDTO){
+        QMaterial qMaterial=QMaterial.material;
+        QMaterL qMaterL=QMaterL.materL;
+        QMaterM qMaterM=QMaterM.materM;
+        QMaterS qMaterS=QMaterS.materS;
+
+        QBox qBox=QBox.box;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO.getMaterL() != null) { builder.and(qMaterS.materM.materL.materLcode.eq(requestDTO.getMaterL())); }
+        if (requestDTO.getMaterM() != null) { builder.and(qMaterS.materM.materMcode.eq(requestDTO.getMaterM())); }
+        if (requestDTO.getMaterS() != null) { builder.and(qMaterS.materScode.eq(requestDTO.getMaterS())); }
+        if (requestDTO.getMaterialSearch()!=null){
+            builder.and(qMaterial.name.containsIgnoreCase(requestDTO.getMaterialSearch())
+                    .or(qMaterial.standard.containsIgnoreCase(requestDTO.getMaterialSearch()))
+                    .or(qMaterial.unit.containsIgnoreCase(requestDTO.getMaterialSearch())));
+        }
+        if (requestDTO.getBox()!=null) { builder.and(qMaterial.box.boxCode.eq(requestDTO.getBox())); }
+
+
+        if (requestDTO.getMaterials()!=null) { builder.and(qMaterial.materCode.notIn(requestDTO.getMaterials())); }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Material> materialList = queryFactory
+                .selectDistinct(qMaterial)
+                .from(qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qMaterial.box, qBox)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qMaterial.materCode.desc())
+                .fetch();
+
+        long total = queryFactory
+                .selectFrom(qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qMaterial.box, qBox)
                 .where(builder)
                 .fetchCount();
 

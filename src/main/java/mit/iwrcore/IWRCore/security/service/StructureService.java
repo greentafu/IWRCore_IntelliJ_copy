@@ -14,6 +14,7 @@ public interface StructureService {
     Structure update(StructureDTO structureDTO);
     void deleteById(Long id);
     List<StructureDTO> findByProduct_ManuCode(Long manuCode);
+    StructureDTO findById(Long sno);
 
     Structure structureDtoToEntity(StructureDTO dto);
     StructureDTO structureTodto(Structure entity);

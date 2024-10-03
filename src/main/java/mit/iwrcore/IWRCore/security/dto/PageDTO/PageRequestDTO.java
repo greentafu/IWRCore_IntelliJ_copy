@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
+
 @Builder
 @AllArgsConstructor
 @Data
@@ -53,4 +55,7 @@ public class PageRequestDTO {
     private Long receiveReturn;
     // 발주중 제품
     private Long baljuProductName;
+
+    // 제품등록 중 자재들
+    private List<Long> materials;
 }

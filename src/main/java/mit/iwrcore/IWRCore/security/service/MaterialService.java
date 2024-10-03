@@ -25,6 +25,8 @@ public interface MaterialService {
     MaterialDTO findM (Long matercode);
     // 자재 리스트
     PageResultDTO<MaterialDTO, Material> findMaterialAll(PageRequestDTO requestDTO);//모든 리스트
+    // 제품등록 중 자재들
+    PageResultDTO<MaterialDTO, Material> productMaterialList(PageRequestDTO requestDTO);//모든 리스트
 
     List<Material> findMaterialPart(Long boxcode, Long materscode); //일부분(창고별, 자재소분류별)
     List<MaterialDTO> materialList();

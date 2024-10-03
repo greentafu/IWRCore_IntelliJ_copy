@@ -59,6 +59,7 @@ public class ManagerController {
         if(pageRequestDTO.getPartnerSearch()==""){ pageRequestDTO.setPartnerSearch(null); }
 
         model.addAttribute("partner_list",partnerService.findPartnerList(pageRequestDTO));
+        model.addAttribute("request", pageRequestDTO);
     }
     @GetMapping("/add_partner")
     public void add_partner(){

@@ -29,15 +29,21 @@
                 <div class="row">
                   <div class="mb-3 col-md-2">
                     <div id="prePartL" th:text="${partner_list.partL}" style="display: none;"></div>
-                    <select class="select form-select" name="partL" id="selectPartL" onchange="updatePartCode('L')"></select>
+                    <select class="select form-select" name="partL" id="selectPartL" onchange="updatePartCode('L')">
+                      <option th:value="${request.partL}" selected></option>
+                    </select>
                   </div>
                   <div class="mb-3 col-md-2">
                     <div id="prePartM" th:text="${partner_list.partM}" style="display: none;"></div>
-                    <select class="select form-select" name="partM" id="selectPartM" onchange="updatePartCode('M')"></select>
+                    <select class="select form-select" name="partM" id="selectPartM" onchange="updatePartCode('M')">
+                      <option th:value="${request.partM}" selected></option>
+                    </select>
                   </div>
                   <div class="mb-3 col-md-2">
                     <div id="prePartS" th:text="${partner_list.partS}" style="display: none;"></div>
-                    <select class="select form-select" name="partS" id="selectPartS" onchange="updatePartCode('S')"></select>
+                    <select class="select form-select" name="partS" id="selectPartS" onchange="updatePartCode('S')">
+                      <option th:value="${request.partS}" selected></option>
+                    </select>
                   </div>
                   <div class="col-md-3">
                     <input
@@ -82,14 +88,16 @@
                     </button>
                     <div class="dropdown-menu">
                       <a class="dropdown-item" th:href="@{/manager/modify_partner(pno=${list.pno})}"><i class="bx bx-edit-alt me-1"></i> 수정</a>
-                      <a data-bs-toggle="modal" href="#modalToggle" class="dropdown-item"
-                         th:p_reg="${list.registrationNumber}"
-                         th:p_name="${list.name}"
-                         th:p_pno="${list.pno}"
-                         onclick="setDeletePartner(this)"
-                      >
-                        <i class="bx bx-trash me-1" ></i> 삭제
-                      </a>
+                      <th:block th:if="${list.pno}!=1">
+                        <a data-bs-toggle="modal" href="#modalToggle" class="dropdown-item"
+                           th:p_reg="${list.registrationNumber}"
+                           th:p_name="${list.name}"
+                           th:p_pno="${list.pno}"
+                           onclick="setDeletePartner(this)"
+                        >
+                          <i class="bx bx-trash me-1" ></i> 삭제
+                        </a>
+                      </th:block>
                     </div>
                   </div>
                 </td>

@@ -41,7 +41,7 @@
                     <input type="text" id="registerNum" name="registerNum" class="form-control" placeholder="000-00-00000" th:value="${partner.registrationNumber}"/>
                   </div>
                 </div>
-                <div id="regCheck" class="mb-2"></div>
+                <div id="regCheck" class="mb-2 text-end"></div>
                 <div class="mb-3 col-md-6">
                   <label class="form-label">대표</label>
                   <div class="input-group input-group-merge">
@@ -153,9 +153,11 @@
                 </div>
                 <div class="mt-2">
                   <button type="button" class="btn btn-primary" onclick="savePartner()">수정</button>
-                  <a data-bs-toggle="modal" href="#modalToggle">
-                    <button type="button" class="btn btn-primary me-2">삭제</button>
-                  </a>
+                  <th:block th:if="${partner.pno}!=1">
+                    <a data-bs-toggle="modal" href="#modalToggle">
+                      <button type="button" class="btn btn-primary me-2">삭제</button>
+                    </a>
+                  </th:block>
                 </div>
                 <!--/-->
               </div>
