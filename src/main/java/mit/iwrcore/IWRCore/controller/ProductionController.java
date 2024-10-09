@@ -27,87 +27,32 @@ import java.util.List;
 public class ProductionController {
 
     private final ProductService productService;
-    private final MaterialService materialService;
-    private final MaterialRepository materialRepository;
     private final StructureService structureService;
-    private final MemberService memberService;
-    private final ProCodeService proCodeService;
 
     @GetMapping("/list_manufacture")
-    public void list_manufacture(PageRequestDTO pageRequestDTO, Model model) {
-        model.addAttribute("product_list", productService.getCheckProducts(pageRequestDTO));
-    }
+    public void list_manufacture() {
 
+    }
     @GetMapping("/new_manufacture")
     public void new_manufacture() {
-    }
 
+    }
     @GetMapping("/modify_manufacture")
-    public void modify_manufacture(@RequestParam Long manuCode, PageRequestDTO pageRequestDTO, Model model) {
-        pageRequestDTO.setSize((int)materialRepository.count());
-        model.addAttribute("material_list", materialService.findMaterialAll(pageRequestDTO));
+    public void modify_manufacture(@RequestParam Long manuCode, Model model) {
         model.addAttribute("product", productService.getProductById(manuCode));
-        model.addAttribute("structure_list", structureService.findByProduct_ManuCode(manuCode));
     }
-
     @GetMapping("/manufacture")
     public void manufacture() {
+
     }
 
     @GetMapping("/list_newProduct")
-    public void list_newProduct(PageRequestDTO pageRequestDTO, Model model) {
-        model.addAttribute("product_list", productService.getNonCheckProducts(pageRequestDTO));
+    public void list_newProduct() {
+
     }
     @GetMapping("/check_manufacture")
-    public void check_manufacture(@RequestParam Long manuCode, PageRequestDTO pageRequestDTO, Model model) {
-        pageRequestDTO.setSize((int)materialRepository.count());
-        model.addAttribute("material_list", materialService.findMaterialAll(pageRequestDTO));
+    public void check_manufacture(@RequestParam Long manuCode, Model model) {
         model.addAttribute("product", productService.getProductById(manuCode));
-        model.addAttribute("structure_list", structureService.findByProduct_ManuCode(manuCode));
-    }
-    @PostMapping("/finalSaveProduct")
-    public Long saveProduct(@RequestBody SaveProductDTO saveProductDTO){
-        ProductDTO productDTO=ProductDTO.builder()
-                .manuCode(saveProductDTO.getManuCode())
-                .name(saveProductDTO.getProductName())
-                .color(saveProductDTO.getProColor())
-                .text(saveProductDTO.getProText())
-                .uuid(saveProductDTO.getProFile())
-                .supervisor(saveProductDTO.getPerson())
-                .mater_imsi(1L)
-                .mater_check(1L)
-                .build();
-
-        if(saveProductDTO.getManuCode()!=null){
-            List<StructureDTO> list=structureService.findByProduct_ManuCode(saveProductDTO.getManuCode());
-            list.forEach(x->structureService.deleteById(x.getSno()));
-        }
-
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
-        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
-        productDTO.setMemberDTO(memberDTO);
-
-        ProSDTO proSDTO=proCodeService.findProS(saveProductDTO.getSelectProS());
-        productDTO.setProSDTO(proSDTO);
-        ProductDTO savedProductDTO=productService.addProduct(productDTO);
-
-        for(MaterQuantityDTO materQuantityDTO:saveProductDTO.getMaterQuantityDTOs()){
-            MaterialDTO materialDTO=materialService.findM(materQuantityDTO.getCode());
-
-            StructureDTO structureDTO=StructureDTO.builder()
-                    .sno(materQuantityDTO.getSno())
-                    .productDTO(savedProductDTO)
-                    .materialDTO(materialDTO)
-                    .quantity(materQuantityDTO.getQuantity())
-                    .build();
-            structureService.save(structureDTO);
-        }
-        return 0L;
-    }
-    @PostMapping("/delete_product")
-    public void delete_product(){
-
     }
     @GetMapping("/structures")
     public List<StructureDTO> getStructures(@RequestParam Long manuCode) {

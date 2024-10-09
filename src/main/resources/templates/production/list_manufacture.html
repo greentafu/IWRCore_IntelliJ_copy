@@ -252,7 +252,7 @@
       function deleteProduct(button){
         var manuCode=button.value;
         $.ajax({
-          url:'/development/delete_product',
+          url:'/deleteProduct',
           method:'GET',
           data:{manuCode:manuCode},
           success:function(response){

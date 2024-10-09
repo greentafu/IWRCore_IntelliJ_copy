@@ -304,7 +304,7 @@
       function deleteMaterial(button){
         var materCode=button.value;
         $.ajax({
-          url:'/material/deleteMaterial',
+          url:'/deleteMaterial',
           method:'GET',
           data:{materCode:materCode},
           success:function(response){
@@ -319,7 +319,6 @@
         });
       }
     </script>
-
     <!--Script-->
 
   </span>

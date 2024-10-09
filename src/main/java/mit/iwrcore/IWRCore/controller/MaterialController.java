@@ -33,15 +33,13 @@ import java.util.UUID;
 public class MaterialController {
 
     private final MaterialService materialService;
-    private final MemberService memberService;
-    private final MaterService materService;
     private final BoxService boxService;
 
     @Autowired
     private FileService fileService;
 
     @GetMapping("/list_material")
-    public void list_material(PageRequestDTO pageRequestDTO, Model model) {
+    public void list_material(Model model) {
         model.addAttribute("box_list", boxService.list());
     }
 
@@ -61,35 +59,6 @@ public class MaterialController {
     @GetMapping("/new_material")
     public void new_material(Model model) {
         model.addAttribute("boxList", boxService.list());
-    }
-
-    @PostMapping("/register")
-    public String aaa(@ModelAttribute MaterialDTO materialDTO, @RequestParam(name = "box") Long box, @RequestParam(name = "materS") Long materS,
-                      @RequestParam("uploadFiles") MultipartFile file,
-                      @RequestParam(name="selboxDirectMeasure") String inputUnit, @RequestParam(name="selboxDirectColor") String inputColor) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
-        MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
-
-        materialDTO.setUnit(inputUnit);
-        materialDTO.setColor(inputColor);
-        materialDTO.setMemberDTO(memberDTO);
-        materialDTO.setBoxDTO(BoxDTO.builder().boxcode(boxService.getBox(box).getBoxcode()).build());
-        materialDTO.setMaterSDTO(materService.findMaterS(materS));
-
-        // 파일 저장
-        if (!file.isEmpty()) {
-            try {
-                String fileName = fileService.storeFile(file);
-                materialDTO.setFile(fileName); // 파일 이름을 DTO에 추가
-            } catch (IOException e) {
-                e.printStackTrace();
-                return "redirect:/material/new_material";
-            }
-        }
-
-        materialService.insertj(materialDTO);
-        return "redirect:/material/list_material";
     }
 
     @PostMapping("/upload")
@@ -121,35 +90,6 @@ public class MaterialController {
         MaterialDTO materialDTO = materialService.findM(id);
         model.addAttribute("materialDTO", materialDTO);
         return "material"; // Thymeleaf 템플릿 파일명
-    }
-    @GetMapping("/deleteMaterial")
-    public String deleteMaterial(@RequestParam(required = false) Long materCode){
-        materialService.deleteJa(materCode);
-        return "redirect:/material/list_material";
-    }
-    @GetMapping("/saveSimpleMaterial")
-    public String saveSimpleMaterial(@RequestParam(required = false) String name, @RequestParam(required = false) String file,
-                                   @RequestParam(required = false) Long materS, @RequestParam(required = false) String standard,
-                                   @RequestParam(required = false) String unit, @RequestParam(required = false) String color){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
-        MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
-
-        MaterSDTO materSDTO=materService.findMaterS(materS);
-        BoxDTO boxDTO=boxService.getBox(1L);
-
-        MaterialDTO materialDTO=MaterialDTO.builder()
-                .name(name)
-                .file((file!="")?file:null)
-                .materSDTO(materSDTO)
-                .standard(standard)
-                .unit(unit)
-                .color(color)
-                .memberDTO(memberDTO)
-                .boxDTO(boxDTO)
-                .build();
-        materialService.insertj(materialDTO);
-        return "redirect:/development/input_dev";
     }
 
 }

@@ -7,6 +7,8 @@ let selectMaterM = null;
 let selectMaterS = null;
 let materialSearch = null;
 
+let formData1 = new FormData();
+
 // 자재 목록 검색
 function materialSearchBtn(){
     selectMaterL = (document.getElementById("selectMaterL2").value!=null)?document.getElementById("selectMaterL2").value:null;
@@ -176,7 +178,7 @@ function saveToLowerTable(whatButton){
     const person=$('#person').val();
     const productName=$('#productName').val();
     const selectProS=$('#selectProS').val();
-    const proColor=$('#proColor2').val();
+    const proColor=$('#inputColor2').val();
     const proFile=$('#proFile').val();
     const proText=$('#proText').val();
     const sel=whatButton;
@@ -210,31 +212,39 @@ function saveToLowerTable(whatButton){
             materData.push({code:code, quantity:quantity, sno:sno});
         });
 
-        if(quantityBlank==false) {
-            alert('자재의 수량을 입력해 주세요.');
+        if((sel==2 || sel==3) && materData.length==0){
+            alert('자재를 한 개 이상 선택해 주세요.');
         }else{
-            $.ajax({
-                url:'/development/saveProduct',
-                method:'POST',
-                contentType:'application/json',
-                data: JSON.stringify({
-                    manuCode:manuCode,
-                    person:person,
-                    productName:productName,
-                    selectProS:parseFloat(selectProS),
-                    proColor:proColor,
-                    proFile:proFile,
-                    proText:proText,
-                    materQuantityDTOs:materData,
-                    sel:sel
-                }),
-                success: function(response) {
-                    window.location.href = '/development/list_dev';
-                },
-                error: function(xhr, status, error) {
-                    window.location.href = '/development/list_dev';
-                }
-            });
+            if(quantityBlank==false) {
+                alert('자재의 수량을 입력해 주세요.');
+            }else{
+                $.ajax({
+                    url:'/saveProduct',
+                    method:'POST',
+                    contentType:'application/json',
+                    data: JSON.stringify({
+                        manuCode:manuCode,
+                        person:person,
+                        productName:productName,
+                        selectProS:parseFloat(selectProS),
+                        proColor:proColor,
+                        proFile:proFile,
+                        proText:proText,
+                        materQuantityDTOs:materData,
+                        sel:sel
+                    }),
+                    success: function(response) {
+                        if(sel==2) window.location.href = '/production/list_newProduct';
+                        else if(sel==3) window.location.href = '/production/list_manufacture';
+                        else window.location.href = '/development/list_dev';
+                    },
+                    error: function(xhr, status, error) {
+                        if(sel==2) window.location.href = '/production/list_newProduct';
+                        else if(sel==3) window.location.href = '/production/list_manufacture';
+                        else window.location.href = '/development/list_dev';
+                    }
+                });
+            }
         }
     }
 }
@@ -314,107 +324,141 @@ function initStructure(){
 
 }
 
-// 제품 최종 저장
-function finalCheckNewProduct(whatButton){
-    const manuCode=$('#productCode').text();
-    const person=$('#person').val();
-    const productName=$('#productName').val();
-    const selectProS=$('#selectProS').val();
-    const proColor=$('#proColor2').val();
-    const proFile=$('#proFile').val();
-    const proText=$('#proText').val();
-    const sel=whatButton;
+// 파일추가1
+document.getElementById('uploadBtn1').addEventListener('click', function() {
+    var files=document.getElementById('uploadFiles1').files;
 
-    const materialSelTable=document.querySelector('#materialSel');
-    const materialRows=materialSelTable.querySelectorAll('tr');
+    for(var i=0; i<files.length; i++){
+        let file=files[i];
+        let originalName = file.name;
+        let newName = originalName;
+        let counter = 1;
 
-    const materData=[];
-    let quantityBlank=true;
+        while (formData1.has('files') && Array.from(formData1.values()).some(f => f.name === newName)) {
+            newName = originalName.replace(/(\.[^/.]+)$/, ` (${counter})$1`);
+            counter++;
+        }
 
-    materialRows.forEach(x=>{
-        const cells=x.querySelectorAll('td');
-
-        const code=cells[0].innerText;
-        const inputId='quantity'+code;
-
-        const inputElement=document.querySelector('#'+inputId);
-        const quantity=inputElement.value;
-        if(quantity==null || quantity=='') quantityBlank=false;
-
-        const sno=cells[12].innerText;
-
-        materData.push({code:code, quantity:quantity, sno:sno});
-    });
-
-    if(materData.length==0){
-        alert('자재를 한 개 이상 선택해 주세요.');
+        formData1.append('files', file, newName);
     }
-    else if(quantityBlank==false) {
-        alert('자재의 수량을 입력해 주세요.');
-    }else{
-        $.ajax({
-            url:'/production/finalSaveProduct',
-            method:'POST',
-            contentType:'application/json',
-            data: JSON.stringify({
-                manuCode:manuCode,
-                person:person,
-                productName:productName,
-                selectProS:parseFloat(selectProS),
-                proColor:proColor,
-                proFile:proFile,
-                proText:proText,
-                materQuantityDTOs:materData,
-            }),
-            success: function(response) {
-                if(sel==1) window.location.href = '/production/list_newProduct';
-                if(sel==2) window.location.href = '/production/list_manufacture';
-            },
-            error: function(xhr, status, error) {
-                if(sel==1) window.location.href = '/production/list_newProduct';
-                if(sel==2) window.location.href = '/production/list_manufacture';
-            }
-        });
+    showFileList1();
+    document.getElementById('uploadFiles1').value='';
+
+    for (var key of formData1.keys()) {
+        console.log(key);
+    }
+    for (var value of formData1.values()) {
+        console.log(value);
+    }
+});
+function showFileList1(){
+    var fileTable1=document.getElementById('fileTable1');
+    fileTable1.innerText='';
+    let index=0;
+
+    for (var value of formData1.values()) {
+        const newRow = document.createElement('tr');
+
+        const fileNameTd = document.createElement('td');
+        const file = value instanceof File ? value : null;
+        fileNameTd.innerText = file ? file.name+'         ' : '파일 아님         ';
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'btn btn-sm btn-secondary';
+        button.innerText = 'x';
+        button.onclick = (function(fileIndex) {
+            return function() {
+                const filesArray = Array.from(formData1.entries());
+                filesArray.splice(fileIndex, 1);
+
+                formData1 = new FormData();
+                filesArray.forEach(([key, file]) => {
+                    formData1.append(key, file);
+                });
+                showFileList1();
+            };
+        })(index);
+        fileNameTd.appendChild(button);
+        newRow.appendChild(fileNameTd);
+
+        fileTable1.appendChild(newRow);
+        index++;
     }
 }
 
 // 신규 자재 추가
-function saveMaterial2(){
+function saveMaterial(whatButton){
+    const materCode=document.getElementById('materCode').value;
     const name=document.getElementById('materialName').value;
-    const file=document.getElementById('inputGroupFile045').value;
     const materS=document.getElementById('selectMaterS').value;
     const standard=document.getElementById('standard').value;
-    const unit=document.getElementById('proUnit').value;
-    const color=document.getElementById('proColor').value;
+    const unit=document.getElementById('inputUnit').value;
+    const color=document.getElementById('inputColor').value;
+    const box=document.getElementById('box').value;
+    const sel=whatButton;
 
     if(name.trim()===''){
         alert('제품명을 입력해 주세요.');
     }else if(materS.trim()===''){
         alert('카테고리를 선택해 주세요');
     }else {
-        $.ajax({
-            url:'/material/saveSimpleMaterial',
-            method:'GET',
-            data:{name:name, file:file, materS:materS, standard:standard, unit:unit, color:color},
-            success:function(data){
-                renewTable();
-                $('#exLargeModal').modal('hide')
-                document.getElementById('materialName').value='';
-                document.getElementById('inputGroupFile045').value='';
-                document.getElementById('selectMaterL').value='';
-                document.getElementById('selectMaterM').value='';
-                document.getElementById('selectMaterS').value='';
-                document.getElementById('standard').value='';
-                document.getElementById('selUnit').value='';
-                document.getElementById('selColor').value='';
-                document.getElementById('proUnit').value='';
-                document.getElementById('proColor').value='';
+        formData1.append('materCode', materCode);
+        formData1.append('name', name);
+        formData1.append('materS', materS);
+        formData1.append('standard', standard);
+        formData1.append('unit', unit);
+        formData1.append('color', color);
+        formData1.append('box', box);
 
-                initMater1();
+        $.ajax({
+            url:'/saveMaterial',
+            method:'POST',
+            data: formData1,
+                    processData: false, // jQuery가 데이터를 처리하지 않도록 설정
+                    contentType: false, // jQuery가 Content-Type을 설정하지 않도록 설정
+            success:function(data){
+                if(sel==1) window.location.href = '/material/list_material';
+                if(sel==2) {
+                    renewTable();
+                    $('#exLargeModal').modal('hide')
+                    document.getElementById('materialName').value='';
+                    document.getElementById('uploadFiles').value='';
+                    document.getElementById('selectMaterL').value='';
+                    document.getElementById('selectMaterM').value='';
+                    document.getElementById('selectMaterS').value='';
+                    document.getElementById('standard').value='';
+                    document.getElementById('selUnit').value='';
+                    document.getElementById('selColor').value='';
+                    document.getElementById('inputUnit').value='';
+                    document.getElementById('inputColor').value='';
+                    formData1 = new FormData();
+
+                    initMater1();
+                }
+            },
+            error: function(xhr, status, error) {
+                if(sel==1) window.location.href = '/material/list_material';
+                if(sel==2) {
+                    renewTable();
+                    $('#exLargeModal').modal('hide')
+                    document.getElementById('materialName').value='';
+                    document.getElementById('uploadFiles').value='';
+                    document.getElementById('selectMaterL').value='';
+                    document.getElementById('selectMaterM').value='';
+                    document.getElementById('selectMaterS').value='';
+                    document.getElementById('standard').value='';
+                    document.getElementById('selUnit').value='';
+                    document.getElementById('selColor').value='';
+                    document.getElementById('inputUnit').value='';
+                    document.getElementById('inputColor').value='';
+                    formData1 = new FormData();
+
+                    initMater1();
+                }
             }
         });
     }
-
 }
 
 // 폼 제출 방지
