@@ -1,12 +1,12 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartCodeListDTO;
 import mit.iwrcore.IWRCore.entity.PartL;
 import mit.iwrcore.IWRCore.entity.PartM;
 import mit.iwrcore.IWRCore.entity.PartS;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartLDTO;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartMDTO;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartSDTO;
 
 import java.util.List;
 

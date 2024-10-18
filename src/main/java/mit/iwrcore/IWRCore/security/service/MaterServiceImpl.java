@@ -2,16 +2,16 @@ package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
 import mit.iwrcore.IWRCore.entity.MaterL;
 import mit.iwrcore.IWRCore.entity.MaterM;
 import mit.iwrcore.IWRCore.entity.MaterS;
 import mit.iwrcore.IWRCore.repository.Mater.MaterLRepository;
 import mit.iwrcore.IWRCore.repository.Mater.MaterMRepository;
 import mit.iwrcore.IWRCore.repository.Mater.MaterSRepository;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterLDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterMDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterSDTO;
 import org.springframework.stereotype.Service;
 
 

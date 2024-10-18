@@ -2,24 +2,19 @@ package mit.iwrcore.IWRCore.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.Member;
-import mit.iwrcore.IWRCore.entity.MemberRole;
-import mit.iwrcore.IWRCore.repository.MemberRepository;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartCodeListDTO;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartSDTO;
 import mit.iwrcore.IWRCore.security.dto.PartnerDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProCodeListDTO;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 @Controller
 @RequestMapping("/manager")

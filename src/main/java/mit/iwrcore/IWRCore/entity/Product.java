@@ -48,4 +48,6 @@ public class Product extends BaseEntity{
     @OneToMany(mappedBy = "product")
     private List<Plan> plans; // 연관된 Plan 목록
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileProduct> files;
 }

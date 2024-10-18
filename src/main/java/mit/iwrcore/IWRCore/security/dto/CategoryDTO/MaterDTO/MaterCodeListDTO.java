@@ -1,4 +1,4 @@
-package mit.iwrcore.IWRCore.security.dto.MaterDTO;
+package mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

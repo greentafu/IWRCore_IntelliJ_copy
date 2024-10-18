@@ -27,13 +27,15 @@
           <!-- Outline Dropdowns -->
           <div class="card-body">
             <label class="form-label">자재명</label>
-            <input type="text" class="form-control" value="앞바퀴" readonly>
+            <input type="text" class="form-control" th:value="${material.name}" readonly>
             <label class="form-label">첨부 파일</label>
-            <div class="card shadow-none border border-secondary mb-3"
-                 style="min-height: 100px;">
-              <!--<a th:href="@{/material/download(fileName=${materialDTO.file})}" class="btn btn-primary">
-                       파일다운로드
-                     </a>-->
+            <button id="uploadBtn1" style="display:none;"></button>
+            <button id="uploadBtn2" style="display:none;"></button>
+            <div class="card shadow-none mb-3" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+              <table style="margin-left: 20px; margin-top: 5px;">
+                <tbody id="fileTable0"></tbody>
+                <tbody id="fileTable1"></tbody>
+              </table>
             </div>
           </div>
           <hr class="m-0"/>
@@ -42,7 +44,6 @@
               <thead>
                 <tr>
                   <th>자재번호</th>
-                  <th>자재명</th>
                   <th>카테고리</th>
                   <th>규격</th>
                   <th>단위</th>
@@ -52,8 +53,7 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>[[${material.materCode}]]</td>
-                  <td>[[${material.name}]]</td>
+                  <td id="materCode">[[${material.materCode}]]</td>
                   <td>[[${material.materSDTO.Sname}]]</td>
                   <td>[[${material.standard}]]</td>
                   <td>[[${material.unit}]]</td>
@@ -65,7 +65,7 @@
               <!--뒤로가기,등록 버튼 세트-->
               <div class="d-flex justify-content-between w-100">
                 <a th:href="@{/material/list_material}">
-                  <button type="reset" class="btn btn-outline-secondary">뒤로가기</button>
+                  <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
                 </a>
                 <a th:href="@{/material/modify_material(materCode=${material.materCode})}">
                   <button class="btn btn-primary">수정</button>
@@ -75,6 +75,16 @@
         </div>
       </div>
     </div>
+    <!--Script-->
+    <script src="../assets/js/new-material-product.js"></script>
+    <script src="../assets/js/file.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const materCode=document.getElementById('materCode').innerText;
+        materialFileList(materCode);
+      });
+    </script>
+    <!--Script-->
   </span>
 </th:block>
 </html>

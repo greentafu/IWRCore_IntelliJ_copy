@@ -38,11 +38,18 @@
                         type="file"
                         class="form-control"
                         aria-label="Upload"
-                        id="uploadFiles"
+                        id="uploadFiles1"
+                        multiple
                 />
                 <button class="btn btn-outline-primary" type="button" id="uploadBtn1">업로드</button>
+                <button id="uploadBtn2" style="display:none;"></button>
               </div>
-              <div class="card shadow-none border border-secondary mb-3" style="min-height: 100px;" id="fileList"></div>
+              <div class="card shadow-none mb-3" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+                <table style="margin-left: 20px; margin-top: 5px;">
+                  <tbody id="fileTable0"></tbody>
+                  <tbody id="fileTable1"></tbody>
+                </table>
+              </div>
             </div>
             <hr class="m-0"/>
             <div class="card-body">
@@ -147,6 +154,13 @@
     <!--Script-->
     <script src="../assets/js/select-input.js"></script>
     <script src="../assets/js/new-material-product.js"></script>
+    <script src="../assets/js/file.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const materCode=document.getElementById('materCode').value;
+        initMaterialFile(materCode);
+      });
+    </script>
     <!--Script-->
   </span>
 

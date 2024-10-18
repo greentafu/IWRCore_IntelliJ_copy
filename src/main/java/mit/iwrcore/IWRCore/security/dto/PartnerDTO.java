@@ -1,18 +1,14 @@
 package mit.iwrcore.IWRCore.security.dto;
 
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.Contract;
 import mit.iwrcore.IWRCore.entity.MemberRole;
-import mit.iwrcore.IWRCore.entity.PartS;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartSDTO;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Log4j2

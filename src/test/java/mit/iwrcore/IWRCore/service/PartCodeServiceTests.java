@@ -1,15 +1,15 @@
 package mit.iwrcore.IWRCore.service;
 
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartCodeListDTO;
 import mit.iwrcore.IWRCore.entity.PartL;
 import mit.iwrcore.IWRCore.entity.PartM;
 import mit.iwrcore.IWRCore.entity.PartS;
 import mit.iwrcore.IWRCore.repository.Part.PartLCodeRepository;
 import mit.iwrcore.IWRCore.repository.Part.PartMCodeRepository;
 import mit.iwrcore.IWRCore.repository.Part.PartSCodeRepository;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartLDTO;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartMDTO;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartSDTO;
 import mit.iwrcore.IWRCore.security.service.PartCodeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -77,15 +77,22 @@
                 <input type="text" class="form-control" id="inputColor2">
               </div>
             </div>
-            <label class="form-label">제품 도안</label>
-            <div class="input-group">
+            <label class="form-label">첨부 파일</label>
+            <div class="input-group mb-2">
               <input
                       type="file"
                       class="form-control"
                       aria-label="Upload"
-                      id="proFile"
+                      id="uploadFiles2"
+                      multiple
               />
-              <button class="btn btn-outline-primary" type="button">업로드</button>
+              <button class="btn btn-outline-primary" type="button" id="uploadBtn2">업로드</button>
+            </div>
+            <div class="card shadow-none mb-3" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList2">
+              <table style="margin-left: 20px; margin-top: 5px;">
+                <tbody id="fileTable2"></tbody>
+                <tbody id="fileTable3"></tbody>
+              </table>
             </div>
             <label class="form-label">비고</label>
             <textarea class="form-control" rows="5" id="proText"></textarea>
@@ -187,15 +194,21 @@
             <input type="text" class="form-control" id="materialName">
             <label class="form-label">첨부 파일</label>
             <div class="input-group mb-2">
-                <input
-                        type="file"
-                        class="form-control"
-                        aria-label="Upload"
-                        id="uploadFiles"
-                />
-                <button class="btn btn-outline-primary" type="button" id="uploadBtn1">업로드</button>
-              </div>
-            <div class="card shadow-none border border-secondary mb-3" style="min-height: 100px;" id="fileList"></div>
+              <input
+                      type="file"
+                      class="form-control"
+                      aria-label="Upload"
+                      id="uploadFiles1"
+                      multiple
+              />
+              <button class="btn btn-outline-primary" type="button" id="uploadBtn1">업로드</button>
+            </div>
+            <div class="card shadow-none mb-3" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+              <table style="margin-left: 20px; margin-top: 5px;">
+                <tbody id="fileTable0"></tbody>
+                <tbody id="fileTable1"></tbody>
+              </table>
+            </div>
             <div class="row mb-3">
               <label class="col-form-label" style="width: 85px;">대분류 : </label>
               <div class="col-md-3">
@@ -280,7 +293,7 @@
     <!--Script-->
     <script src="../assets/js/select-input.js"></script>
     <script src="../assets/js/new-material-product.js"></script>
-
+    <script src="../assets/js/file.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         content1.addEventListener("scroll", function () {

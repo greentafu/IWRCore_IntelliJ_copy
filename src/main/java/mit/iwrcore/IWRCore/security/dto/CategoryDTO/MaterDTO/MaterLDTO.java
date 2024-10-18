@@ -1,4 +1,4 @@
-package mit.iwrcore.IWRCore.security.dto.MaterDTO;
+package mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO;
 
 import lombok.*;
 import lombok.extern.log4j.Log4j2;

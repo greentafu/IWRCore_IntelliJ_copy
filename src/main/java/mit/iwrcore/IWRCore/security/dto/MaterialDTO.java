@@ -1,17 +1,15 @@
 package mit.iwrcore.IWRCore.security.dto;
 
-import jakarta.persistence.Column;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.Box;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterMDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterSDTO;
+import mit.iwrcore.IWRCore.entity.FileMaterial;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterSDTO;
 
-import java.io.Writer;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Log4j2
 @Getter
@@ -32,5 +30,5 @@ public class MaterialDTO {
     private MaterSDTO materSDTO;
     private MemberDTO memberDTO;
 
-
+    private List<FileMaterial> fileList;
 }

@@ -1,13 +1,13 @@
 package mit.iwrcore.IWRCore.service;
 
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.Mater.MaterLRepository;
 import mit.iwrcore.IWRCore.repository.Mater.MaterMRepository;
 import mit.iwrcore.IWRCore.repository.Mater.MaterSRepository;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterLDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterMDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterSDTO;
 import mit.iwrcore.IWRCore.security.service.MaterService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

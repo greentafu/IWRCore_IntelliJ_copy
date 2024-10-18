@@ -7,8 +7,6 @@ let selectMaterM = null;
 let selectMaterS = null;
 let materialSearch = null;
 
-let formData1 = new FormData();
-
 // 자재 목록 검색
 function materialSearchBtn(){
     selectMaterL = (document.getElementById("selectMaterL2").value!=null)?document.getElementById("selectMaterL2").value:null;
@@ -179,7 +177,6 @@ function saveToLowerTable(whatButton){
     const productName=$('#productName').val();
     const selectProS=$('#selectProS').val();
     const proColor=$('#inputColor2').val();
-    const proFile=$('#proFile').val();
     const proText=$('#proText').val();
     const sel=whatButton;
 
@@ -190,11 +187,11 @@ function saveToLowerTable(whatButton){
     let quantityBlank=true;
 
     if(person.trim()===''){
-        alert('제품 담당자의 실명을 입력해 주세요.');
+        alert('제품 담당자의 실명을 입력해 주세요.'+formData2);
     }else if(productName.trim()===''){
-        alert('제품의 이름을 입력해 주세요.');
+        alert('제품의 이름을 입력해 주세요.'+formData2);
     }else if(selectProS.trim()===''){
-        alert('제품의 소분류 카테고리를 선택해 주세요.');
+        alert('제품의 소분류 카테고리를 선택해 주세요.'+formData2);
     }else{
         materialRows.forEach(x=>{
             const cells=x.querySelectorAll('td');
@@ -218,30 +215,31 @@ function saveToLowerTable(whatButton){
             if(quantityBlank==false) {
                 alert('자재의 수량을 입력해 주세요.');
             }else{
+                formData2.append('manuCode', manuCode);
+                formData2.append('person', person);
+                formData2.append('productName', productName);
+                formData2.append('selectProS', parseFloat(selectProS));
+                formData2.append('proColor', proColor);
+                formData2.append('proText', proText);
+                formData2.append('materQuantityDTOs', JSON.stringify(materData));
+                formData2.append('sel', sel);
+                formData2.append('deleteFile', deleteFile2);
+
                 $.ajax({
                     url:'/saveProduct',
                     method:'POST',
-                    contentType:'application/json',
-                    data: JSON.stringify({
-                        manuCode:manuCode,
-                        person:person,
-                        productName:productName,
-                        selectProS:parseFloat(selectProS),
-                        proColor:proColor,
-                        proFile:proFile,
-                        proText:proText,
-                        materQuantityDTOs:materData,
-                        sel:sel
-                    }),
+                    data: formData2,
+                          processData: false, // jQuery가 데이터를 처리하지 않도록 설정
+                          contentType: false, // jQuery가 Content-Type을 설정하지 않도록 설정
                     success: function(response) {
                         if(sel==2) window.location.href = '/production/list_newProduct';
                         else if(sel==3) window.location.href = '/production/list_manufacture';
                         else window.location.href = '/development/list_dev';
                     },
                     error: function(xhr, status, error) {
-                        if(sel==2) window.location.href = '/production/list_newProduct';
-                        else if(sel==3) window.location.href = '/production/list_manufacture';
-                        else window.location.href = '/development/list_dev';
+                        console.log('실패야', manuCode, '/', person,'/',productName,'/', selectProS, '/', proColor, '/', proText, '/', materData, '/', sel,'/');
+                        console.log('실 ', formData2);
+                        console.log('패 ', deleteFile2);
                     }
                 });
             }
@@ -324,69 +322,6 @@ function initStructure(){
 
 }
 
-// 파일추가1
-document.getElementById('uploadBtn1').addEventListener('click', function() {
-    var files=document.getElementById('uploadFiles1').files;
-
-    for(var i=0; i<files.length; i++){
-        let file=files[i];
-        let originalName = file.name;
-        let newName = originalName;
-        let counter = 1;
-
-        while (formData1.has('files') && Array.from(formData1.values()).some(f => f.name === newName)) {
-            newName = originalName.replace(/(\.[^/.]+)$/, ` (${counter})$1`);
-            counter++;
-        }
-
-        formData1.append('files', file, newName);
-    }
-    showFileList1();
-    document.getElementById('uploadFiles1').value='';
-
-    for (var key of formData1.keys()) {
-        console.log(key);
-    }
-    for (var value of formData1.values()) {
-        console.log(value);
-    }
-});
-function showFileList1(){
-    var fileTable1=document.getElementById('fileTable1');
-    fileTable1.innerText='';
-    let index=0;
-
-    for (var value of formData1.values()) {
-        const newRow = document.createElement('tr');
-
-        const fileNameTd = document.createElement('td');
-        const file = value instanceof File ? value : null;
-        fileNameTd.innerText = file ? file.name+'         ' : '파일 아님         ';
-
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'btn btn-sm btn-secondary';
-        button.innerText = 'x';
-        button.onclick = (function(fileIndex) {
-            return function() {
-                const filesArray = Array.from(formData1.entries());
-                filesArray.splice(fileIndex, 1);
-
-                formData1 = new FormData();
-                filesArray.forEach(([key, file]) => {
-                    formData1.append(key, file);
-                });
-                showFileList1();
-            };
-        })(index);
-        fileNameTd.appendChild(button);
-        newRow.appendChild(fileNameTd);
-
-        fileTable1.appendChild(newRow);
-        index++;
-    }
-}
-
 // 신규 자재 추가
 function saveMaterial(whatButton){
     const materCode=document.getElementById('materCode').value;
@@ -410,20 +345,21 @@ function saveMaterial(whatButton){
         formData1.append('unit', unit);
         formData1.append('color', color);
         formData1.append('box', box);
+        formData1.append('deleteFile', deleteFile1);
 
         $.ajax({
             url:'/saveMaterial',
             method:'POST',
             data: formData1,
-                    processData: false, // jQuery가 데이터를 처리하지 않도록 설정
-                    contentType: false, // jQuery가 Content-Type을 설정하지 않도록 설정
+                  processData: false, // jQuery가 데이터를 처리하지 않도록 설정
+                  contentType: false, // jQuery가 Content-Type을 설정하지 않도록 설정
             success:function(data){
                 if(sel==1) window.location.href = '/material/list_material';
                 if(sel==2) {
                     renewTable();
                     $('#exLargeModal').modal('hide')
                     document.getElementById('materialName').value='';
-                    document.getElementById('uploadFiles').value='';
+                    document.getElementById('uploadFiles1').value='';
                     document.getElementById('selectMaterL').value='';
                     document.getElementById('selectMaterM').value='';
                     document.getElementById('selectMaterS').value='';
@@ -432,6 +368,7 @@ function saveMaterial(whatButton){
                     document.getElementById('selColor').value='';
                     document.getElementById('inputUnit').value='';
                     document.getElementById('inputColor').value='';
+                    document.getElementById('fileTable1').innerText='';
                     formData1 = new FormData();
 
                     initMater1();
@@ -443,7 +380,7 @@ function saveMaterial(whatButton){
                     renewTable();
                     $('#exLargeModal').modal('hide')
                     document.getElementById('materialName').value='';
-                    document.getElementById('uploadFiles').value='';
+                    document.getElementById('uploadFiles1').value='';
                     document.getElementById('selectMaterL').value='';
                     document.getElementById('selectMaterM').value='';
                     document.getElementById('selectMaterS').value='';
@@ -452,6 +389,7 @@ function saveMaterial(whatButton){
                     document.getElementById('selColor').value='';
                     document.getElementById('inputUnit').value='';
                     document.getElementById('inputColor').value='';
+                    document.getElementById('fileTable1').innerText='';
                     formData1 = new FormData();
 
                     initMater1();

@@ -1,15 +1,15 @@
 package mit.iwrcore.IWRCore.service;
 
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProCodeListDTO;
 import mit.iwrcore.IWRCore.entity.ProL;
 import mit.iwrcore.IWRCore.entity.ProM;
 import mit.iwrcore.IWRCore.entity.ProS;
 import mit.iwrcore.IWRCore.repository.Pro.ProLCodeRepository;
 import mit.iwrcore.IWRCore.repository.Pro.ProMCodeRepository;
 import mit.iwrcore.IWRCore.repository.Pro.ProSCodeRepository;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProLDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProMDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 import mit.iwrcore.IWRCore.security.service.ProCodeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

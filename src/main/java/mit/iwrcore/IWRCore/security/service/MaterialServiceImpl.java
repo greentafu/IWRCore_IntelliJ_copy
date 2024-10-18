@@ -1,34 +1,17 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.*;
-import mit.iwrcore.IWRCore.repository.BoxRepository;
-import mit.iwrcore.IWRCore.repository.Mater.MaterSRepository;
 import mit.iwrcore.IWRCore.repository.MaterialRepository;
-import mit.iwrcore.IWRCore.repository.MemberRepository;
-import mit.iwrcore.IWRCore.security.dto.BoxDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterSDTO;
 import mit.iwrcore.IWRCore.security.dto.MaterialDTO;
-import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartSDTO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -40,12 +23,17 @@ public class MaterialServiceImpl implements MaterialService {
     private final BoxService boxService;
 
     @Override
-    public void insertj(MaterialDTO dto) {
-        log.info("Inserting material");
+    public Long saveMaterial(MaterialDTO dto, List<FileMaterial> fileList) {
         Material material = materdtoToEntity(dto);
-        materialRepository.save(material);
+        material.setFiles(fileList);
+        Material saved=materialRepository.save(material);
+        return saved.getMaterCode();
     }
-
+    @Override
+    public void deleteMaterial(Long materCode) {
+        log.info("Deleting material with code: {}", materCode);
+        materialRepository.deleteById(materCode);
+    }
     @Override
     public MaterialDTO findM(Long materCode) {
         log.info("Finding material with code: {}", materCode);
@@ -90,11 +78,7 @@ public class MaterialServiceImpl implements MaterialService {
         return materialRepository.findAll().stream().map(this::materTodto).toList();
     }
 
-    @Override
-    public void deleteJa(Long materCode) {
-        log.info("Deleting material with code: {}", materCode);
-        materialRepository.deleteById(materCode);
-    }
+
 
     // dto를 entity로
     @Override

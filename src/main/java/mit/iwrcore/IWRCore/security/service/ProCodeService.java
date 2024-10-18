@@ -1,12 +1,12 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProCodeListDTO;
 import mit.iwrcore.IWRCore.entity.ProL;
 import mit.iwrcore.IWRCore.entity.ProM;
 import mit.iwrcore.IWRCore.entity.ProS;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProLDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProMDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 
 import java.util.List;
 

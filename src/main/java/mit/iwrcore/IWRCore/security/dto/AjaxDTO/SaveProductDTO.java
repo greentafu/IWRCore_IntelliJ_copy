@@ -15,8 +15,7 @@ public class SaveProductDTO {
     private String productName;
     private Long selectProS;
     private String proColor;
-    private String proFile;
     private String proText;
-    private List<MaterQuantityDTO> materQuantityDTOs;
+    private String materQuantityDTOs;
     private Long sel;
 }

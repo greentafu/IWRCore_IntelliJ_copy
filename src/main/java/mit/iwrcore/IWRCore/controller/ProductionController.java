@@ -1,20 +1,8 @@
 package mit.iwrcore.IWRCore.controller;
 
 import lombok.RequiredArgsConstructor;
-import mit.iwrcore.IWRCore.repository.MaterialRepository;
-import mit.iwrcore.IWRCore.security.dto.AjaxDTO.MaterQuantityDTO;
-import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveProductDTO;
-import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterialDTO;
-import mit.iwrcore.IWRCore.security.dto.MemberDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProCodeListDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProSDTO;
-import mit.iwrcore.IWRCore.security.dto.ProductDTO;
 import mit.iwrcore.IWRCore.security.dto.StructureDTO;
 import mit.iwrcore.IWRCore.security.service.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

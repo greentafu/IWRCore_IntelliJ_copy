@@ -1,11 +1,10 @@
-package mit.iwrcore.IWRCore.security.dto.MaterDTO;
+package mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.MaterM;
 
 @Log4j2
 @Getter

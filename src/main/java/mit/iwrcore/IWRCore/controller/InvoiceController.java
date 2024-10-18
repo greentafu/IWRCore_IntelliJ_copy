@@ -2,18 +2,14 @@ package mit.iwrcore.IWRCore.controller;
 
 import lombok.RequiredArgsConstructor;
 import mit.iwrcore.IWRCore.entity.Invoice;
-import mit.iwrcore.IWRCore.entity.Material;
 import mit.iwrcore.IWRCore.entity.Shipment;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.InvoiceTextDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveInvoiceDTO;
 import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
 import mit.iwrcore.IWRCore.security.dto.InvoiceDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterDTO.MaterCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
-import mit.iwrcore.IWRCore.security.dto.PartDTO.PartCodeListDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.ShipmentDTO;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.security.core.Authentication;

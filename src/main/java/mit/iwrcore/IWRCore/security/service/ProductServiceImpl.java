@@ -1,5 +1,6 @@
 package mit.iwrcore.IWRCore.security.service;
 
+import mit.iwrcore.IWRCore.entity.FileProduct;
 import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.repository.MaterialRepository;
 import mit.iwrcore.IWRCore.repository.Pro.ProSCodeRepository;
@@ -83,20 +84,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO addProduct(ProductDTO productDTO) {
+    public ProductDTO saveProduct(ProductDTO productDTO, List<FileProduct> fileList) {
         Product product = productDtoToEntity(productDTO);
+        product.setFiles(fileList);
         Product savedProduct=productRepository.save(product);
         return productEntityToDto(savedProduct);
-    }
-
-    @Override
-    public void updateProduct(ProductDTO productDTO) {
-        if (productRepository.existsById(productDTO.getManuCode())) {  // ID로 존재 확인
-            Product product = productDtoToEntity(productDTO);  // DTO를 엔티티로 변환
-            productRepository.save(product);
-        } else {
-            throw new RuntimeException("Product not found");  // 예외 처리
-        }
     }
 
     @Override

@@ -1,11 +1,17 @@
 package mit.iwrcore.IWRCore.controller_rest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.FileMaterial;
+import mit.iwrcore.IWRCore.entity.FileProduct;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.MaterQuantityDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveProductDTO;
 import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
+import mit.iwrcore.IWRCore.security.dto.FileDTO.FileMaterialDTO;
+import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProductDTO;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,9 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @Log4j2
@@ -34,6 +38,8 @@ public class CRUDController {
     private StructureService structureService;
     @Autowired
     private ProCodeService proCodeService;
+    @Autowired
+    private FileService fileService;
 
     // 직원
 
@@ -50,7 +56,8 @@ public class CRUDController {
     public void saveMaterial(@ModelAttribute MaterialDTO materialDTO,
                              @RequestParam(name = "box") Long box,
                              @RequestParam(name = "materS") Long materS,
-                             @RequestParam(name = "files")MultipartFile[] files) {
+                             @RequestParam(name = "files", required = false) MultipartFile[] files,
+                             @RequestParam(name = "deleteFile", required = false) List<String> deleteFile) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
         MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
@@ -58,25 +65,46 @@ public class CRUDController {
         materialDTO.setMemberDTO(memberDTO);
         materialDTO.setBoxDTO(BoxDTO.builder().boxcode(boxService.getBox(box).getBoxcode()).build());
         materialDTO.setMaterSDTO(materService.findMaterS(materS));
-        materialService.insertj(materialDTO);
 
-        System.out.println("@@@@@@@@@@@@@@@@@@"+files);
+        List<FileMaterialDTO> exDtoFileList=fileService.getMaterialFileList(materialDTO.getMaterCode());
+        List<FileMaterial> exEntityFileList=new ArrayList<>();
+        if(exDtoFileList!=null) exDtoFileList.forEach(x->exEntityFileList.add(fileService.mFile_dTe(x)));
+
+        Long materialCode=materialService.saveMaterial(materialDTO, exEntityFileList);
+
+        if(deleteFile!=null) fileService.deleteFileRun(deleteFile, "m");
+        if(files!=null) fileService.saveFileRun(files, materialCode, "m");
     }
     @GetMapping("/deleteMaterial")
     public String deleteMaterial(@RequestParam(required = false) Long materCode){
-        materialService.deleteJa(materCode);
+        List<FileMaterialDTO> fileList=fileService.getMaterialFileList(materCode);
+        List<String> deleteFile=new ArrayList<>();
+        fileList.forEach(x->deleteFile.add(x.getUuid()));
+        fileService.deleteFileRun(deleteFile, "m");
+        materialService.deleteMaterial(materCode);
         return "redirect:/material/list_material";
     }
 
     // 제품
     @PostMapping("/saveProduct")
-    public void saveProduct(@RequestBody SaveProductDTO saveProductDTO){
+    public void saveProduct(@ModelAttribute SaveProductDTO saveProductDTO,
+                            @RequestParam(name = "files", required = false) MultipartFile[] files,
+                            @RequestParam(name = "deleteFile", required = false) List<String> deleteFile){
+        String jsonList = saveProductDTO.getMaterQuantityDTOs();
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<MaterQuantityDTO> quantityList=null;
+
+        try {
+            quantityList = objectMapper.readValue(jsonList, new TypeReference<List<MaterQuantityDTO>>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         ProductDTO productDTO=ProductDTO.builder()
                 .manuCode((saveProductDTO.getManuCode()!=null)? saveProductDTO.getManuCode():null)
                 .name(saveProductDTO.getProductName())
                 .color(saveProductDTO.getProColor())
                 .text(saveProductDTO.getProText())
-                .uuid(saveProductDTO.getProFile())
                 .supervisor(saveProductDTO.getPerson())
                 .mater_imsi(0L)
                 .mater_check(0L)
@@ -94,15 +122,21 @@ public class CRUDController {
 
         ProSDTO proSDTO=proCodeService.findProS(saveProductDTO.getSelectProS());
         productDTO.setProSDTO(proSDTO);
-        ProductDTO savedProductDTO=productService.addProduct(productDTO);
+
+        List<FileProductDTO> exDtoFileList=fileService.getProductFileList(productDTO.getManuCode());
+        List<FileProduct> exEntityFileList=new ArrayList<>();
+        if(exDtoFileList!=null) exDtoFileList.forEach(x->exEntityFileList.add(fileService.pFile_dTe(x)));
+
+        ProductDTO savedProductDTO=productService.saveProduct(productDTO, exEntityFileList);
+
+        if(deleteFile!=null) fileService.deleteFileRun(deleteFile, "p");
+        if(files!=null) fileService.saveFileRun(files, savedProductDTO.getManuCode(), "p");
 
         List<StructureDTO> stlist=null;
         if(saveProductDTO.getManuCode()!=null){
             stlist=new ArrayList<>(structureService.findByProduct_ManuCode(saveProductDTO.getManuCode()));
             if(stlist.isEmpty()) stlist=null;
         }
-        List<MaterQuantityDTO> quantityList=saveProductDTO.getMaterQuantityDTOs();
-        if(quantityList.isEmpty()) quantityList=null;
 
         if(stlist==null && quantityList!=null){
             // 새로운 structure 저장
@@ -183,9 +217,12 @@ public class CRUDController {
     public String delete_product(@RequestParam(required = false) Long manuCode){
         List<StructureDTO> structureDTOList=structureService.findByProduct_ManuCode(manuCode);
         structureDTOList.forEach(x->structureService.deleteById(x.getSno()));
+        List<FileProductDTO> fileList=fileService.getProductFileList(manuCode);
+        List<String> deleteFile=new ArrayList<>();
+        fileList.forEach(x->deleteFile.add(x.getUuid()));
+        fileService.deleteFileRun(deleteFile, "p");
         productService.deleteProduct(manuCode);
         return "redirect:/development/list_dev";
     }
-
 
 }

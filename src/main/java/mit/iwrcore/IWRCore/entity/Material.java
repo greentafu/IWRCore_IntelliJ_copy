@@ -5,6 +5,7 @@ import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -45,4 +46,7 @@ public class Material extends BaseEntity {
     @OneToMany(mappedBy = "material")
     @Builder.Default
     private Set<Structure> structures=new HashSet<>();
+
+    @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileMaterial> files;
 }

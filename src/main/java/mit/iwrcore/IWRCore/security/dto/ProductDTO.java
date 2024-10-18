@@ -1,15 +1,10 @@
 package mit.iwrcore.IWRCore.security.dto;
 
-import jakarta.persistence.Entity;
 import lombok.*;
-import mit.iwrcore.IWRCore.entity.Material;
-import mit.iwrcore.IWRCore.entity.ProS;
-import mit.iwrcore.IWRCore.entity.Structure;
-import mit.iwrcore.IWRCore.security.dto.ProDTO.ProSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Builder
 @AllArgsConstructor
