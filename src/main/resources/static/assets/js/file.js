@@ -121,6 +121,38 @@ function showFileList2(){
 }
 
 
+// 첨부파일 목록(이미지) 출력1
+function viewList(originalFileName, fileName, fileType, path, listNum, type){
+    var id='previewList'+listNum;
+    var previewList=document.getElementById(id);
+    var str="";
+    if(fileType==='text/plain'){
+        str+="<li style='margin-right: 20px;' onclick='viewDetail(\"" + originalFileName + "\", \"" + fileName + "\", \"" + fileType + "\", \"" + path + "\", \"" + listNum + "\", \"" + type + "\")'><img src='/assets/img/txtpreview.png' width='50' height='auto'><span style='color:black;'>" + fileName + "</span></li>";
+    }else if(fileType.startsWith('image/')){
+        str+="<li style='margin-right: 20px;' onclick='viewDetail(\"" + originalFileName + "\", \"" + fileName + "\", \"" + fileType + "\", \"" + path + "\", \"" + listNum + "\", \"" + type + "\")'><img src='/file/thumbnail?fileName=s_"+originalFileName+"&path="+path+"&type="+type+"'><span style='color:black;'>"+fileName+"</span></li>"
+    }else if(fileType==='application/pdf'){
+        str+="<li style='margin-right: 20px;' onclick='viewDetail(\"" + originalFileName + "\", \"" + fileName + "\", \"" + fileType + "\", \"" + path + "\", \"" + listNum + "\", \"" + type + "\")'><img src='/assets/img/pdfpreview.png' width='50' height='auto'><span style='color:black;'>" + fileName + "</span></li>";
+    }else{
+        str+="<li style='margin-right: 20px;' onclick='viewDetail(\"" + originalFileName + "\", \"" + fileName + "\", \"" + fileType + "\", \"" + path + "\", \"" + listNum + "\", \"" + type + "\")'><span style='color:black;'>"+fileName+"</span></li>"
+    }
+    previewList.innerHTML+=str;
+}
+// 첨부파일 자세히 출력1
+function viewDetail(originalFileName, fileName, fileType, path, listNum, type){
+    var id='preview'+listNum;
+    var preview=document.getElementById(id);
+    var str="";
+    if(fileType==='text/plain'){
+        str="<iframe src='/file/readtxt?fileName="+originalFileName+"&path="+path+"&type="+type+"&name="+fileName+"' style='width:100%;height:800px;'></iframe>";
+    }else if(fileType.startsWith('image/')){
+        str="<img src='/file/thumbnail?fileName="+originalFileName+"&path="+path+"&type="+type+"&name="+fileName+"' style='height:800px;'>";
+    }else if(fileType==='application/pdf'){
+        str="<iframe src='/file/thumbnail?fileName="+originalFileName+"&path="+path+"&type="+type+"&name="+fileName+"' style='width:100%;height:800px;'></iframe>";
+    }else{
+        str="<span style='width:100%;height:800px;'>미리보기가 지원되지 않는 파일입니다</span>";
+    }
+    preview.innerHTML=str;
+}
 
 
 // 자재 수정 첨부파일 목록 불러오기
@@ -171,17 +203,22 @@ function materialFileList(materCode){
         method:'GET',
         data:{code:code},
         success:function(data){
+            document.getElementById('previewList1').innerText='';
+            document.getElementById('preview1').innerText='';
             data.forEach(x=>{
                 var path=x.uploadPath.replaceAll("\\", "/");
                 var uuid=x.uuid;
                 var originalFileName=x.fileName;
                 var fileName=originalFileName.substring(uuid.length+1);
+                var fileType=x.contentType;
 
                 const newRow = document.createElement('tr');
                 const fileNameTd = document.createElement('td');
                 fileNameTd.innerHTML = `<a href="/file/download?path=${path}&fileName=${originalFileName}&type=m&uuid=${uuid}">${fileName}</a>`;
                 newRow.appendChild(fileNameTd);
                 fileTable0.appendChild(newRow);
+
+                viewList(originalFileName, fileName, fileType, path, 1, "m");
             });
         }
     });
@@ -237,17 +274,22 @@ function productFileList(manuCode){
         method:'GET',
         data:{code:code},
         success:function(data){
+            document.getElementById('previewList2').innerText='';
+            document.getElementById('preview2').innerText='';
             data.forEach(x=>{
                 var path=x.uploadPath.replaceAll("\\", "/");
                 var uuid=x.uuid;
                 var originalFileName=x.fileName;
                 var fileName=originalFileName.substring(uuid.length+1);
+                var fileType=x.contentType;
 
                 const newRow = document.createElement('tr');
                 const fileNameTd = document.createElement('td');
                 fileNameTd.innerHTML = `<a href="/file/download?path=${path}&fileName=${originalFileName}&type=p&uuid=${uuid}">${fileName}</a>`;
                 newRow.appendChild(fileNameTd);
                 fileTable2.appendChild(newRow);
+
+                viewList(originalFileName, fileName, fileType, path, 2, "p");
             });
         }
     });

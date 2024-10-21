@@ -12,144 +12,156 @@
 
   <span id="head">
     <title>관련 자재</title>
-      <!--Style-->
+    <!--Style-->
 
-      <!--/Style-->
+    <!--/Style-->
   </span>
 
-    <span id="content">
+  <span id="content">
     <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">개발 부서 /</span> 등록 정보 보기</h4>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5>제품 정보</h5>
+          <label class="form-label">제품명</label>
+          <input
+                  class="form-control"
+                  id="productName"
+                  placeholder="등록할 제품 명"
+                  th:value=${product.name}
+                  readonly
+          />
+          <label class="form-label">첨부 파일</label>
+          <button type="button" id="uploadBtn1" style="display:none;"></button>
+          <button type="button" id="uploadBtn2" style="display:none;"></button>
+          <div class="card shadow-none" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList2">
+            <table style="margin-left: 20px; margin-top: 5px;">
+              <tbody id="fileTable2"></tbody>
+              <tbody id="fileTable3"></tbody>
+            </table>
+          </div>
+          <label class="form-label">제품정보</label>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>제품번호</th>
+                <th>카테고리</th>
+                <th>색상</th>
+                <th>담당자</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td id="manuCode">[[${product.manuCode}]]</td>
+                <td>[[${product.proSDTO.Sname}]]</td>
+                <td>[[${product.color}]]</td>
+                <td>[[${product.supervisor}]]</td>
+              </tr>
+            </tbody>
+            <thead>
+              <tr><th colspan="4">비고</th></tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="4">[[${product.text}]]</td></tr>
+            </tbody>
+          </table>
+          <label class="form-label">미리보기</label>
+          <div class="mb-4">
+            <div style="background-color:#f0f0f0;">
+              <ul id="previewList2"
+                  style="list-style-type: none; padding: 10px; margin: 0; display: flex; justify-content: center; align-items:center;">
+              </ul>
+            </div>
+            <hr class="m-0">
+            <div id="preview2"
+                 style="border: 1px solid #f0f0f0; padding: 10px; margin: 0;display: flex; justify-content: center; align-items: center; overflow-x: auto;">
+              </div>
+          </div>
+          <div class="d-flex justify-content-between w-100">
+            <a th:href="@{/development/list_dev}">
+              <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="card mb-4">
+        <!--/ Card-->
+        <div class="card-body">
+          <h5>자재 정보</h5>
+          <label class="form-label">제품에 들어가는 자재 목록</label>
+          <div class="text-nowrap table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>자재번호</th>
+                  <th>자재명</th>
+                  <th style="width: fit-content;">제품 1개당 소요량</th>
+                  <th>분류</th>
+                  <th>규격/단위</th>
+                  <th>색상</th>
+                  <th>창고위치</th>
+                  <th style="width: 10px;">파일</th>
+                </tr>
+              </thead>
+              <tbody id="materialSel">
+                <tr th:each="structure:${structures}">
+                  <td>[[${structure.materialDTO.materCode}]]</td>
+                  <td><strong>[[${structure.materialDTO.name}]]</strong></td>
+                  <td>[[${structure.sno}]]</td>
+                  <td>[[${structure.materialDTO.materSDTO.materMDTO.materLDTO.lname}]]>
+                      [[${structure.materialDTO.materSDTO.materMDTO.Mname}]]>
+                      [[${structure.materialDTO.materSDTO.Sname}]]
+                  </td>
+                  <td>[[${structure.materialDTO.unit}]]/[[${structure.materialDTO.standard}]]</td>
+                  <td>[[${structure.materialDTO.color}]]</td>
+                  <td>[[${structure.materialDTO.boxDTO.boxname}]]</td>
+                  <td>
+                    <button type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            id="showFile"
+                            th:value="${structure.materialDTO.materCode}"
+                            th:onclick="materialFileList(this.value)"
+                    >
+                      파일보기
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <label class="form-label">자재파일 미리보기</label>
+            <div class="card shadow-none" style="display:none;" id="fileList1">
+              <table style="margin-left: 20px; margin-top: 5px;">
+                <tbody id="fileTable0"></tbody>
+                <tbody id="fileTable1"></tbody>
+              </table>
+            </div>
+            <div class="mb-4">
+              <div style="background-color:#f0f0f0;">
+                <ul id="previewList1"
+                    style="list-style-type: none; padding: 10px; margin: 0; display: flex; justify-content: center; align-items:center;">
+                </ul>
+              </div>
+              <hr class="m-0">
+              <div id="preview1"
+                   style="border: 1px solid #f0f0f0; padding: 10px; margin: 0;display: flex; justify-content: center; align-items: center; overflow-x: auto;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Modal-->
 
-                <!-- Heading and other content -->
-                <h4 class="fw-bold py-3 mb-4">
-                    <span class="text-muted fw-light">개발 부서 /</span> 등록 정보 보기
-                </h4>
-
-        <!-- Other content can go here -->
-
-        <!-- Vertical Scrollbar -->
-                  <div class="fullscreen-background">
-                    <div class="card overflow-hidden mb-4">
-                      <h5 class="card-header">전동 킥보드</h5>
-                      <div class="card-body">
-                        <img src="image.png" style="width: 100%;">
-                      </div>
-                    </div>
-
-
-                    <div class="card overflow-hidden mb-4" style="height: 300px;">
-
-                      <h5 class="card-header">요구 자재 목록</h5>
-                      <div class="card-body" id="vertical-example">
-                        <div class="table-responsive text-nowrap">
-                          <table class="table table-bordered">
-                            <thead>
-                              <tr>
-                                <th>제품 번호</th>
-                                <th>자재 명</th>
-                                <th>자재 번호</th>
-                                <th>색상</th>
-                                <th>수량</th>
-                                <th>규격/재질</th>
-                                <th>비고</th>
-                                <th>도면 상세 보기</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td>ZK-103</td>
-                                <td>앞 브레이크</td>
-                                <td><strong>BM-8523</strong></td>
-                                <td>화이트</td>
-                                <td>2</td>
-                                <td>120mm</td>
-                                <td>
-                                  디스크 브레이크 사용
-                                </td>
-                                <td>
-                                  <button type="button" class="btn btn-sm btn-outline-primary">도면 보기</button>
-                                </td>
-                              </tr>
-                              <tr>
-                                <td>ZK-103</td>
-                                <td>뒷 브레이크</td>
-                                <td><strong>BB-124</strong></td>
-                                <td>블랙</td>
-                                <td>1</td>
-                                <td>130mm</td>
-                                <td>
-
-                                </td>
-                                <td>
-                                  <button type="button" class="btn btn-sm btn-outline-primary">도면 보기</button>
-                                </td>
-                              </tr> <tr>
-                                <td>ZK-103</td>
-                                <td>배터리</button></td>
-                                <td><strong>BT-590</strong></td>
-                                <td>화이트</td>
-                                <td>2</td>
-                                <td>36V</td>
-                                <td>
-                                  20Ah 용량
-                                </td>
-                                <td>
-                                  <button type="button" class="btn btn-sm btn-outline-primary">도면 보기</button>
-                                </td>
-                              </tr> <tr>
-                                <td>ZK-103</td>
-                                <td>발판</td>
-                                <td><strong>BP-275</strong></td>
-                                <td>블랙</td>
-                                <td>1</td>
-                                <td>알루미늄 합금</td>
-                                <td>
-                                  브랜드 로고나 패턴이 포함
-                                </td>
-                                <td>
-                                  <button type="button" class="btn btn-sm btn-outline-primary">도면 보기</button>
-                                </td>
-                              </tr><tr>
-                                <td>ZK-103</td>
-                                <td>핸들</td>
-                                <td><strong>HD-550</strong></td>
-                                <td>화이트</td>
-                                <td>1</td>
-                                <td>플라스틱</td>
-                                <td>
-                                  벨,라이트 추가적인 안전 기능 포함
-                                </td>
-                                <td>
-                                  <button type="button" class="btn btn-sm btn-outline-primary">도면 보기</button>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-                    <div class="col-12">
-                  <div class="card overflow-hidden" style="height: 500px">
-                    <h5 class="card-header">참고 도면</h5>
-                    <div class="card-body" id="both-scrollbars-example" style="height: 80%;">
-                      <img src="../assets/img/backgrounds/image.png" alt="scrollbar-image" />
-                    </div>
-                    <div class="card-body">
-                      <a th:href="@{/development/list_dev}">
-                        <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-                 </div>
-                </div>
-        <!--Modal-->
-
-        <!--/Modal-->
-        <!--Script-->
-
-        <!--Script-->
+    <!--/Modal-->
+    <!--Script-->
+    <script src="../assets/js/file.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const manuCode=document.getElementById('manuCode').innerText;
+        productFileList(manuCode);
+      });
+    </script>
+    <!--Script-->
   </span>
 
 </th:block>

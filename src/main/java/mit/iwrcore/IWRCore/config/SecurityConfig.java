@@ -36,6 +36,7 @@ public class SecurityConfig {
         http.csrf(csrf->csrf.disable());
         http.logout(logout->
                 logout.permitAll());
+        http.headers().frameOptions().sameOrigin();
         return http.build();
     }
 

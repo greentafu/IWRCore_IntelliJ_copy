@@ -30,7 +30,7 @@ function loadItems() {
         longList.push(num);
     });
 
-    console.log('aaa', page, '/', longList, '/', selectMaterL, '/', selectMaterM, '/', selectMaterS, '/', materialSearch);
+    console.log("되나안되나: "+longList);
 
     $.ajax({
         url:'/select/materialList',

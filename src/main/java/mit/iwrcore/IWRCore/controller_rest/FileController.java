@@ -8,10 +8,15 @@ import mit.iwrcore.IWRCore.security.service.FileService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 
 @RestController
@@ -28,6 +33,47 @@ public class FileController {
     @GetMapping("/productFile")
     public List<FileProductDTO> getProductFile(@RequestParam(required = false) Long code){
         return fileService.getProductFileList(code);
+    }
+
+    @GetMapping("/thumbnail")
+    @ResponseBody
+    public ResponseEntity<byte[]> getThumbnail(String fileName, String path, String type, String name){
+        String folder="";
+        if(type.equals("m")) folder="material";
+        else if(type.equals("p")) folder="product";
+
+        File file=new File("C:\\iwlcore\\"+folder+"\\"+path+"\\"+fileName);
+
+        ResponseEntity<byte[]> result=null;
+        try{
+            HttpHeaders header=new HttpHeaders();
+            header.add("Content-Type", Files.probeContentType(file.toPath()));
+            result=new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+    @GetMapping("/readtxt")
+    @ResponseBody
+    public ResponseEntity<String> readtxt(String fileName, String path, String type, String name) {
+        String folder = "";
+        if (type.equals("m")) folder = "material";
+        else if (type.equals("p")) folder = "product";
+
+        File file = new File("C:\\iwlcore\\" + folder + "\\" + path + "\\" + fileName);
+
+        ResponseEntity<String> result = null;
+        try {
+            String content = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+            HttpHeaders header = new HttpHeaders();
+            header.add("Content-Type", "text/plain");
+            result = new ResponseEntity<>(content, header, HttpStatus.OK);
+        } catch (IOException e) {
+            e.printStackTrace();
+            result = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return result;
     }
 
     @GetMapping(value = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

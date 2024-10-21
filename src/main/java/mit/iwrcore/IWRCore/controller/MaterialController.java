@@ -21,36 +21,26 @@ import java.net.URLEncoder;
 @Log4j2
 @Controller
 public class MaterialController {
-
     private final MaterialService materialService;
     private final BoxService boxService;
-
-    @Autowired
-    private FileService fileService;
 
     @GetMapping("/list_material")
     public void list_material(Model model) {
         model.addAttribute("box_list", boxService.list());
     }
-
-    @GetMapping("/material")
-    public void material(@RequestParam Long materCode, Model model) {
-        MaterialDTO materialDTO=materialService.findM(materCode);
-        model.addAttribute("material", materialDTO);
-    }
-
-    @GetMapping("/modify_material")
-    public void modify_material(@RequestParam Long materCode, Model model) {
-        MaterialDTO materialDTO=materialService.findM(materCode);
-        model.addAttribute("material", materialDTO);
-        model.addAttribute("boxList", boxService.list());
-    }
-
     @GetMapping("/new_material")
     public void new_material(Model model) {
         model.addAttribute("boxList", boxService.list());
     }
-
+    @GetMapping("/modify_material")
+    public void modify_material(@RequestParam Long materCode, Model model) {
+        model.addAttribute("material", materialService.findM(materCode));
+        model.addAttribute("boxList", boxService.list());
+    }
+    @GetMapping("/material")
+    public void material(@RequestParam Long materCode, Model model) {
+        model.addAttribute("material", materialService.findM(materCode));
+    }
 }
 
 

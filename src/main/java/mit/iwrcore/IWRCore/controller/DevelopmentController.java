@@ -14,21 +14,21 @@ import org.springframework.web.bind.annotation.*;
 public class DevelopmentController {
 
     private final ProductService productService;
+    private final FileService fileService;
+    private final StructureService structureService;
 
-    @GetMapping("/input_dev")
-    public void input_dev(){
-
-    }
     @GetMapping("/list_dev")
-    public void list_dev(){
-
-    }
-    @GetMapping("/detail_dev")
-    public void detail_dev(){
-
-    }
+    public void list_dev(){}
+    @GetMapping("/input_dev")
+    public void input_dev(){}
     @GetMapping("/modify_dev")
     public void modify_dev(@RequestParam Long manuCode, Model model){
         model.addAttribute("product", productService.getProductById(manuCode));
+    }
+    @GetMapping("/detail_dev")
+    public void detail_dev(@RequestParam Long manuCode, Model model){
+        model.addAttribute("product", productService.getProductById(manuCode));
+        model.addAttribute("pFiles", fileService.getProductFileList(manuCode));
+        model.addAttribute("structures", structureService.findByProduct_ManuCode(manuCode));
     }
 }
