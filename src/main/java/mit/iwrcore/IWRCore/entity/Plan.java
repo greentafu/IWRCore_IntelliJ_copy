@@ -26,8 +26,9 @@ public class Plan {
 
     @NotNull
     private Long quantity;  // 수량
-    @NotNull
-    private String line;    // 라인
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="line")
+    private Line line;
 }
 

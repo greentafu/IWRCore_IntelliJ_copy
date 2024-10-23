@@ -1,6 +1,5 @@
-package mit.iwrcore.IWRCore.repository;
+package mit.iwrcore.IWRCore.repository.File;
 
-import mit.iwrcore.IWRCore.entity.FileMaterial;
 import mit.iwrcore.IWRCore.entity.FileProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

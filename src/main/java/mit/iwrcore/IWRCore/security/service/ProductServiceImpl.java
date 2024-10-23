@@ -3,17 +3,14 @@ package mit.iwrcore.IWRCore.security.service;
 import mit.iwrcore.IWRCore.entity.FileProduct;
 import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.repository.MaterialRepository;
-import mit.iwrcore.IWRCore.repository.Pro.ProSCodeRepository;
+import mit.iwrcore.IWRCore.repository.Category.Pro.ProSCodeRepository;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
 import mit.iwrcore.IWRCore.repository.ProductRepository;
 import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
-import mit.iwrcore.IWRCore.security.dto.StructureDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -144,40 +141,41 @@ public class ProductServiceImpl implements ProductService {
                 .build();
 
         // proPlans 필드 추가: Product 엔티티의 proPlans를 DTO로 변환하여 설정
-        if (entity.getProPlans() != null) {
-            List<ProplanDTO> proPlans = entity.getProPlans().stream()
-                    .map(proPlan -> ProplanDTO.builder()
-                            .proplanNo(proPlan.getProplanNo())
-                            .pronum(proPlan.getPronum())
-                            .filename(proPlan.getFilename())
-                            .startDate(proPlan.getStartDate())
-                            .endDate(proPlan.getEndDate())
-                            .line(proPlan.getLine())
-                            .details(proPlan.getDetails())
-                            .build())
-                    .collect(Collectors.toList());
-            productDTO.setProPlans(proPlans);
-        }
+//        if (entity.getProPlans() != null) {
+//            List<ProplanDTO> proPlans = entity.getProPlans().stream()
+//                    .map(proPlan -> ProplanDTO.builder()
+//                            .proplanNo(proPlan.getProplanNo())
+//                            .pronum(proPlan.getPronum())
+//                            .filename(proPlan.getFilename())
+//                            .startDate(proPlan.getStartDate())
+//                            .endDate(proPlan.getEndDate())
+//                            .line(proPlan.getLine())
+//                            .details(proPlan.getDetails())
+//                            .build())
+//                    .collect(Collectors.toList());
+//            productDTO.setProPlans(proPlans);
+//        }
 
         return productDTO;
     }
 
     @Override
     public List<ProplanDTO> convertProPlans(Product entity) {
-        if (entity == null || entity.getProPlans() == null) {
-            return Collections.emptyList(); // proPlans가 null일 경우 빈 리스트 반환
-        }
-        return entity.getProPlans().stream()
-                .map(proPlan -> ProplanDTO.builder()
-                        .proplanNo(proPlan.getProplanNo())
-                        .pronum(proPlan.getPronum())
-                        .filename(proPlan.getFilename())
-                        .startDate(proPlan.getStartDate())
-                        .endDate(proPlan.getEndDate())
-                        .line(proPlan.getLine())
-                        .details(proPlan.getDetails())
-                        .build())
-                .collect(Collectors.toList());
+//        if (entity == null || entity.getProPlans() == null) {
+//            return Collections.emptyList(); // proPlans가 null일 경우 빈 리스트 반환
+//        }
+//        return entity.getProPlans().stream()
+//                .map(proPlan -> ProplanDTO.builder()
+//                        .proplanNo(proPlan.getProplanNo())
+//                        .pronum(proPlan.getPronum())
+//                        .filename(proPlan.getFilename())
+//                        .startDate(proPlan.getStartDate())
+//                        .endDate(proPlan.getEndDate())
+//                        .line(proPlan.getLine())
+//                        .details(proPlan.getDetails())
+//                        .build())
+//                .collect(Collectors.toList());
+        return null;
     }
     @Override
     public List<ProductDTO> searchProducts(String query) {

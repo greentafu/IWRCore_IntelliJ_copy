@@ -2,9 +2,9 @@ package mit.iwrcore.IWRCore.service;
 
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
 import mit.iwrcore.IWRCore.entity.*;
-import mit.iwrcore.IWRCore.repository.Mater.MaterLRepository;
-import mit.iwrcore.IWRCore.repository.Mater.MaterMRepository;
-import mit.iwrcore.IWRCore.repository.Mater.MaterSRepository;
+import mit.iwrcore.IWRCore.repository.Category.Mater.MaterLRepository;
+import mit.iwrcore.IWRCore.repository.Category.Mater.MaterMRepository;
+import mit.iwrcore.IWRCore.repository.Category.Mater.MaterSRepository;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterLDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterSDTO;

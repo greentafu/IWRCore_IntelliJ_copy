@@ -16,7 +16,7 @@ public class ProplanDTO {
     private String filename;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private String line;
+    private List<String> line;
     private LocalDateTime regDate;
 //    private Long productId;
     private String details;

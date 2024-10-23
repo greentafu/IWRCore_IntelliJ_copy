@@ -187,11 +187,11 @@ function saveToLowerTable(whatButton){
     let quantityBlank=true;
 
     if(person.trim()===''){
-        alert('제품 담당자의 실명을 입력해 주세요.'+formData2);
+        alert('제품 담당자의 실명을 입력해 주세요.');
     }else if(productName.trim()===''){
-        alert('제품의 이름을 입력해 주세요.'+formData2);
+        alert('제품의 이름을 입력해 주세요.');
     }else if(selectProS.trim()===''){
-        alert('제품의 소분류 카테고리를 선택해 주세요.'+formData2);
+        alert('제품의 소분류 카테고리를 선택해 주세요.');
     }else{
         materialRows.forEach(x=>{
             const cells=x.querySelectorAll('td');
@@ -235,11 +235,6 @@ function saveToLowerTable(whatButton){
                         if(sel==2) window.location.href = '/production/list_newProduct';
                         else if(sel==3) window.location.href = '/production/list_manufacture';
                         else window.location.href = '/development/list_dev';
-                    },
-                    error: function(xhr, status, error) {
-                        console.log('실패야', manuCode, '/', person,'/',productName,'/', selectProS, '/', proColor, '/', proText, '/', materData, '/', sel,'/');
-                        console.log('실 ', formData2);
-                        console.log('패 ', deleteFile2);
                     }
                 });
             }

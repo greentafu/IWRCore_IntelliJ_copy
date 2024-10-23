@@ -29,7 +29,6 @@
   <span id="content">
     <div class="container-xxl flex-grow-1 container-p-y">
       <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">생산부서 /</span> 생산 계획 목록</h4>
-
       <!--추가해야 햘 목록-->
       <div class="card mb-4">
         <!--검색-->
@@ -342,7 +341,7 @@
 
               const nameTd = document.createElement("td");
               nameTd.id='manuName'+proplanNo;
-              nameTd.innerHTML = `<strong><a href="/proteam/details_plan?manuCode=${manuCode}"> ${name}</a></strong>`;
+              nameTd.innerHTML = `<strong><a href="/proteam/details_plan?proplanNo=${proplanNo}"> ${name}</a></strong>`;
               newRow.appendChild(nameTd);
 
               const periodTd = document.createElement("td");
@@ -435,7 +434,7 @@
       function deleteProPlan(button){
         var proplanNo=button.value;
         $.ajax({
-          url:'/proteam/delete_proplan',
+          url:'/deleteProPlan',
           method:'GET',
           data:{proplanNo:proplanNo},
           success:function(response){

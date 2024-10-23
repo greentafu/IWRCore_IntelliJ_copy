@@ -18,139 +18,93 @@
   </span>
 
   <span id="content">
-     <div class="container-xxl flex-grow-1 container-p-y">
-        <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">생산부서 /</span> 생산 계획 수정</h4>
-        <div class="row">
-           <div class="fullscreen-background">
-              <div class="card mb-4"><!--Card body-->
-                 <div class="card-body">
-                    <h5>일일 생산 라인 능력 등록</h5>
-                    <div class="mb-3 col-md-6">
-                       <label for="productName" class="form-label">제품명</label>
-                       <input class="form-control" type="text" id="productName" name="productName" th:value="${product.name}" readonly />
-                    </div>
-                    <label class="form-label">생산 라인</label>
-                    <form th:action="@{/proteam/save_plan}" method="post">
-                       <input type="hidden" name="manuCode" th:value="${product.manuCode}" />
-                       <div class="row mb-1" th:each="line:${plan_list}">
-                          <span class="col-md-1" style="width: fit-content;" th:text="${line.line} + '라인:'"></span>
-                          <div class="col-md-2">
-                             <input type="number" name="quantities" class="form-control col-md-2" th:value="${line.quantity}"/>
-                          </div>
-                       </div>
-                       <div th:if="${#lists.isEmpty(plan_list)}">
-                          <div class="row mb-1">
-                             <span class="col-md-1" style="width: fit-content;">A라인:</span>
-                             <div class="col-md-2">
-                                 <input type="number" class="form-control col-md-2" name="lineA" id="lineA"/>
-                             </div>
-                          </div>
-                          <div class="row mb-1">
-                             <span class="col-md-1" style="width: fit-content;">B라인:</span>
-                             <div class="col-md-2">
-                                <input type="number" class="form-control col-md-2" name="lineB" id="lineB"/>
-                             </div>
-                          </div>
-                          <div class="row mb-1">
-                             <span class="col-md-1" style="width: fit-content;">C라인:</span>
-                             <div class="col-md-2">
-                                <input type="number" class="form-control col-md-2" name="lineC" id="lineC"/>
-                             </div>
-                          </div>
-                       </div><!-- Form submission buttons -->
-                       <div class="row mb-1">
-                          <div class="col text-end">
-                             <button type="button" class="btn btn-primary">추가</button>
-                             <button type="submit" class="btn btn-primary" style="width: 80px;">저장</button>
-                          </div>
-                       </div>
-                    </form>
-                    <hr class="m-0">
-                    <div class="card-body">
-                       <h5>생산 계획</h5>
-                       <div style="display:none;" id="lines">[[${proplan.line}]]</div>
-                       <div style="display:none;" id="startDay">[[${proplan.startDate}]]</div>
-                       <div style="display:none;" id="endDay">[[${proplan.endDate}]]</div>
-                       <label for="exampleNumberInput" class="form-label">제품 생산을 위한 라인</label>
-                       <form id="proplanForm" class="mb-4" method="post" th:action="@{/proteam/Psave}">
-                          <input type="hidden" name="proplanNo" th:value="${proplan.proplanNo}" />
-                          <input type="hidden" name="manuCode" th:value="${product.manuCode}" />
-                          <div>
-                             <input type="checkbox" class="form-check-input" name="line" value="A" id="checkLineA"> 라인A &nbsp;&nbsp;
-                             <input type="checkbox" class="form-check-input" name="line" value="B" id="checkLineB"> 라인B &nbsp;&nbsp;
-                             <input type="checkbox" class="form-check-input" name="line" value="C" id="checkLineC"> 라인C
-                          </div>
-                          <label for="exampleNumberInput" class="form-label">총 수량 입력</label>
-                          <input type="number" class="form-control mb-3" id="exampleNumberInput" name="pronum" th:value="${proplan.pronum}">
-                          <label class="form-label">생산일 입력</label>
-                          <input type="date" class="form-control mb-3" name="startDate" id="startDate">
-                          <label class="form-label">마감일 입력</label>
-                          <input type="date" class="form-control mb-3" name="endDate" id="endDate">
-                          <label  class="form-label">첨부 파일</label>
-                          <div class="input-group mb-4">
-                             <input
-                                      type="file"
-                                      class="form-control"
-                                      id="inputGroupFile04"
-                                      aria-describedby="inputGroupFileAddon04"
-                                      aria-label="Upload"
-                                      th:value="${proplan.filename}"
-                             />
-                             <button class="btn btn-outline-primary" type="button" id="inputGroupFileAddon04">업로드</button>
-                          </div>
-                          <label for="exampleFormControlTextarea1" class="form-label">등록 상세 내용</label>
-                          <textarea class="form-control mb-3" id="exampleFormControlTextarea1" name="details" rows="15">[[${proplan.details}]]</textarea>
-                          <div class="d-flex justify-content-between w-100">
-                             <a th:href="@{/proteam/list_pro}">
-                                <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
-                             </a>
-                             <a th:href="@{/proteam/list_pro}">
-                                <button class="btn btn-primary" type="submit">수정</button>
-                             </a>
-                          </div>
-                       </form>
-                    </div>
-                    <!--Card body-->
-                 </div>
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">생산부서 /</span> 생산 계획 수정</h4>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5>일일 생산 라인 능력 등록</h5>
+          <div class="mb-3 col-md-6">
+            <input type="hidden" id="manuCode" th:value="${product.manuCode}" readonly/>
+            <label for="productName" class="form-label">제품명</label>
+            <input class="form-control" type="text" id="productName" th:value="${product.name}" readonly/>
+          </div>
+          <label class="form-label">생산 라인</label>
+          <div>
+            <div class="row mb-1" th:each="line:${line_list}">
+              <span class="col-md-1" style="width: fit-content;">[[${line}]]라인:</span>
+              <div class="col-md-2">
+                <input type="number" class="form-control col-md-2" th:id="'line'+${line}" value="0"/>
               </div>
-           </div>
+            </div>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-primary" style="width: 80px;" onclick="saveLine()">저장</button>
+          </div>
         </div>
-     </div>
+      </div>
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5>생산 계획</h5>
+          <input type="hidden" id="proplanNo" th:value="${proplan.proplanNo}" readonly/>
+          <div style="display:none;" id="lines">[[${useLine}]]</div>
+          <div style="display:none;" id="startDay">[[${proplan.startDate}]]</div>
+          <div style="display:none;" id="endDay">[[${proplan.endDate}]]</div>
+          <label class="form-label">제품 생산을 위한 라인</label>
+          <div class="mb-4" th:each="line:${line_list}">
+            <input type="checkbox" class="form-check-input" th:value=${line} th:id="'ckeck'+${line}"> [[${line}]]라인
+          </div>
+          <label class="form-label">총 수량 입력</label>
+          <label class="form-label">총 수량 입력</label>
+          <input type="number" class="form-control mb-3" id="pronum" th:value="${proplan.pronum}">
+          <label class="form-label">생산일 입력</label>
+          <input type="date" class="form-control mb-3" id="startDate">
+          <label class="form-label">마감일 입력</label>
+          <input type="date" class="form-control mb-3" id="endDate">
+          <label class="form-label">첨부 파일</label>
+          <div class="input-group mb-2">
+            <input
+                    type="file"
+                    class="form-control"
+                    aria-label="Upload"
+                    id="uploadFiles1"
+                    multiple
+            />
+            <button class="btn btn-outline-primary" type="button" id="uploadBtn1">업로드</button>
+            <button id="uploadBtn2" style="display:none;"></button>
+          </div>
+          <div class="card shadow-none mb-3" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+            <table style="margin-left: 20px; margin-top: 5px;">
+              <tbody id="fileTable0"></tbody>
+              <tbody id="fileTable1"></tbody>
+            </table>
+          </div>
+          <label class="form-label">등록 상세 내용</label>
+          <textarea class="form-control mb-3" id="details" rows="15">[[${proplan.details}]]</textarea>
+          <div class="d-flex justify-content-between w-100">
+            <a th:href="@{/proteam/list_pro}">
+              <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
+            </a>
+            <button class="btn btn-primary" type="button" onclick="savePlan()">수정</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!--Modal-->
+    <!--Modal-->
 
-  <!--/Modal-->
-  <!--Script-->
-     <script>
-        $(document).ready(function(){
-           initModifyProPlan();
-        });
-        function initModifyProPlan(){
-           const startDay=document.getElementById('startDay').innerText;
-           const endDay=document.getElementById('endDay').innerText;
-           const start=startDay.split('T')[0];
-           const end=endDay.split('T')[0];
-           document.getElementById('startDate').value=start;
-           document.getElementById('endDate').value=end;
-
-           const lines=document.getElementById('lines').innerText;
-           const line=lines.split(', ');
-           line.forEach(x=>{
-               const lineId='checkLine'+x;
-               const tempLine=document.getElementById(lineId);
-               if(tempLine) tempLine.checked=true;
-           });
-        }
-
-
-
-
-
-
-
-     </script>
-
-  <!--Script-->
+    <!--/Modal-->
+    <!--Script-->
+    <script src="../assets/js/new-proplan-jodalplan.js"></script>
+    <script src="../assets/js/file.js"></script>
+    <script>
+      $(document).ready(function(){
+        var proplanNo=document.getElementById('proplanNo').value;
+        initLine();
+        initModifyProPlan();
+        initProPlanFile(proplanNo);
+      });
+    </script>
+    <!--Script-->
   </span>
 
 </th:block>

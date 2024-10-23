@@ -17,58 +17,88 @@
       <!--/Style-->
   </span>
 
-    <span id="content">
+  <span id="content">
     <div class="container-xxl flex-grow-1 container-p-y">
-              <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">생산부서 /</span> 계획 정보 보기</h4>
-        <!-- Accordion -->
-              <div class="card mb-4">
-                <div class="card-body">
-
-
-                  <p><strong>전동 킥보드 생산 계획</strong></p>
-
-                  <p><strong>1. 생산 개요</strong></p>
-                  <p>제품명: 전동 킥보드 - 모델 X</p>
-                  <p>제품 번호:  ZK-103</p>
-                  <p>총 생산량: 1500 대</p>
-                  <p>생산 기간: 2024년 08월 20일 - 2024년 12월 10일</p>
-
-
-                  <p><strong>2. 주요 마일스톤</strong></p>
-                  <p>생산 준비 완료: 2024년 08월 18일</p>
-                  <p>첫 생산 시작: 2024년 08월 20일</p>
-                  <p>중간 점검 및 품질 검사: 2024년 9월 01일</p>
-                  <p>생산 완료: 2024년 12월 10일</p>
-                  <p>최종 품질 검사 및 포장: 2024년 8월 21일 - 2024년 8월 25일</p>
-                  <p>출하 준비 완료: 2024년 8월 25일</p>
-
-                  <p><strong>3. 품질 관리</strong></p>
-                  <p>초기 품질 검사: 생산 시작 전 모든 부품 및 재료의 품질 검사</p>
-                  <p>중간 품질 점검: 생산 중간에 랜덤 샘플을 통한 품질 점검</p>
-                  <p>최종 품질 검사: 생산 완료 후 최종 품질 검사 및 포장 전 점검</p>
-
-                  <p><strong>4. 인력 배치 계획</strong></p>
-                  <p>생산 팀: 총 10명 (주간 5명, 야간 5명)</p>
-                  <p>품질 관리 팀: 총 3명 (각 주에 1명씩)</p>
-                  <p>포장 및 출하 팀: 총 2명</p>
-
-                  <p><strong>5. 기타 사항</strong></p>
-                  <p>비상 대책: 생산 장비 고장 시 예비 장비 준비 및 즉각 대응</p>
-                  <p>자재 관리: 생산 부품 및 재료의 지속적 자재 관리 및 보충</p>
-
-                   <a th:href="@{/proteam/list_pro}">
-                    <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
-                  </a>
-                </div>
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">생산부서 /</span> 계획 정보 보기</h4>
+      <div class="card">
+        <div class="table-responsive text-nowrap">
+          <!-- Outline Dropdowns -->
+          <div class="card-body">
+            <label class="form-label">제품명</label>
+            <input type="text" class="form-control" th:value="${proplan.productDTO.name}" readonly>
+            <label class="form-label">첨부 파일</label>
+            <button id="uploadBtn1" style="display:none;"></button>
+            <button id="uploadBtn2" style="display:none;"></button>
+            <div class="card shadow-none" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+              <table style="margin-left: 20px; margin-top: 5px;">
+                <tbody id="fileTable0"></tbody>
+                <tbody id="fileTable1"></tbody>
+              </table>
+            </div>
+            <label class="form-label">생산계획 정보</label>
+            <input style="display:none;" id="proplanNo" th:value="${proplan.proplanNo}">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>총 생산 수량</th>
+                  <th>생산일</th>
+                  <th>마감일</th>
+                  <th>사용 라인</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>[[${proplan.productDTO.name}]]</td>
+                  <td>[[${#temporals.format(proplan.startDate, 'yyyy-MM-dd')}]]</td>
+                  <td>[[${#temporals.format(proplan.endDate, 'yyyy-MM-dd')}]]</td>
+                  <td>[[${useLine}]]</td>
+                </tr>
+              </tbody>
+              <thead>
+                <tr><th colspan="4">비고</th></tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="4">[[${proplan.details}]]</td></tr>
+              </tbody>
+            </table>
+            <label class="form-label">미리보기</label>
+            <div class="mb-4">
+              <div style="background-color:#f0f0f0;">
+                <ul id="previewList1"
+                    style="list-style-type: none; padding: 10px; margin: 0; display: flex; justify-content: center; align-items:center;">
+                </ul>
+              </div>
+              <hr class="m-0">
+              <div id="preview1"
+                   style="border: 1px solid #f0f0f0; padding: 10px; margin: 0;display: flex; justify-content: center; align-items: center; overflow-x: auto;">
               </div>
             </div>
+            <!--뒤로가기,등록 버튼 세트-->
+            <div class="d-flex justify-content-between w-100">
+              <a th:href="@{/proteam/list_pro}">
+                <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
+              </a>
+              <a th:href="@{/proteam/modify_plan(proplanNo=${proplan.proplanNo})}">
+                <button class="btn btn-primary">수정</button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        <!--Modal-->
+    <!--Modal-->
 
-        <!--/Modal-->
-        <!--Script-->
-
-        <!--Script-->
+    <!--/Modal-->
+    <!--Script-->
+    <script src="../assets/js/file.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const proplanNo=document.getElementById('proplanNo').value;
+        proPlanFileList(proplanNo);
+      });
+    </script>
+    <!--Script-->
   </span>
 
 </th:block>

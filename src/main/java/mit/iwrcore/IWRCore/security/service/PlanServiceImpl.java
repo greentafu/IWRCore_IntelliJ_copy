@@ -3,8 +3,10 @@ package mit.iwrcore.IWRCore.security.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.Line;
 import mit.iwrcore.IWRCore.entity.Plan;
 import mit.iwrcore.IWRCore.entity.Product;
+import mit.iwrcore.IWRCore.repository.LineRepository;
 import mit.iwrcore.IWRCore.repository.PlanRepository;
 import mit.iwrcore.IWRCore.repository.ProductRepository;
 import mit.iwrcore.IWRCore.security.dto.PlanDTO;
@@ -20,28 +22,24 @@ import java.util.stream.Collectors;
 @Log4j2
 public class PlanServiceImpl implements PlanService{
     private final PlanRepository planRepository;
-    private final ProductRepository productRepository;
-
     private final ProductServiceImpl productServiceImpl;
 
+    private final LineService lineService;
+
     @Override
-    public void save(PlanDTO dto) {
+    public void saveLine(PlanDTO dto) {
         Plan plan = dtoToEntity(dto);
         planRepository.save(plan);
     }
-
-    @Override
-    public void update(PlanDTO planDTO) {
-        // Ensure the plan exists before updating
-        if (!planRepository.existsById(planDTO.getPlancode())) {
-            throw new IllegalArgumentException("Plan not found with id: " + planDTO.getPlancode());
-        }
-        planRepository.save(dtoToEntity(planDTO));
-    }
-
     @Override
     public void deleteById(Long id) {
         planRepository.deleteById(id);
+    }
+    @Override
+    public PlanDTO findLineByLine(Long manuCode, String line){
+        Plan plan=planRepository.findLineByLine(manuCode, line);
+        PlanDTO planDTO=entityToDTO(plan);
+        return planDTO;
     }
 
     @Override
@@ -59,44 +57,24 @@ public class PlanServiceImpl implements PlanService{
 
     @Override
     public Plan dtoToEntity(PlanDTO dto) {
-        // Fetch the products associated with the IDs from the DTO
+        if(dto==null) return null;
         Plan entity=Plan.builder()
                 .plancode(dto.getPlancode())
-                .line(dto.getLine())
+                .line(lineService.stringToLine(dto.getLine()))
                 .product(productServiceImpl.productDtoToEntity(dto.getProductDTO()))
                 .quantity(dto.getQuantity())
                 .build();
         return entity;
-
-//        List<Product> products = dto.getProductIds().stream()
-//                .map(id -> productRepository.findById(id).orElse(null))
-//                .collect(Collectors.toList());
-//
-//        Product product = products.isEmpty() ? null : products.get(0);
-//
-//        return Plan.builder()
-//                .plancode(dto.getPlancode())
-//                .product(product)
-//                .quantity(dto.getQuantity())
-//                .line(dto.getLine())
-//                .build();
     }
-
     @Override
     public PlanDTO entityToDTO(Plan entity) {
+        if(entity==null) return null;
         PlanDTO dto=PlanDTO.builder()
                 .plancode(entity.getPlancode())
-                .line(entity.getLine())
+                .line(lineService.lineToString(entity.getLine()))
                 .productDTO(productServiceImpl.productEntityToDto(entity.getProduct()))
                 .quantity(entity.getQuantity())
                 .build();
         return dto;
-//        return PlanDTO.builder()
-//                .plancode(entity.getPlancode())
-//                .quantity(entity.getQuantity())
-//                .line(entity.getLine())
-//                .productIds(entity.getProduct() != null ?
-//                        List.of(entity.getProduct().getManuCode()) : List.of())
-//                .build();
     }
 }

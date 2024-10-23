@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 @Builder
 @ToString
-
 public class JodalPlanDTO {
     private Long joNo;       // 조달계획 번호
 //    private String details; // 세부사항

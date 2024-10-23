@@ -1,6 +1,8 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
+import mit.iwrcore.IWRCore.entity.FileProPlan;
+import mit.iwrcore.IWRCore.entity.Line;
 import mit.iwrcore.IWRCore.entity.ProPlan;
 import mit.iwrcore.IWRCore.repository.ProPlanRepository;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -24,11 +28,13 @@ public class ProplanServiceImpl implements ProplanService{
     private final MemberService memberService;
 
     private final StructureService structureService;
+    private final LineService lineService;
 
 
     @Override
-    public ProplanDTO save(ProplanDTO dto) {
+    public ProplanDTO saveProPlan(ProplanDTO dto, List<FileProPlan> fileList) {
         ProPlan proPlan = dtoToEntity(dto);
+        proPlan.setFiles(fileList);
         ProPlan savedProPlan=proPlanRepository.save(proPlan); // savedProPlan = 저장된 proplan
         return entityToDTO(savedProPlan);
     }
@@ -70,25 +76,18 @@ public class ProplanServiceImpl implements ProplanService{
         return new ProPlanContractNumDTO(proplanDTO, (jcnum!=null)?jcnum:0L, (contractNum!=null)?contractNum:0L);
     }
 
-
-
-//    @Override
-//    public List<ProplanDTO> findByPlanId(Long planId) {
-//        List<ProPlan> proPlans = proPlanRepository.findByProplanNo(planId);
-//        return proPlans.stream()
-//                .map(this::entityToDTO)
-//                .collect(Collectors.toList());
-//    }
-
     @Override
     public ProPlan dtoToEntity(ProplanDTO dto) {
+        List<String> strings=dto.getLine();
+        List<Line> lines=new ArrayList<>();
+        strings.forEach(x->lines.add(lineService.stringToLine(x)));
         ProPlan entity=ProPlan.builder()
                 .proplanNo(dto.getProplanNo())
                 .pronum(dto.getPronum())
                 .filename(dto.getFilename())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
-                .line(dto.getLine())
+                .line(lines)
                 .details(dto.getDetails())
                 .product(productService.productDtoToEntity(dto.getProductDTO()))
                 .writer(memberService.memberdtoToEntity(dto.getMemberDTO()))
@@ -98,13 +97,16 @@ public class ProplanServiceImpl implements ProplanService{
 
     @Override
     public ProplanDTO entityToDTO(ProPlan entity) {
+        List<Line> lines=entity.getLine();
+        List<String> strings=new ArrayList<>();
+        lines.forEach(x->strings.add(x.getLineName()));
         ProplanDTO dto=ProplanDTO.builder()
                 .proplanNo(entity.getProplanNo())
                 .pronum(entity.getPronum())
                 .filename(entity.getFilename())
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
-                .line(entity.getLine())
+                .line(strings)
                 .details(entity.getDetails())
                 .regDate(entity.getRegDate())
                 .productDTO(productService.productEntityToDto(entity.getProduct()))

@@ -26,8 +26,9 @@ public class ProPlan extends BaseEntity {
     @NotNull
     private LocalDateTime endDate;    // 마감일
 
-    @NotNull
-    private String line;         // 라인
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinColumn(name="line_id")
+    private List<Line> line;         // 라인
 
     private String details;      // 상세내용
 
@@ -44,4 +45,6 @@ public class ProPlan extends BaseEntity {
     @OneToMany(mappedBy = "proPlan")
     private List<JodalPlan> jodalPlans;
 
+    @OneToMany(mappedBy = "proPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileProPlan> files;
 }

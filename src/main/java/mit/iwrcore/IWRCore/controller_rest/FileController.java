@@ -3,6 +3,7 @@ package mit.iwrcore.IWRCore.controller_rest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.FileMaterialDTO;
+import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProPlanDTO;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProductDTO;
 import mit.iwrcore.IWRCore.security.service.FileService;
 import org.springframework.core.io.FileSystemResource;
@@ -34,6 +35,10 @@ public class FileController {
     public List<FileProductDTO> getProductFile(@RequestParam(required = false) Long code){
         return fileService.getProductFileList(code);
     }
+    @GetMapping("/proPlanFile")
+    public List<FileProPlanDTO> getProPlanFile(@RequestParam(required = false) Long code){
+        return fileService.getProPlanFileList(code);
+    }
 
     @GetMapping("/thumbnail")
     @ResponseBody
@@ -41,6 +46,7 @@ public class FileController {
         String folder="";
         if(type.equals("m")) folder="material";
         else if(type.equals("p")) folder="product";
+        else if(type.equals("pp")) folder="proplan";
 
         File file=new File("C:\\iwlcore\\"+folder+"\\"+path+"\\"+fileName);
 
@@ -60,6 +66,7 @@ public class FileController {
         String folder = "";
         if (type.equals("m")) folder = "material";
         else if (type.equals("p")) folder = "product";
+        else if(type.equals("pp")) folder="proplan";
 
         File file = new File("C:\\iwlcore\\" + folder + "\\" + path + "\\" + fileName);
 
@@ -83,6 +90,7 @@ public class FileController {
         String folder="";
         if(type.equals("m")) folder="material";
         else if(type.equals("p")) folder="product";
+        else if(type.equals("pp")) folder="proplan";
 
         Resource resource=new FileSystemResource("C:\\iwlcore\\"+folder+"\\"+path+"\\"+fileName);
 

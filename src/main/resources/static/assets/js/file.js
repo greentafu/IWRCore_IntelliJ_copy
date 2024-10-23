@@ -294,3 +294,72 @@ function productFileList(manuCode){
         }
     });
 }
+
+// 생산계획 수정 첨부파일 목록 불러오기
+function initProPlanFile(proplanNo){
+    var fileTable0=document.getElementById('fileTable0');
+    var code=proplanNo;
+    $.ajax({
+        url:'/file/proPlanFile',
+        method:'GET',
+        data:{code:code},
+        success:function(data){
+            data.forEach(x=>{
+                var path=x.uploadPath.replaceAll("\\", "/");
+                var uuid=x.uuid;
+                var originalFileName=x.fileName;
+                var fileName=originalFileName.substring(uuid.length+1);
+
+                var temp={uuid: uuid, fileName: fileName};
+                existFile1.push(temp);
+
+                const newRow = document.createElement('tr');
+                const fileNameTd = document.createElement('td');
+                fileNameTd.innerText = fileName+'         ';
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-sm btn-secondary';
+                button.innerText = 'x';
+                button.onclick = (function(fileIndex) {
+                    newRow.remove();
+                    existFile1=existFile1.filter(x => x.uuid !== uuid);
+                    deleteFile1.push(uuid);
+                });
+
+                fileNameTd.appendChild(button);
+                newRow.appendChild(fileNameTd);
+                fileTable0.appendChild(newRow);
+            });
+        }
+    });
+}
+// 생산계획 첨부파일 목록 불러오기
+function proPlanFileList(proplanNo){
+    var fileTable0=document.getElementById('fileTable0');
+    var code=proplanNo;
+    $.ajax({
+        url:'/file/proPlanFile',
+        method:'GET',
+        data:{code:code},
+        success:function(data){
+            document.getElementById('previewList1').innerText='';
+            document.getElementById('preview1').innerText='';
+            data.forEach(x=>{
+                var path=x.uploadPath.replaceAll("\\", "/");
+                var uuid=x.uuid;
+                var originalFileName=x.fileName;
+                var fileName=originalFileName.substring(uuid.length+1);
+                var fileType=x.contentType;
+
+                const newRow = document.createElement('tr');
+                const fileNameTd = document.createElement('td');
+                fileNameTd.innerHTML = `<a href="/file/download?path=${path}&fileName=${originalFileName}&type=pp&uuid=${uuid}">${fileName}</a>`;
+                newRow.appendChild(fileNameTd);
+                fileTable0.appendChild(newRow);
+
+                viewList(originalFileName, fileName, fileType, path, 1, "pp");
+            });
+        }
+    });
+}

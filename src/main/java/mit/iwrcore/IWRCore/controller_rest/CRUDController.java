@@ -3,22 +3,26 @@ package mit.iwrcore.IWRCore.controller_rest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.FileMaterial;
-import mit.iwrcore.IWRCore.entity.FileProduct;
+import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.MaterQuantityDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveProductDTO;
 import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.FileMaterialDTO;
+import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProPlanDTO;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProductDTO;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
@@ -40,6 +44,14 @@ public class CRUDController {
     private ProCodeService proCodeService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private PlanService planService;
+    @Autowired
+    private LineService lineService;
+    @Autowired
+    private ProplanService proplanService;
+    @Autowired
+    private JodalPlanService jodalPlanService;
 
     // 직원
 
@@ -76,13 +88,12 @@ public class CRUDController {
         if(files!=null) fileService.saveFileRun(files, materialCode, "m");
     }
     @GetMapping("/deleteMaterial")
-    public String deleteMaterial(@RequestParam(required = false) Long materCode){
+    public void deleteMaterial(@RequestParam(required = false) Long materCode){
         List<FileMaterialDTO> fileList=fileService.getMaterialFileList(materCode);
         List<String> deleteFile=new ArrayList<>();
         fileList.forEach(x->deleteFile.add(x.getUuid()));
         fileService.deleteFileRun(deleteFile, "m");
         materialService.deleteMaterial(materCode);
-        return "redirect:/material/list_material";
     }
 
     // 제품
@@ -214,7 +225,7 @@ public class CRUDController {
         structureService.save(structureDTO);
     }
     @GetMapping("/deleteProduct")
-    public String delete_product(@RequestParam(required = false) Long manuCode){
+    public void deleteProduct(@RequestParam(required = false) Long manuCode){
         List<StructureDTO> structureDTOList=structureService.findByProduct_ManuCode(manuCode);
         structureDTOList.forEach(x->structureService.deleteById(x.getSno()));
         List<FileProductDTO> fileList=fileService.getProductFileList(manuCode);
@@ -222,7 +233,85 @@ public class CRUDController {
         fileList.forEach(x->deleteFile.add(x.getUuid()));
         fileService.deleteFileRun(deleteFile, "p");
         productService.deleteProduct(manuCode);
-        return "redirect:/development/list_dev";
     }
 
+    // 생산계획
+    @GetMapping("/getLines")
+    public List<PlanDTO> getLines(@RequestParam(required = false) Long manuCode){
+        List<PlanDTO> planDTOs=planService.findByProductId(manuCode);
+        return planDTOs;
+    }
+    @GetMapping("/saveLine")
+    public List<Long> saveLine(@RequestParam(required = false) Long manuCode,
+                               @RequestParam(required = false) List<Long> quantityList){
+        ProductDTO productDTO=productService.getProductById(manuCode);
+        List<PlanDTO> planDTOs=planService.findByProductId(manuCode);
+
+        List<String> lines=lineService.getLines();
+        for(int i=0; i<quantityList.size(); i++){
+            Long tempCode=null;
+            if(planDTOs!=null){
+                PlanDTO planDTO=planService.findLineByLine(manuCode, lines.get(i));
+                if(planDTO!=null) tempCode=planDTO.getPlancode();
+            }
+            PlanDTO planDTO=PlanDTO.builder()
+                    .plancode(tempCode)
+                    .productDTO(productDTO)
+                    .quantity(quantityList.get(i))
+                    .line(lines.get(i))
+                    .build();
+            planService.saveLine(planDTO);
+        }
+        return quantityList;
+    }
+    @PostMapping("/savePlan")
+    public void savePlan(@ModelAttribute ProplanDTO proplanDTO,
+                         @RequestParam(name = "manuCode", required = false) Long manuCode,
+                         @RequestParam(name = "startD", required = false) String startD,
+                         @RequestParam(name = "endD", required = false) String endD,
+                         @RequestParam(name = "lineList", required = false) List<String> lineList,
+                         @RequestParam(name = "files", required = false) MultipartFile[] files,
+                         @RequestParam(name = "deleteFile", required = false) List<String> deleteFile){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
+        MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
+        proplanDTO.setMemberDTO(memberDTO);
+
+        ProductDTO productDTO=productService.getProductById(manuCode);
+        proplanDTO.setProductDTO(productDTO);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime start=LocalDateTime.parse(startD+" 00:00:00", formatter);
+        LocalDateTime end=LocalDateTime.parse(endD+" 00:00:00", formatter);
+        proplanDTO.setStartDate(start);
+        proplanDTO.setEndDate(end);
+
+        proplanDTO.setLine(lineList);
+
+        List<FileProPlanDTO> exDtoFileList=fileService.getProPlanFileList(proplanDTO.getProplanNo());
+        List<FileProPlan> exEntityFileList=new ArrayList<>();
+        if(exDtoFileList!=null) exDtoFileList.forEach(x->exEntityFileList.add(fileService.ppFile_dTe(x)));
+
+        ProplanDTO savedProplanDTO=proplanService.saveProPlan(proplanDTO, exEntityFileList);
+        Long proplanNo=savedProplanDTO.getProplanNo();
+
+        if(deleteFile!=null) fileService.deleteFileRun(deleteFile, "pp");
+        if(files!=null) fileService.saveFileRun(files, proplanNo, "pp");
+
+        if(proplanDTO.getProplanNo()==null) jodalPlanService.saveFromProplan(savedProplanDTO, memberDTO);
+    }
+    @GetMapping("/deleteProPlan")
+    public void deleteProPlan(@RequestParam(required = false) Long proplanNo){
+        List<FileProPlanDTO> fileList=fileService.getProPlanFileList(proplanNo);
+        List<String> deleteFile=new ArrayList<>();
+        if(fileList!=null){
+            fileList.forEach(x->deleteFile.add(x.getUuid()));
+            fileService.deleteFileRun(deleteFile, "pp");
+        }
+
+        List<JodalPlanDTO> jodalPlanDTOs=jodalPlanService.findJodalPlanByProPlan(proplanNo);
+        if(jodalPlanDTOs!=null) jodalPlanDTOs.forEach(x->jodalPlanService.deleteById(x.getJoNo()));
+
+        proplanService.deleteById(proplanNo);
+    }
 }

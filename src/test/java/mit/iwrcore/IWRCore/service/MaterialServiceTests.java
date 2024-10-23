@@ -2,18 +2,13 @@ package mit.iwrcore.IWRCore.service;
 
 import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.repository.BoxRepository;
-import mit.iwrcore.IWRCore.repository.FileMaterialRepository;
-import mit.iwrcore.IWRCore.repository.Mater.MaterSRepository;
+import mit.iwrcore.IWRCore.repository.Category.Mater.MaterSRepository;
 import mit.iwrcore.IWRCore.repository.MaterialRepository;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootTest
 public class MaterialServiceTests {

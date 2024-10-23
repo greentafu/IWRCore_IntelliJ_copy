@@ -35,169 +35,62 @@ public class ProTeamController {
     private final ProductService productService;
     private final ProplanService proplanService;
     private final RequestService requestService;
-    private final PlanService planService;
     private final MemberService memberService;
-    private final JodalPlanService jodalPlanService;
     private final MaterialService materialService;
     private final StructureService structureService;
     private final RequestRepository requestRepository;
     private final ShipmentService shipmentService;
+    private final LineService lineService;
+    private final PlanService planService;
 
 
     @GetMapping("/list_pro")
-    public void list_pro(PageRequestDTO pageRequestDTO, PageRequestDTO2 pageRequestDTO2, Model model) {
-        model.addAttribute("product_list", productService.getNonPlanProducts(pageRequestDTO));
-        model.addAttribute("proplan_list", proplanService.proplanList2(pageRequestDTO2));
+    public void list_pro() {}
+    @GetMapping("/input_pro")
+    public void input_pro(@RequestParam("manuCode") Long manuCode, Model model) {
+        model.addAttribute("product", productService.getProductById(manuCode));
+        model.addAttribute("line_list", lineService.getLines());
     }
+    @GetMapping("/modify_plan")
+    public void modify_plan(@RequestParam("proplanNo") Long proplanNo, Model model) {
+        ProplanDTO proplanDTO=proplanService.findById(proplanNo);
+
+        model.addAttribute("proplan", proplanDTO);
+        model.addAttribute("product", proplanDTO.getProductDTO());
+        model.addAttribute("line_list", lineService.getLines());
+        model.addAttribute("useLine", String.join(",", proplanDTO.getLine()));
+    }
+    @GetMapping("/details_plan")
+    public void details_plan(@RequestParam("proplanNo") Long proplanNo, Model model) {
+        ProplanDTO proplanDTO=proplanService.findById(proplanNo);
+        Long manuCode=proplanDTO.getProductDTO().getManuCode();
+
+        model.addAttribute("proplan", proplanDTO);
+        model.addAttribute("lines", planService.findByProductId(manuCode));
+        model.addAttribute("useLine", String.join(", ", proplanDTO.getLine()));
+    }
+
 
     @GetMapping("/list_request")
     public void list_request(PageRequestDTO requestDTO, Model model) {
         model.addAttribute("list", requestService.requestPage(requestDTO));
     }
-
-    @GetMapping("/input_pro")
-    public void input_pro(@RequestParam("manuCode") Long manuCode, Model model) {
-
-        model.addAttribute("plan_list", planService.findByProductId(manuCode));
-
-        // 제품 코드를 이용해 제품 정보를 가져옵니다.
-        ProductDTO product = productService.getProductById(manuCode);
-
-        // 가져온 제품 정보를 모델에 추가하여 뷰로 전달합니다.
-        model.addAttribute("product", product);
-    }
-
-    @PostMapping("/save_plan")
-    public String savePlan(
-            @RequestParam("manuCode") Long manuCode,
-            @RequestParam(name = "lineA", required = false) Long lineA,
-            @RequestParam(name = "lineB", required = false) Long lineB,
-            @RequestParam(name = "lineC", required = false) Long lineC,
-            @RequestParam(name = "quantities", required = false) List<Long> quantities,
-            @RequestParam(name = "lines", required = false) List<String> lines) {
-
-        // 제품 정보 가져오기
-        ProductDTO product = productService.getProductById(manuCode);
-
-        // 기존 계획 업데이트
-        List<PlanDTO> existingPlans = planService.findByProductId(manuCode);
-        if (!existingPlans.isEmpty()) {
-            for (int i = 0; i < existingPlans.size(); i++) {
-                PlanDTO plan = existingPlans.get(i);
-                Long quantity = quantities != null && i < quantities.size() ? quantities.get(i) : null;
-                if (quantity != null) {
-                    plan.setQuantity(quantity);
-                    planService.update(plan);
-                }
-            }
-        }
-
-        // 새 계획 저장
-        if (lineA != null) {
-            PlanDTO newPlan = PlanDTO.builder()
-                    .line("A")
-                    .quantity(lineA)
-                    .productDTO(product)
-                    .build();
-            planService.save(newPlan);
-        }
-        if (lineB != null) {
-            PlanDTO newPlan = PlanDTO.builder()
-                    .line("B")
-                    .quantity(lineB)
-                    .productDTO(product)
-                    .build();
-            planService.save(newPlan);
-        }
-        if (lineC != null) {
-            PlanDTO newPlan = PlanDTO.builder()
-                    .line("C")
-                    .quantity(lineC)
-                    .productDTO(product)
-                    .build();
-            planService.save(newPlan);
-        }
-
-        // 리디렉션
-        return "redirect:/proteam/input_pro?manuCode=" + manuCode;
-    }
-
-
-    @PostMapping("/Psave")
-    public String PlanSave(
-            @RequestParam(required = false) Long proplanNo,
-            @RequestParam("manuCode") Long manuCode,
-            @RequestParam("line") List<String> lines,
-            @RequestParam("pronum") Long pronum,
-            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @RequestParam("details") String details) {
-
-        // 인증된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
-        MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
-
-        // DTO 객체 생성 및 설정
-        ProplanDTO dto = ProplanDTO.builder()
-                .proplanNo((proplanNo!=null)?proplanNo:null)
-                .productDTO(productService.getProductById(manuCode))
-                .pronum(pronum)
-                .startDate(startDate.atStartOfDay()) // LocalDate를 LocalDateTime으로 변환
-                .endDate(endDate.atStartOfDay())     // LocalDate를 LocalDateTime으로 변환
-                .line(String.join(", ", lines)) // 라인 정보를 콤마로 구분하여 설정
-                .details(details)
-                .memberDTO(memberDTO) // memberDTO 설정
-                .build();
-
-        // DTO를 서비스에 저장
-        ProplanDTO proplanDTO = proplanService.save(dto);
-
-        // JodalPlanService 호출
-        if(proplanNo==null) jodalPlanService.saveFromProplan(proplanDTO, memberDTO);
-
-        // 리디렉션
-        return "redirect:/proteam/list_pro";
-    }
-
     @GetMapping("/input_request")
     public void input_request() {
 
     }
-
-    @GetMapping("/details_plan")
-    public void details_plan() {
+    @GetMapping("/modify_request")
+    public void modify_request() {
 
     }
-
     @GetMapping("/details_request")
     public void details_request() {
 
     }
 
-    @GetMapping("/modify_plan")
-    public void modify_plan(Long proplanNo, Model model) {
-        ProplanDTO proplanDTO=proplanService.findById(proplanNo);
-        Long manuCode=proplanDTO.getProductDTO().getManuCode();
-        model.addAttribute("plan_list", planService.findByProductId(manuCode));
-        model.addAttribute("product", proplanDTO.getProductDTO());
-        model.addAttribute("proplan", proplanDTO);
-    }
 
-    @GetMapping("/modify_request")
-    public void modify_request() {
 
-    }
 
-    @GetMapping("/delete_proplan")
-    public String delete_proplan(@RequestParam(required = false) Long proplanNo) {
-        List<JodalPlanDTO> jodalPlanDTOs=jodalPlanService.findJodalPlanByProPlan(proplanNo);
-        if(jodalPlanDTOs!=null){
-            jodalPlanDTOs.forEach(x->jodalPlanService.deleteById(x.getJoNo()));
-        }
-        proplanService.deleteById(proplanNo);
-        return "redirect:/proteam/list_pro";
-    }
 
     @PostMapping("/save_request")
     public void save_request() {

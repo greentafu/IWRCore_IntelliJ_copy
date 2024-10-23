@@ -3,11 +3,9 @@ package mit.iwrcore.IWRCore.controller;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.Box;
-import mit.iwrcore.IWRCore.entity.Member;
-import mit.iwrcore.IWRCore.entity.MemberRole;
-import mit.iwrcore.IWRCore.entity.Partner;
+import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.BoxRepository;
+import mit.iwrcore.IWRCore.repository.LineRepository;
 import mit.iwrcore.IWRCore.repository.MemberRepository;
 import mit.iwrcore.IWRCore.repository.PartnerRepository;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
@@ -40,18 +38,24 @@ public class LoginController {
     private final ProductService productService;
     private final JodalPlanService jodalPlanService;
     private final MemberRepository memberRepository;
-    private final MemberService memberService;
-    private final BoxService boxService;
     private final BoxRepository boxRepository;
     private final RequestService requestService;
     private final ShipmentService shipmentService;
-    private final PartnerService partnerService;
     private final PartnerRepository partnerRepository;
     private final BaljuService baljuService;
+    private final LineRepository lineRepository;
 
     @GetMapping("/login")
     @Transactional
     public void login(){
+        if(lineRepository.findAll().size()==0){
+            Line line0=Line.builder().lineName("A").build();
+            Line line1=Line.builder().lineName("B").build();
+            Line line2=Line.builder().lineName("C").build();
+            lineRepository.save(line0);
+            lineRepository.save(line1);
+            lineRepository.save(line2);
+        }
         if(boxRepository.findAll().size()==0){
             Box box0=Box.builder().boxName("미정").boxCode(1L).build();
             Box box1=Box.builder().boxName("A창고").boxCode(2L).build();

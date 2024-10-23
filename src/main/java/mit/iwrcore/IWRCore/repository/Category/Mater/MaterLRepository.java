@@ -1,4 +1,4 @@
-package mit.iwrcore.IWRCore.repository.Mater;
+package mit.iwrcore.IWRCore.repository.Category.Mater;
 import mit.iwrcore.IWRCore.entity.MaterL;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
