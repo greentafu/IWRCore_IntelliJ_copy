@@ -83,7 +83,7 @@ public class OrderController {
                 jodalChasuDTO.setJoNum(joNum);
                 jodalChasuDTO.setJoDate(localDateTime);
 
-                jodalChasuService.createJodalChasu(jodalChasuDTO);
+                jodalChasuService.saveJodalChasu(jodalChasuDTO);
                 sum+=joNum;
             }
 

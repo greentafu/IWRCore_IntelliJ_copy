@@ -72,7 +72,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
 
         Pageable pageable= PageRequest.of(requestDTO.getPage2()-1, requestDTO.getSize2());
         List<Tuple> tupleList = queryFactory
-                .select(qJodalPlan, qContract, qJodalChasu, qJodalChasu.jcnum.sum())
+                .select(qJodalPlan, qContract, qJodalChasu, qJodalChasu.joNum.sum())
                 .from(qJodalPlan)
                 .leftJoin(qJodalPlan.proPlan, qProPlan)
                 .leftJoin(qProPlan.product, qProduct)
@@ -117,7 +117,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
                         tuple.get(qJodalPlan),
                         tuple.get(qContract),
                         tuple.get(qJodalChasu),
-                        tuple.get(qJodalChasu.jcnum.sum())
+                        tuple.get(qJodalChasu.joNum.sum())
                 })
                 .collect(Collectors.toList());
 

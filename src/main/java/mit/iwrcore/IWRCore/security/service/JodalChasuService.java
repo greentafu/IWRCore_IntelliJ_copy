@@ -14,7 +14,7 @@ public interface JodalChasuService {
 
     JodalChasu convertToEntity(JodalChasuDTO dto);
 
-    JodalChasuDTO createJodalChasu(JodalChasuDTO dto);
+    JodalChasuDTO saveJodalChasu(JodalChasuDTO dto);
 
     JodalChasuDTO getJodalChasuById(Long id);
 

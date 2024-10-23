@@ -6,6 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.MaterQuantityDTO;
+import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveJodalChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveProductDTO;
 import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
@@ -52,6 +53,8 @@ public class CRUDController {
     private ProplanService proplanService;
     @Autowired
     private JodalPlanService jodalPlanService;
+    @Autowired
+    private JodalChasuService jodalChasuService;
 
     // 직원
 
@@ -313,5 +316,45 @@ public class CRUDController {
         if(jodalPlanDTOs!=null) jodalPlanDTOs.forEach(x->jodalPlanService.deleteById(x.getJoNo()));
 
         proplanService.deleteById(proplanNo);
+    }
+
+    // 조달차수
+    @PostMapping("/saveJodalChasu")
+    public void saveJodalChasu(@RequestBody List<SaveJodalChasuDTO> list){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
+        MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
+
+        for(SaveJodalChasuDTO dto:list){
+            JodalPlanDTO jodalPlanDTO=jodalPlanService.findById(Long.valueOf(dto.getId()));
+
+            List<JodalChasuDTO> jodalChasuDTOs=jodalChasuService.findJCfromJP(jodalPlanDTO.getJoNo());
+
+            List<Long> longs=new ArrayList<>();
+            longs.add(Long.valueOf(dto.getOneNum()));
+            longs.add(Long.valueOf(dto.getOneNum()));
+            longs.add(Long.valueOf(dto.getThreeNum()));
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            List<LocalDateTime> localDateTimes=new ArrayList<>();
+            localDateTimes.add(LocalDateTime.parse(dto.getOneDate()+" 00:00:00", formatter));
+            localDateTimes.add(LocalDateTime.parse(dto.getTwoDate()+" 00:00:00", formatter));
+            localDateTimes.add(LocalDateTime.parse(dto.getThreeDate()+" 00:00:00", formatter));
+
+            for(int i=0; i<3; i++){
+                JodalChasuDTO jodalChasuDTO=JodalChasuDTO.builder()
+                        .jcnum((jodalChasuDTOs.size()!=0)?jodalChasuDTOs.get(i).getJcnum():null)
+                        .jodalPlanDTO(jodalPlanDTO)
+                        .joNum(longs.get(i))
+                        .joDate(localDateTimes.get(i))
+                        .memberDTO(memberDTO)
+                        .build();
+                jodalChasuService.saveJodalChasu(jodalChasuDTO);
+            }
+        }
+    }
+    @GetMapping("/deleteJodalChasu")
+    public void deleteJodalChasu(@RequestParam(required = false) Long joNo){
+        jodalChasuService.deleteJodalChasuByPlan(joNo);
     }
 }

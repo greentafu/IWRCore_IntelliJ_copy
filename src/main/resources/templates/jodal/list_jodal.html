@@ -391,7 +391,7 @@
 
               const btnTd = document.createElement("td");
               btnTd.innerHTML=`
-                <a href="/jodal/jodal_ready?joNo=${joNo}&manufactureCode=${manuCode}">
+                <a href="/jodal/jodal_ready?joNo=${joNo}">
                   <button type="button" class="btn btn-primary">조달계획 등록</button>
                 </a>
               `;
@@ -546,7 +546,7 @@
       function deleteJodalChasu(button){
         var joNo=button.value;
         $.ajax({
-          url:'/jodal/delete_jodalchasu',
+          url:'/deleteJodalChasu',
           method:'GET',
           data:{joNo:joNo},
           success:function(response){

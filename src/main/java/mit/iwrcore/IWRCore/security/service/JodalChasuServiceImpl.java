@@ -57,7 +57,7 @@ public class JodalChasuServiceImpl implements JodalChasuService {
     }
 
     @Override
-    public JodalChasuDTO createJodalChasu(JodalChasuDTO dto) {
+    public JodalChasuDTO saveJodalChasu(JodalChasuDTO dto) {
         JodalChasu entity = convertToEntity(dto);
         JodalChasu savedEntity = jodalChasuRepository.save(entity);
         return convertToDTO(savedEntity);
@@ -70,7 +70,7 @@ public class JodalChasuServiceImpl implements JodalChasuService {
 
     @Override
     public JodalChasuDTO updateJodalChasu(JodalChasuDTO dto) {
-        JodalChasuDTO jodalChasuDTO=createJodalChasu(dto);
+        JodalChasuDTO jodalChasuDTO=saveJodalChasu(dto);
         return jodalChasuDTO;
     }
 
