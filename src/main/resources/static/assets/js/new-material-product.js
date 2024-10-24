@@ -21,16 +21,14 @@ function loadItems() {
     const content1 = document.getElementById("content1");
     const firstTbody = document.getElementById("firstTbody");
 
-    var allQuantity=document.querySelectorAll('[id^="quantity"]');
-    var longList=[];
+    const allQuantity=document.querySelectorAll('[id^="quantity"]');
+    const longList=[];
 
     // 선택된 자재번호 목록
     allQuantity.forEach(x=>{
-        var num=x.id.substring(8);
+        const num=x.id.substring(8);
         longList.push(num);
     });
-
-    console.log("되나안되나: "+longList);
 
     $.ajax({
         url:'/select/materialList',
@@ -40,21 +38,21 @@ function loadItems() {
             if(data.totalPage<page) finPage=true;
 
             data.dtoList.forEach(x=>{
-                var materCode=x.materCode;
-                var name=x.name;
-                var Lname=x.materSDTO.materMDTO.materLDTO.lname;
-                var Mname=x.materSDTO.materMDTO.mname;
-                var Sname=x.materSDTO.sname;
-                var standard=x.standard;
-                var unit=x.unit;
-                var color=x.color;
-                var boxName=x.boxDTO.boxname;
-                var file=x.file;
+                const materCode=x.materCode;
+                const name=x.name;
+                const Lname=x.materSDTO.materMDTO.materLDTO.lname;
+                const Mname=x.materSDTO.materMDTO.mname;
+                const Sname=x.materSDTO.sname;
+                const standard=x.standard;
+                const unit=x.unit;
+                const color=x.color;
+                const boxName=x.boxDTO.boxname;
+                const file=x.file;
 
-                var newRow = document.createElement('tr');
+                const newRow = document.createElement('tr');
 
-                var inputTd = document.createElement('td');
-                var input = document.createElement('input');
+                const inputTd = document.createElement('td');
+                const input = document.createElement('input');
                 input.type = 'checkbox';
                 input.id = 'checkbox'+materCode;
                 input.class='form-check-input';
@@ -62,23 +60,23 @@ function loadItems() {
                 newRow.appendChild(inputTd);
 
                 [materCode, name].forEach(function(text) {
-                    var td = document.createElement('td');
+                    const td = document.createElement('td');
                     td.innerText = text;
                     newRow.appendChild(td);
                 });
                 [Lname, Mname, Sname].forEach(function(text) {
-                    var td = document.createElement('td');
+                    const td = document.createElement('td');
                     td.innerText = text;
                     td.style.display = 'none';
                     newRow.appendChild(td);
                 });
                 [standard, unit, color].forEach(function(text) {
-                    var td = document.createElement('td');
+                    const td = document.createElement('td');
                     td.innerText = text;
                     newRow.appendChild(td);
                 });
                 [boxName, file].forEach(function(text) {
-                    var td = document.createElement('td');
+                    const td = document.createElement('td');
                     td.innerText = text;
                     td.style.display = 'none';
                     newRow.appendChild(td);
@@ -250,7 +248,6 @@ function initStructure(){
         method:'GET',
         data:{manuCode:manuCode},
         success:function(data){
-            console.log(data);
             const materialSelTable=document.querySelector('#materialSel');
 
             data.forEach(x=>{

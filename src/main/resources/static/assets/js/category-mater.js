@@ -1,21 +1,16 @@
 $(document).ready(function(){
-    var Lcode = $('#selectMaterL').val();
-    var Mcode = $('#selectMaterM').val();
-    var Scode = $('#selectMaterS').val();
+    let Lcode = $('#selectMaterL').val();
+    let Mcode = $('#selectMaterM').val();
+    let Scode = $('#selectMaterS').val();
 
     Lcode=(Lcode==="")?null:Lcode;
     Mcode=(Mcode==="")?null:Mcode;
     Scode=(Scode==="")?null:Scode;
 
-    if(Lcode===null && Mcode===null && Scode===null){
-        initMater1();
-    }
-    else{
-        searchMaterCode(Lcode, Mcode, Scode);
-    }
+    if(Lcode===null && Mcode===null && Scode===null) initMater1();
+    else searchMaterCode(Lcode, Mcode, Scode);
 
     initMater2();
-
 });
 
 // 초기값1
@@ -52,13 +47,10 @@ function initMater1(){
                         .prop('selected', materS.materScode == data.s)
                 );
             });
-
             const tf=document.getElementById('inputMaterL');
             if(tf) addSelectChangeListenersM();
-
         }
     });
-
 }
 // 초기값2
 function initMater2(){
@@ -96,16 +88,13 @@ function initMater2(){
             });
         }
     });
-
 }
 
 // 선택1
 function updateMaterCode(changedSelect){
-    var Lcode=$('#selectMaterL').val();
-    var Mcode=$('#selectMaterM').val();
-    var Scode=$('#selectMaterS').val();
-
-    console.log(Lcode, Mcode, Scode);
+    let Lcode=$('#selectMaterL').val();
+    let Mcode=$('#selectMaterM').val();
+    let Scode=$('#selectMaterS').val();
 
     if (changedSelect === 'L') {
         Mcode=null;
@@ -119,9 +108,6 @@ function updateMaterCode(changedSelect){
         method:'GET',
         data:{lcode:Lcode, mcode:Mcode, scode:Scode},
         success:function(data){
-
-            console.log(data);
-
             $('#selectMaterL').empty().append("<option value=''>전체보기</option>");
             $('#selectMaterM').empty().append('<option value="">전체보기</option>');
             $('#selectMaterS').empty().append('<option value="">전체보기</option>');
@@ -154,15 +140,12 @@ function updateMaterCode(changedSelect){
             if(tf) addSelectChangeListenersM();
         }
     });
-
 }
 // 선택2
 function updateMaterCode2(changedSelect){
-    var Lcode=$('#selectMaterL2').val();
-    var Mcode=$('#selectMaterM2').val();
-    var Scode=$('#selectMaterS2').val();
-
-    console.log(Lcode, Mcode, Scode);
+    let Lcode=$('#selectMaterL2').val();
+    let Mcode=$('#selectMaterM2').val();
+    let Scode=$('#selectMaterS2').val();
 
     if (changedSelect === 'L') {
         Mcode=null;
@@ -176,9 +159,6 @@ function updateMaterCode2(changedSelect){
         method:'GET',
         data:{lcode:Lcode, mcode:Mcode, scode:Scode},
         success:function(data){
-
-            console.log(data);
-
             $('#selectMaterL2').empty().append("<option value=''>전체보기</option>");
             $('#selectMaterM2').empty().append('<option value="">전체보기</option>');
             $('#selectMaterS2').empty().append('<option value="">전체보기</option>');
@@ -207,10 +187,8 @@ function updateMaterCode2(changedSelect){
                         .prop('selected', materS.materScode == data.s)
                 );
             });
-
         }
     });
-
 }
 
 // input
@@ -249,32 +227,25 @@ function addSelectChangeListenersM() {
         const selectedL=document.getElementById('selectMaterL');
         const selectedOptionL = selectedL.options[selectedL.selectedIndex];
         const selectLText = selectedOptionL.textContent;
-        console.log("selectL:", selectLText);
         $('#inputMaterL').val(selectLText);
 
         const selectedM=document.getElementById('selectMaterM');
         const selectedOptionM = selectedM.options[selectedM.selectedIndex];
         const selectMText = selectedOptionM.textContent;
-        console.log("selectM:", selectMText);
         $('#inputMaterM').val(selectMText);
     });
 }
 // 초기화면1(검색)
 function searchMaterCode(materL1, materM1, materS1){
-    var Lcode=materL1;
-    var Mcode=materM1;
-    var Scode=materS1;
-
-    console.log(Lcode, Mcode, Scode);
+    let Lcode=materL1;
+    let Mcode=materM1;
+    let Scode=materS1;
 
     $.ajax({
         url:'/select/mater',
         method:'GET',
         data:{lcode:Lcode, mcode:Mcode, scode:Scode},
         success:function(data){
-
-            console.log(data);
-
             $('#selectMaterL').empty().append("<option value=''>전체보기</option>");
             $('#selectMaterM').empty().append('<option value="">전체보기</option>');
             $('#selectMaterS').empty().append('<option value="">전체보기</option>');
@@ -303,8 +274,6 @@ function searchMaterCode(materL1, materM1, materS1){
                         .prop('selected', materS.materScode == data.s)
                 );
             });
-
         }
     });
-
 }

@@ -1,8 +1,8 @@
-var exLine=[];
+let exLine=[];
 
 // 생산계획 생산라인 수량 가져오기
 function initLine(){
-    var manuCode=document.getElementById('manuCode').value;
+    const manuCode=document.getElementById('manuCode').value;
     $.ajax({
         url:'/getLines',
         method:'GET',
@@ -10,9 +10,9 @@ function initLine(){
         success:function(data){
             if(data){
                 data.forEach(x=>{
-                    var quantity=x.quantity;
-                    var lineId='line'+x.line;
-                    var input=document.getElementById(lineId);
+                    const quantity=x.quantity;
+                    const lineId='line'+x.line;
+                    const input=document.getElementById(lineId);
                     input.value=quantity;
 
                     exLine.push(quantity);
@@ -23,16 +23,16 @@ function initLine(){
 }
 // 생산계획 생산라인 수량 저장
 function saveLine(){
-    var manuCode=document.getElementById('manuCode').value;
-    var list=[];
-    var lines = document.querySelectorAll('input[id^="line"]');
+    const manuCode=document.getElementById('manuCode').value;
+    const list=[];
+    const lines = document.querySelectorAll('input[id^="line"]');
 
-    var trueNum=false;
-    var minNum=false;
+    let trueNum=false;
+    let minNum=false;
     lines.forEach(x=>{
-        var temp=x.value;
+        const temp=x.value;
         if(temp===null || temp==='') temp=0;
-        var number=Number(temp);
+        const number=Number(temp);
         list.push(number);
         if(!Number.isInteger(number)) trueNum=true;
         if(number<0) minNum=true;
@@ -53,25 +53,25 @@ function saveLine(){
 }
 // 생산계획 저장
 function savePlan(){
-    var proplanNo=document.getElementById('proplanNo').value;
-    var manuCode=document.getElementById('manuCode').value;
-    var pronum=document.getElementById('pronum').value;
-    var startDate=document.getElementById('startDate').value;
-    var endDate=document.getElementById('endDate').value;
-    var details=document.getElementById('details').value;
+    const proplanNo=document.getElementById('proplanNo').value;
+    const manuCode=document.getElementById('manuCode').value;
+    const pronum=document.getElementById('pronum').value;
+    const startDate=document.getElementById('startDate').value;
+    const endDate=document.getElementById('endDate').value;
+    const details=document.getElementById('details').value;
 
-    var list=[];
-    var boxes = document.querySelectorAll('input[id^="ckeck"]');
+    const list=[];
+    const boxes = document.querySelectorAll('input[id^="ckeck"]');
     boxes.forEach(x=>{
         if(x.checked){
             list.push(x.value);
         }
     });
 
-    var trueNum=false;
-    var minNum=false;
+    let trueNum=false;
+    let minNum=false;
     if(pronum.trim()!==''){
-        var number=Number(pronum);
+        const number=Number(pronum);
         if(!Number.isInteger(number)) trueNum=true;
         if(number<0) minNum=true;
     }

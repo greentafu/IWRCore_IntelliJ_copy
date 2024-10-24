@@ -1,23 +1,17 @@
 $(document).ready(function(){
-    var Lcode = $('#selectPartL').val();
-    var Mcode = $('#selectPartM').val();
-    var Scode = $('#selectPartS').val();
+    let Lcode = $('#selectPartL').val();
+    let Mcode = $('#selectPartM').val();
+    let Scode = $('#selectPartS').val();
 
     Lcode=(Lcode==="")?null:Lcode;
     Mcode=(Mcode==="")?null:Mcode;
     Scode=(Scode==="")?null:Scode;
 
-    console.log("PART: "+Lcode+"/"+Mcode+"/"+Scode);
+    if(Lcode===null && Mcode===null && Scode===null) initPart1();
+    else searchPartCode(Lcode, Mcode, Scode);
 
-    if(Lcode===null && Mcode===null && Scode===null){
-        initPart1();
-    }
-    else{
-        searchPartCode(Lcode, Mcode, Scode);
-    }
     initPart2();
 });
-
 
 // 초기값1
 function initPart1(){
@@ -53,13 +47,10 @@ function initPart1(){
                         .prop('selected', partS.partScode == data.s)
                 );
             });
-
             const tf=document.getElementById('inputPartL');
             if(tf) addSelectChangeListeners();
-
         }
     });
-
 }
 // 초기값2
 function initPart2(){
@@ -67,7 +58,6 @@ function initPart2(){
         url:'/select/getPart',
         method:'GET',
         success:function(data){
-            console.log("정보가져옴");
             $('#selectPartL2').empty().append("<option value=''>전체보기</option>");
             $('#selectPartM2').empty().append('<option value="">전체보기</option>');
             $('#selectPartS2').empty().append('<option value="">전체보기</option>');
@@ -98,16 +88,13 @@ function initPart2(){
             });
         }
     });
-
 }
 
 // 선택1
 function updatePartCode(changedSelect){
-    var Lcode=$('#selectPartL').val();
-    var Mcode=$('#selectPartM').val();
-    var Scode=$('#selectPartS').val();
-
-    console.log(Lcode, Mcode, Scode);
+    let Lcode=$('#selectPartL').val();
+    let Mcode=$('#selectPartM').val();
+    let Scode=$('#selectPartS').val();
 
     if (changedSelect === 'L') {
         Mcode=null;
@@ -121,9 +108,6 @@ function updatePartCode(changedSelect){
         method:'GET',
         data:{lcode:Lcode, mcode:Mcode, scode:Scode},
         success:function(data){
-
-            console.log(data);
-
             $('#selectPartL').empty().append("<option value=''>전체보기</option>");
             $('#selectPartM').empty().append('<option value="">전체보기</option>');
             $('#selectPartS').empty().append('<option value="">전체보기</option>');
@@ -152,21 +136,16 @@ function updatePartCode(changedSelect){
                         .prop('selected', partS.partScode == data.s)
                 );
             });
-
             const tf=document.getElementById('inputPartL');
             if(tf) addSelectChangeListeners();
-
         }
     });
-
 }
 // 선택2
 function updatePartCode2(changedSelect){
-    var Lcode=$('#selectPartL2').val();
-    var Mcode=$('#selectPartM2').val();
-    var Scode=$('#selectPartS2').val();
-
-    console.log(Lcode, Mcode, Scode);
+    let Lcode=$('#selectPartL2').val();
+    let Mcode=$('#selectPartM2').val();
+    let Scode=$('#selectPartS2').val();
 
     if (changedSelect === 'L') {
         Mcode=null;
@@ -180,9 +159,6 @@ function updatePartCode2(changedSelect){
         method:'GET',
         data:{lcode:Lcode, mcode:Mcode, scode:Scode},
         success:function(data){
-
-            console.log(data);
-
             $('#selectPartL2').empty().append("<option value=''>전체보기</option>");
             $('#selectPartM2').empty().append('<option value="">전체보기</option>');
             $('#selectPartS2').empty().append('<option value="">전체보기</option>');
@@ -211,10 +187,8 @@ function updatePartCode2(changedSelect){
                         .prop('selected', partS.partScode == data.s)
                 );
             });
-
         }
     });
-
 }
 
 // input
@@ -238,7 +212,6 @@ function addSelectChangeListeners() {
         const selectedL=document.getElementById('selectPartL');
         const selectedOptionL = selectedL.options[selectedL.selectedIndex];
         const selectLText = selectedOptionL.textContent;
-        console.log("selectL:", selectLText);
         $('#inputPartL').val(selectLText);
 
         const selectSValue = '';
@@ -253,33 +226,26 @@ function addSelectChangeListeners() {
         const selectedL=document.getElementById('selectPartL');
         const selectedOptionL = selectedL.options[selectedL.selectedIndex];
         const selectLText = selectedOptionL.textContent;
-        console.log("selectL:", selectLText);
         $('#inputPartL').val(selectLText);
 
         const selectedM=document.getElementById('selectPartM');
         const selectedOptionM = selectedM.options[selectedM.selectedIndex];
         const selectMText = selectedOptionM.textContent;
-        console.log("selectM:", selectMText);
         $('#inputPartM').val(selectMText);
     });
 }
 
 // 초기화면1(검색)
 function searchPartCode(partL1, partM1, partS1){
-    var Lcode=partL1;
-    var Mcode=partM1;
-    var Scode=partS1;
-
-    console.log(Lcode, Mcode, Scode);
+    let Lcode=partL1;
+    let Mcode=partM1;
+    let Scode=partS1;
 
     $.ajax({
         url:'/select/part',
         method:'GET',
         data:{lcode:Lcode, mcode:Mcode, scode:Scode},
         success:function(data){
-
-            console.log(data);
-
             $('#selectPartL').empty().append("<option value=''>전체보기</option>");
             $('#selectPartM').empty().append('<option value="">전체보기</option>');
             $('#selectPartS').empty().append('<option value="">전체보기</option>');
@@ -308,8 +274,6 @@ function searchPartCode(partL1, partM1, partS1){
                         .prop('selected', partS.partScode == data.s)
                 );
             });
-
         }
     });
-
 }

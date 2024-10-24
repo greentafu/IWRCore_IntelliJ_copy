@@ -119,10 +119,17 @@
     <!--script-->
     <script src="../assets/js/new-jodalplan.js"></script>
     <script>
-      $(document).ready(function(){
+      document.addEventListener("DOMContentLoaded", function () {
         const startdate=document.getElementById('proStart').innerText;
         const date=startdate.split('T')[0];
         document.getElementById('baseDate').value=date;
+
+        const inputs = document.querySelectorAll('input[id*="Num"]');
+        inputs.forEach(function(input) {
+          input.addEventListener('input', function() {
+              checkSumNum(input);
+          });
+        });
       });
     </script>
     <!--/script-->
