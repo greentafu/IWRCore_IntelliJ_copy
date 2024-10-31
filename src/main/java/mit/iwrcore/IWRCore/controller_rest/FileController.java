@@ -2,6 +2,7 @@ package mit.iwrcore.IWRCore.controller_rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.security.dto.FileDTO.FileContractDTO;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.FileMaterialDTO;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProPlanDTO;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProductDTO;
@@ -39,6 +40,10 @@ public class FileController {
     public List<FileProPlanDTO> getProPlanFile(@RequestParam(required = false) Long code){
         return fileService.getProPlanFileList(code);
     }
+    @GetMapping("/contractFile")
+    public List<FileContractDTO> getContractFile(@RequestParam(required = false) Long code){
+        return fileService.getContractFileList(code);
+    }
 
     @GetMapping("/thumbnail")
     @ResponseBody
@@ -47,6 +52,7 @@ public class FileController {
         if(type.equals("m")) folder="material";
         else if(type.equals("p")) folder="product";
         else if(type.equals("pp")) folder="proplan";
+        else if(type.equals("c")) folder="contract";
 
         File file=new File("C:\\iwlcore\\"+folder+"\\"+path+"\\"+fileName);
 
@@ -67,6 +73,7 @@ public class FileController {
         if (type.equals("m")) folder = "material";
         else if (type.equals("p")) folder = "product";
         else if(type.equals("pp")) folder="proplan";
+        else if(type.equals("c")) folder="contract";
 
         File file = new File("C:\\iwlcore\\" + folder + "\\" + path + "\\" + fileName);
 
@@ -91,6 +98,7 @@ public class FileController {
         if(type.equals("m")) folder="material";
         else if(type.equals("p")) folder="product";
         else if(type.equals("pp")) folder="proplan";
+        else if(type.equals("c")) folder="contract";
 
         Resource resource=new FileSystemResource("C:\\iwlcore\\"+folder+"\\"+path+"\\"+fileName);
 

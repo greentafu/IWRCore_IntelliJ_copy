@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-
 @ToString(exclude = {"writer", "proPlan", "material"})
 public class JodalPlan extends BaseEntity {
 
@@ -29,7 +28,7 @@ public class JodalPlan extends BaseEntity {
     private List<JodalChasu> jodalChasus; // 이 JodalPlan과 연관된 JodalChasu 목록
 
     @OneToOne(mappedBy = "jodalPlan")
-    private Contract contracts;
+    private Contract contract; // 이 JodalPlan과 연관된 Contract 엔티티
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proplan_id")  // 외래 키 컬럼 이름

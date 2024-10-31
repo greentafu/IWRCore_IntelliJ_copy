@@ -2,12 +2,15 @@ package mit.iwrcore.IWRCore.controller_rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.JodalPlan;
 import mit.iwrcore.IWRCore.entity.Material;
+import mit.iwrcore.IWRCore.entity.Partner;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.NoneGumsuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.NoneGumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProCodeListDTO;
@@ -211,17 +214,14 @@ public class SelectboxController {
     }
 
     @GetMapping("/materialList")
-    public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
-                                                             @RequestParam(required = false) List<Long> longList,
-                                                             @RequestParam(required = false) Long selectMaterL,
-                                                             @RequestParam(required = false) Long selectMaterM,
-                                                             @RequestParam(required = false) Long selectMaterS,
-                                                             @RequestParam(required = false) String materialSearch){
+    public PageResultDTO<MaterialDTO, Material> materialList(
+            @RequestParam(required = false) int page, @RequestParam(required = false) List<Long> longList,
+            @RequestParam(required = false) Long selectMaterL, @RequestParam(required = false) Long selectMaterM,
+            @RequestParam(required = false) Long selectMaterS, @RequestParam(required = false) String materialSearch){
         PageRequestDTO requestDTO=PageRequestDTO.builder()
                 .page(page).size(15)
                 .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch)
                 .materials(longList).build();
-
         return materialService.productMaterialList(requestDTO);
     }
 
@@ -229,7 +229,6 @@ public class SelectboxController {
     public List<StructureDTO> selectedController(@RequestParam(required = false) String manuCode){
         Long code=Long.valueOf(manuCode);
         List<StructureDTO> dtoList=structureService.findByProduct_ManuCode(code);
-        System.out.println(dtoList);
         return dtoList;
     }
 
@@ -246,5 +245,44 @@ public class SelectboxController {
     @PostMapping("/stockDetail")
     public List<StockDetailDTO> stockDetail(@RequestParam(required = false) Long materCode){
         return contractService.detailStock(materCode);
+    }
+
+
+
+
+    // 계약서> 모든 협력회사 목록 가져오기
+    @PostMapping("/getAllPartner")
+    public PageResultDTO<PartnerDTO, Partner> getAllPartner(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) Long selectPartL, @RequestParam(required = false) Long selectPartM,
+            @RequestParam(required = false) Long selectPartS, @RequestParam(required = false) String partnerSearch){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .partL(selectPartL).partM(selectPartM).partS(selectPartS).partnerSearch(partnerSearch)
+                .build();
+        return partnerService.getAllPartner(requestDTO);
+    }
+    // 계약서> 계약하지 않은 조달계획 목록 가져오기
+    @PostMapping("/getAllNonContractJodalPlan")
+    public PageResultDTO<JodalPlanJodalChsuDTO, Object[]> getAllNonContractJodalPlan(
+            @RequestParam(required = false) int page2, @RequestParam(required = false) List<Long> longList,
+            @RequestParam(required = false) Long selectMaterL2, @RequestParam(required = false) Long selectMaterM2,
+            @RequestParam(required = false) Long selectMaterS2, @RequestParam(required = false) String materialSearch2){
+        PageRequestDTO2 requestDTO2=PageRequestDTO2.builder()
+                .page2(page2).size2(15)
+                .materL2(selectMaterL2).materM2(selectMaterM2).materS2(selectMaterS2).materialSearch2(materialSearch2)
+                .jodalPlans(longList)
+                .build();
+        return jodalPlanService.noneContractJodalPlan(requestDTO2);
+    }
+    // 계약서> 계약하지 않은 조달계획 목록 가져오기
+    @PostMapping("/getOneNonContractJodalPlan")
+    public JodalPlanJodalChsuDTO getOneNonContractJodalPlan(@RequestParam(required = false) Long joNo){
+        return jodalPlanService.selectedJodalPlan(joNo);
+    }
+    // 계약서> 협력회사 선택
+    @PostMapping("/getOnePartner")
+    public PartnerDTO getOnePartner(@RequestParam(required = false) Long pno){
+        return partnerService.findPartnerDto(pno, null, null);
     }
 }

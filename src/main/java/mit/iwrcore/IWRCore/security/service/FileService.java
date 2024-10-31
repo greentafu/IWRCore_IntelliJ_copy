@@ -2,16 +2,16 @@ package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
 import mit.iwrcore.IWRCore.entity.*;
+import mit.iwrcore.IWRCore.repository.ContractRepository;
+import mit.iwrcore.IWRCore.repository.File.FileContractRepository;
 import mit.iwrcore.IWRCore.repository.File.FileMaterialRepository;
 import mit.iwrcore.IWRCore.repository.File.FileProPlanRepository;
 import mit.iwrcore.IWRCore.repository.File.FileProductRepository;
 import mit.iwrcore.IWRCore.repository.MaterialRepository;
 import mit.iwrcore.IWRCore.repository.ProPlanRepository;
 import mit.iwrcore.IWRCore.repository.ProductRepository;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.AttachFileDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileMaterialDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProPlanDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProductDTO;
+import mit.iwrcore.IWRCore.security.dto.ContractDTO;
+import mit.iwrcore.IWRCore.security.dto.FileDTO.*;
 import mit.iwrcore.IWRCore.security.dto.MaterialDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
 import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
@@ -19,12 +19,11 @@ import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -36,13 +35,16 @@ public class FileService {
     private final MaterialRepository materialRepository;
     private final ProductService productService;
     private final ProplanService proplanService;
-    private final MemberService memberService;
+    private final ContractService contractService;
 
     private final ProductRepository productRepository;
     private final ProPlanRepository proPlanRepository;
+    private final ContractRepository contractRepository;
+
     private final FileMaterialRepository fileMaterialRepository;
     private final FileProductRepository fileProductRepository;
     private final FileProPlanRepository fileProPlanRepository;
+    private final FileContractRepository fileContractRepository;
 
     // 파일 저장
     public void saveFile(Long code, AttachFileDTO attachFileDTO, String where){
@@ -79,6 +81,17 @@ public class FileService {
                     .imgType((attachFileDTO.isImage())?1:0)
                     .proPlan(proPlan).build();
             fileProPlanRepository.save(fileProPlan);
+        }else if(where.equals("c")){
+            ContractDTO contractDTO=contractService.getContractById(code);
+            Contract contract=contractService.convertToEntity(contractDTO);
+            FileContract fileContract=FileContract.builder()
+                    .uuid(attachFileDTO.getUuid())
+                    .fileName(attachFileDTO.getFileName())
+                    .uploadPath(attachFileDTO.getUploadPath())
+                    .contentType(attachFileDTO.getType())
+                    .imgType((attachFileDTO.isImage())?1:0)
+                    .contract(contract).build();
+            fileContractRepository.save(fileContract);
         }
     }
     // 파일 삭제
@@ -101,6 +114,12 @@ public class FileService {
                     .orElseThrow(IllegalArgumentException::new);
             proPlan.getFiles().remove(fileProPlan);
             fileProPlanRepository.deleteById(uuid);
+        }else if(where.equals("c")){
+            FileContract fileContract=fileContractRepository.findById(uuid).get();
+            Contract contract=contractRepository.findById(fileContract.getContract().getConNo())
+                    .orElseThrow(IllegalArgumentException::new);
+            contract.getFiles().remove(fileContract);
+            fileContractRepository.deleteById(uuid);
         }
     }
 
@@ -117,6 +136,10 @@ public class FileService {
         }else if(type.equals("pp")){
             FileProPlan entity=fileProPlanRepository.findById(uuid).get();
             FileProPlanDTO dto=ppFile_eTd(entity);
+            return dto;
+        }else if(type.equals("c")){
+            FileContract entity=fileContractRepository.findById(uuid).get();
+            FileContractDTO dto=cFile_eTd(entity);
             return dto;
         }
         return null;
@@ -140,7 +163,81 @@ public class FileService {
         List<FileProPlanDTO> dtoList=entityList.stream().map(x->ppFile_eTd(x)).toList();
         return dtoList;
     }
+    // 계약서에 따른 파일 목록
+    public List<FileContractDTO> getContractFileList(Long conNo){
+        List<FileContract> entityList=fileContractRepository.getContractFileListByConNo(conNo);
+        List<FileContractDTO> dtoList=entityList.stream().map(x->cFile_eTd(x)).toList();
+        return dtoList;
+    }
 
+
+
+
+    // multipartFile->AttachFileDTO
+    public List<AttachFileDTO> fileCopy(MultipartFile[] files, String type, int count){
+        List<AttachFileDTO> result = new ArrayList<>();
+
+        String folder = "";
+        if (type.equals("m")) folder = "material";
+        else if (type.equals("p")) folder = "product";
+        else if (type.equals("pp")) folder = "proplan";
+        else if (type.equals("c")) folder = "contract";
+
+        // 파일 저장 위치
+        String uploadFolder = "C:\\iwlcore\\" + folder;
+        String uploadFolderPath = getFolder();
+        // 폴더 생성
+        File uploadPath = new File(uploadFolder, uploadFolderPath);
+        if (!uploadPath.exists()) {
+            uploadPath.mkdirs();
+        }
+
+        // 파일 저장
+        for (MultipartFile multipartFile : files) {
+            String uploadFileName = multipartFile.getOriginalFilename();
+            uploadFileName = uploadFileName.substring(uploadFileName.lastIndexOf("\\") + 1);
+            try {
+                for (int i = 0; i < count; i++) {
+                    UUID uuid = UUID.randomUUID();
+                    String saveuploadFileName = uuid.toString() + "_" + uploadFileName;
+
+                    File saveFile = new File(uploadPath, saveuploadFileName);
+
+                    // 파일 저장
+                    try (InputStream is = multipartFile.getInputStream();
+                         FileOutputStream fos = new FileOutputStream(saveFile)) {
+                        byte[] buffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = is.read(buffer)) != -1) {
+                            fos.write(buffer, 0, bytesRead);
+                        }
+                    }
+
+                    if (!saveFile.exists()) { continue; }
+
+                    AttachFileDTO attachDTO = AttachFileDTO.builder()
+                            .uuid(uuid.toString())
+                            .fileName(saveuploadFileName)
+                            .uploadPath(uploadFolderPath)
+                            .type(multipartFile.getContentType())
+                            .image(false).build();
+
+                    if (checkImageType(saveFile)) {
+                        attachDTO.setImage(true);
+                        try (FileInputStream is = new FileInputStream(saveFile);
+                             FileOutputStream thumbnail = new FileOutputStream(new File(uploadPath, "s_" + saveuploadFileName))) {
+                            Thumbnailator.createThumbnail(is, thumbnail, 100, 100);
+                        }
+                    }
+
+                    result.add(attachDTO);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
 
 
 
@@ -177,7 +274,6 @@ public class FileService {
                 .productDTO(productService.productEntityToDto(entity.getProduct())).build();
         return fileProductDTO;
     }
-
     // 생산계획 파일 entity-dto 변환
     public FileProPlan ppFile_dTe(FileProPlanDTO dto){
         FileProPlan fileProPlan=FileProPlan.builder()
@@ -193,11 +289,21 @@ public class FileService {
                 .proplanDTO(proplanService.entityToDTO(entity.getProPlan())).build();
         return fileProPlanDTO;
     }
-
-
-
-
-
+    // 계약서 파일 entity-dto변환
+    public FileContract cFile_dTe(FileContractDTO dto){
+        FileContract fileContract=FileContract.builder()
+                .uuid(dto.getUuid()).fileName(dto.getFileName()).uploadPath(dto.getUploadPath())
+                .contentType(dto.getContentType()).imgType(dto.getImgType())
+                .contract(contractService.convertToEntity(dto.getContractDTO())).build();
+        return fileContract;
+    }
+    public FileContractDTO cFile_eTd(FileContract entity){
+        FileContractDTO fileContractDTO=FileContractDTO.builder()
+                .uuid(entity.getUuid()).fileName(entity.getFileName()).uploadPath(entity.getUploadPath())
+                .contentType(entity.getContentType()).imgType(entity.getImgType())
+                .contractDTO(contractService.convertToDTO(entity.getContract())).build();
+        return fileContractDTO;
+    }
 
     // 파일 처리 관련 service
     public void saveFileRun(MultipartFile[] files, Long code, String type){
@@ -205,6 +311,7 @@ public class FileService {
         if(type.equals("m")) folder="material";
         else if(type.equals("p")) folder="product";
         else if(type.equals("pp")) folder="proplan";
+        else if(type.equals("c")) folder="contract";
 
         // 파일 저장 위치
         String uploadFolder="C:\\iwlcore\\"+folder;
@@ -282,6 +389,15 @@ public class FileService {
                 Object object=getFile(x, "pp");
                 if(object!=null){
                     FileProPlanDTO dto=(FileProPlanDTO) object;
+                    deFile.setFileName(dto.getFileName());
+                    deFile.setUploadPath(dto.getUploadPath());
+                    deFile.setImage(dto.getImgType()==1);
+                }
+            }else if(type.equals("c")){
+                folder="contract";
+                Object object=getFile(x, "c");
+                if(object!=null){
+                    FileContractDTO dto=(FileContractDTO) object;
                     deFile.setFileName(dto.getFileName());
                     deFile.setUploadPath(dto.getUploadPath());
                     deFile.setImage(dto.getImgType()==1);

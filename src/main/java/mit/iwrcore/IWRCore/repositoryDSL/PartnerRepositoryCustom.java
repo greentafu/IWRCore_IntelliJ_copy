@@ -6,4 +6,7 @@ import org.springframework.data.domain.Page;
 
 public interface PartnerRepositoryCustom {
     Page<Partner> findPartnerByCustomQuery(PageRequestDTO requestDTO);
+
+    // 계약서> 소속회사 외 협력회사 모두 보기
+    Page<Partner> getAllPartner(PageRequestDTO requestDTO);
 }

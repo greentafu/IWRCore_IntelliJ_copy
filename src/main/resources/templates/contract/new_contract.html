@@ -12,14 +12,22 @@
 
   <span id="head">
     <title>계약서/ 신규 등록</title>
-      <!--Style-->
-
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 250px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content2 {
+        height: 300px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
   <span id="content">
     <!-- Content -->
-
     <div class="container-xxl flex-grow-1 container-p-y">
       <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">계약서 /</span> 신규 등록</h4>
       <div class="row">
@@ -32,7 +40,8 @@
               <input class="form-control" type="text" id="person" name="firstName" placeholder="홍길동" autofocus />
             </div>
             <hr class="m-0">
-            <div style="display:none;" th:id="selectedJoNo" th:text="${jodalPlan!=null? jodalPlan.joNo:null}"></div>
+            <div style="display:none;" id="selectedJoNo" th:text="${joNo}"></div>
+            <div style="display:none;" id="selectedconNo"></div>
             <div class="card-body">
               <div class="mb-3 col-md-6">
                 <h5>공급자 정보</h5>
@@ -51,19 +60,26 @@
                 <input class="form-control" type="text" id="partnerNo" style="display:none;"/>
               </div>
               <label class="form-label">첨부 파일</label>
-              <div class="input-group mb-3">
+              <div class="input-group mb-2">
                 <input
                         type="file"
                         class="form-control"
-                        id="file"
-                        aria-describedby="inputGroupFileAddon04"
                         aria-label="Upload"
+                        id="uploadFiles1"
+                        multiple
                 />
-                <button class="btn btn-outline-primary" type="button" id="inputGroupFileAddon04">업로드</button>
+                <button class="btn btn-outline-primary" type="button" id="uploadBtn1">업로드</button>
+                <button id="uploadBtn2" style="display:none;"></button>
+              </div>
+              <div class="card shadow-none mb-3" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+                <table style="margin-left: 20px; margin-top: 5px;">
+                  <tbody id="fileTable0"></tbody>
+                  <tbody id="fileTable1"></tbody>
+                </table>
               </div>
             </div>
             <hr class="m-0" />
-            <div class="card-body ㅡ">
+            <div class="card-body">
               <h5>계약 자재 정보</h5>
               <button
                       type="button"
@@ -81,7 +97,6 @@
                     <th>자재명</th>
                     <th>단가</th>
                     <th>수량</th>
-                    <th>걸리는 일수</th>
                     <th>체결일</th>
                     <th>삭제</th>
                   </tr>
@@ -108,49 +123,39 @@
       <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
           <div class="modal-body">
-            <h5 class="modal-title mb-4" id="modalScrollableTitle">공급자 검색</h5>
+            <h5 class="modal-title mb-4">공급자 검색</h5>
             <div class="row mb-10 mb-2">
               <label class="form-label col-md-2" style="width: fit-content;">협력회사</label>
               <div class="col-md-10">
+                <div class="row mb-2">
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartL" onchange="updatePartCode('L')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartM" onchange="updatePartCode('M')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartS" onchange="updatePartCode('S')"></select>
+                  </div>
+                </div>
                 <div class="row">
-                  <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="partnerSearch" style="height: 32px; font-size: 12px;" value="">
                   </div>
                   <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn()">검색</button>
                   </div>
                 </div>
               </div>
             </div>
-            <div>
-              <form class="d-flex" onsubmit="return false">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                <button class="btn btn-outline-primary" type="submit">Search</button>
-              </form>
-            </div>
           </div>
           <hr class="m-0">
           <div class="modal-body" style="height: 350px;">
-            <table class="table table-hover">
-              <tr th:each="partner:${partner}" th:if="${partner.pno!=1}">
-                <td>[[${partner.name}]]</td>
-                <td>[[${partner.registrationNumber}]]</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary" th:value="${partner.pno}" onclick="selPartner(this)">
-                    선택
-                  </button>
-                </td>
-              </tr>
-            </table>
+            <div id="content1">
+              <table class="table table-hover">
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -170,46 +175,47 @@
             <div class="row mb-10 mb-2">
               <label class="form-label col-md-2" style="width: fit-content;">자재</label>
               <div class="col-md-10">
+                <div class="row mb-2">
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectMaterL2" onchange="updateMaterCode2('L')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectMaterM2" onchange="updateMaterCode2('M')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectMaterS2" onchange="updateMaterCode2('S')"></select>
+                  </div>
+                </div>
                 <div class="row">
-                  <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="materialSearch2" style="height: 32px; font-size: 12px;" value="">
                   </div>
                   <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="materialSearchBtn2()">검색</button>
                   </div>
                 </div>
               </div>
-            </div>
-            <div>
-              <form class="d-flex" onsubmit="return false">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                <button class="btn btn-outline-primary" type="submit">Search</button>
-              </form>
             </div>
           </div>
           <hr class="m-0">
           <div class="modal-body" style="height: 350px;">
             <input type="number" value="0" style="display:none;" id="checkValue">
-            <button type="button" class="btn btn-primary btn-sm mb-2" onclick="selectAllPlan()">모두선택</button>
             <div class="table-responsive text-nowrap">
-              <table class="table table-hover">
-                <tr>
-                  <th></th>
-                  <th>조달계획번호</th>
-                  <th>자재번호</th>
-                  <th>자재명</th>
-                </tr>
-                <tbody id="noneContract"></tbody>
-              </table>
+              <div id="content2">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="selectAllNonContractJodalPlan()">모두선택</button>
+                      </th>
+                      <th>조달계획번호</th>
+                      <th>자재번호</th>
+                      <th>자재명</th>
+                    </tr>
+                  </thead>
+                  <tbody id="secondTbody"></tbody>
+                </table>
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -226,219 +232,41 @@
     <!--/Modal2-->
     <!--/Modal-->
     <!--Script-->
+    <script src="../assets/js/file.js"></script>
+    <script src="../assets/js/new-contract.js"></script>
     <script>
-        $(document).ready(function(){
-          var selectedJoNo=document.getElementById('selectedJoNo').innerText;
-          initNoneContract(selectedJoNo);
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+            if(finPage==false){
+                const scrollTop = content1.scrollTop;
+                const scrollHeight = content1.scrollHeight;
+                const clientHeight = content1.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    loadItems('contract');
+                }
+            }
+        });
+        content2.addEventListener("scroll", function () {
+            if(finPage2==false){
+                const scrollTop = content2.scrollTop;
+                const scrollHeight = content2.scrollHeight;
+                const clientHeight = content2.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    loadItems2('contract');
+                }
+            }
         });
 
-        function selPartner(button){
-          var pno=button.value;
-          $.ajax({
-            url:'/select/anyPartner',
-            method:'GET',
-            data:{pno:pno},
-            success:function(data){
-              document.getElementById('partnerName').value=data.name;
-              document.getElementById('partnerNo').value=data.pno;
-            }
-          });
-        }
-
-        function initNoneContract(selectedJoNo){
-          var setJoNo=(selectedJoNo!='')?selectedJoNo:null;
-          var tbodyArea=document.getElementById('noneContract');
-          setTimeout(function() {
-            tbodyArea.innerHTML = '';
-
-            $.ajax({
-              url:'/select/noneContractJodalPlan',
-              method:'GET',
-              success:function(data){
-                data.forEach(x=>{
-
-                  var joNo=x.jodalPlanDTO.joNo;
-
-                  var tempId='inputDate'+joNo;
-                  var temp=document.getElementById(tempId);
-                  if(temp==null){
-
-                    var materCode=x.jodalPlanDTO.materialDTO.materCode;
-                    var materName=x.jodalPlanDTO.materialDTO.name;
-                    var allNum=x.allJodalChasuNum;
-
-                    var newRow = document.createElement('tr');
-
-                    var inputTd = document.createElement('td');
-                    var input = document.createElement('input');
-                    input.type = 'checkbox';
-                    input.id = 'checkbox'+joNo;
-                    input.class='form-check-input';
-
-                    if(setJoNo==joNo){
-                      input.checked = true;
-                    }
-                    inputTd.appendChild(input);
-                    newRow.appendChild(inputTd);
-
-                    [joNo, materCode, materName].forEach(function(text){
-                      var td = document.createElement('td');
-                      td.innerText = text;
-                      newRow.appendChild(td);
-                    });
-
-                    var numTd = document.createElement('td');
-                    numTd.innerText = allNum;
-                    numTd.style.display = 'none';
-                    newRow.appendChild(numTd);
-
-                    tbodyArea.appendChild(newRow);
-
-                    if(setJoNo==joNo){
-                      addJodalPlan();
-                    }
-
-                  }
-
-                });
-              }
-            });
-          }, 100);
-        }
-
-        let checkValue = 0;
-        function selectAllPlan(){
-          const checkBox=document.querySelectorAll('input[type="checkbox"]');
-          checkBox.forEach(x=>{
-            if(checkValue==0) {x.checked=true;}
-            if(checkValue==1) {x.checked=false;}
-          });
-          checkValue=(checkValue===0)?1:0;
-          document.getElementById('checkValue').value = checkValue;
-        }
-
-        function addJodalPlan(){
-          const planRows=document.querySelectorAll('#noneContract tr');
-          const insertPoint=document.querySelector('#insertPoint');
-
-          planRows.forEach(x=>{
-            const checkbox=x.querySelector('input[type="checkbox"]');
-
-            if(checkbox&&checkbox.checked){
-              const cells=x.querySelectorAll('td');
-              const joNo=cells[1].innerText;
-              const materNo=cells[2].innerText;
-              const materName=cells[3].innerText;
-              const allNum=cells[4].innerText;
-
-              const newRow = document.createElement('tr');
-
-              [joNo, materNo, materName].forEach(text => {
-                const td = document.createElement('td');
-                td.innerText = text;
-                newRow.appendChild(td);
-              });
-
-              const inputCash = document.createElement('input');
-              inputCash.type = 'number';
-              inputCash.style.border = '0px';
-              inputCash.style.width = '150px';
-              inputCash.id = 'inputCash'+joNo;
-              const cashTd = document.createElement('td');
-              cashTd.appendChild(inputCash);
-              newRow.appendChild(cashTd);
-
-              const inputNum = document.createElement('input');
-              inputNum.type = 'number';
-              inputNum.style.border = '0px';
-              inputNum.style.width = '150px';
-              inputNum.id = 'inputNum'+joNo;
-              inputNum.value=allNum;
-              const numTd = document.createElement('td');
-              numTd.appendChild(inputNum);
-              newRow.appendChild(numTd);
-
-              const inputDayNum = document.createElement('input');
-              inputDayNum.type = 'number';
-              inputDayNum.style.border = '0px';
-              inputDayNum.style.width = '150px';
-              inputDayNum.id = 'inputDayNum'+joNo;
-              const dayTd = document.createElement('td');
-              dayTd.appendChild(inputDayNum);
-              newRow.appendChild(dayTd);
-
-              const inputDate = document.createElement('input');
-              inputDate.type = 'date';
-              inputDate.style.border = '0px';
-              inputDate.style.width = '150px';
-              inputDate.id = 'inputDate'+joNo;
-              const dateTd = document.createElement('td');
-              dateTd.appendChild(inputDate);
-              newRow.appendChild(dateTd);
-
-              const deleteTd = document.createElement('td');
-              const button = document.createElement('button');
-              button.type = 'button';
-              button.className = 'btn btn-sm btn-secondary';
-              button.innerText = '삭제';
-              button.onclick = function() {
-                  newRow.remove(); // Remove the row when the button is clicked
-                  initNoneContract();
-              };
-              deleteTd.appendChild(button);
-              newRow.appendChild(deleteTd);
-
-              insertPoint.appendChild(newRow);
-            }
-          });
-          initNoneContract();
-
-        }
-
-        function saveContract(){
-          var person=document.getElementById('person').value;
-          var partnerNo=document.getElementById('partnerNo').value;
-          var file=document.getElementById('file').value;
-          var planData=[];
-          console.log("저장시: ", person, partnerNo, file);
-
-          var insertPoint=document.querySelectorAll('#insertPoint tr');
-          insertPoint.forEach(x=>{
-            const cells=x.querySelectorAll('td');
-            const joNo=cells[0].innerText;
-
-            const inputCash=document.getElementById('inputCash'+joNo).value;
-            const inputNum=document.getElementById('inputNum'+joNo).value;
-            const inputDayNum=document.getElementById('inputDayNum'+joNo).value;
-            const inputDate=document.getElementById('inputDate'+joNo).value;
-
-            planData.push({joNo:joNo, inputCash:inputCash, inputNum:inputNum, inputDayNum:inputDayNum, inputDate:inputDate});
-          });
-
-          $.ajax({
-            url:'/contract/saveContract',
-            method:'POST',
-            contentType:'application/json',
-            data: JSON.stringify({
-              person:person,
-              partnerNo:partnerNo,
-              file:file,
-              planData:planData
-            }),
-            success: function(response) {
-              console.log("성공");
-              window.location.href = '/contract/list_contract';
-            },
-            error: function(xhr, status, error) {
-              console.log("실패");
-              window.location.href = '/contract/list_contract';
-            }
-          });
-        }
-
-      </script>
-
-      <!--Script-->
+        loadItems('contract');
+        initJodalPlan();
+        setTimeout(function() {
+          loadItems2('contract');
+        }, 1000);
+      });
+    </script>
+    <!--Script-->
   </span>
 
 </th:block>

@@ -12,95 +12,202 @@
 
   <span id="head">
     <title>계약서 수정</title>
-      <!--Style-->
-
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 250px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content2 {
+        height: 300px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
-    <span id="content">
-     <div class="container-xxl flex-grow-1 container-p-y">
-       <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">계약서 /</span> 계약서 수정</h4>
-       <div class="row">
-         <div class="col-md-12">
-           <div class="card mb-4">
-             <!-- Account -->
-             <form th:action="@{/contract/rewrite_contract}" method="post">
-               <div class="card-body">
-                 <label for="firstName" class="form-label">담당자</label>
-                 <input class="form-control mb-1" type="text" id="firstName" name="who"
-                        placeholder="담당자 입력" th:value="${contract.who}"/>
-                 <label class="form-label">첨부 파일</label>
-                 <div class="input-group mb-3">
-                   <input
-                           type="file"
-                           class="form-control"
-                           id="inputGroupFile04"
-                           aria-describedby="inputGroupFileAddon04"
-                           aria-label="Upload"
-                           name="filename"
-                           th:value="${contract.filename}"
-                   />
-                   <button class="btn btn-outline-primary" type="button" id="inputGroupFileAddon04">업로드</button>
-                 </div>
-               </div>
-               <hr class="m-0" />
-               <div class="card-body">
-                 <input type="number" name="conNo" style="display:none;" th:value="${contract.conNo}">
-                 <div class="text-nowrap table-responsive">
-                   <table class="table table-bordered mb-4">
-                     <tr>
-                       <th>조달계획번호</th>
-                       <th>자재번호</th>
-                       <th>자재명</th>
-                       <th>단가</th>
-                       <th>수량</th>
-                       <th>걸리는 일수</th>
-                       <th>체결일 </th>
-                     </tr>
-                     <tr>
-                       <td>[[${contract.jodalPlanDTO.proplanDTO.productDTO.name}]]</td>
-                       <td>[[${contract.jodalPlanDTO.materialDTO.materCode}]]</td>
-                       <td>[[${contract.jodalPlanDTO.materialDTO.name}]]</td>
-                       <td>
-                         <input type="number" class="form-control" name="money" style="width: 150px; border:0" th:value="${contract.money}">
-                       </td>
-                       <td>
-                         <input type="number" class="form-control" name="conNum" style="width: 150px; border:0" th:value="${contract.conNum}">
-                       </td>
-                       <td>
-                         <input type="number" class="form-control" name="howDate" style="width: 150px; border:0" th:value="${contract.howDate}">
-                       </td>
-                       <td>
-                         <input type="date" class="form-control" name="conDate" style="width: 150px; border:0" id="conDate">
-                       </td>
-                       <td style="display:none" id="conday">[[${contract.conDate}]]</td>
-                     </tr>
-                   </table>
-                 </div>
-                 <div class="d-flex justify-content-between w-100">
-                   <a th:href="@{/contract/list_contract}">
-                     <button type="button" class="btn btn-outline-secondary">취소</button>
-                   </a>
-                   <button class="btn btn-primary" type="submit">수정</button>
-                 </div>
-               </div>
-             </form>
-           </div>
-         </div>
-       </div>
-     </div>
-     <!--Modal-->
-     <!--/Modal-->
-     <!--Script-->
-     <script>
-        $(document).ready(function(){
-          const date=document.getElementById('conday').innerText;
-          document.getElementById('conDate').value=date.split('T')[0];
+  <span id="content">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">계약서 /</span> 계약서 수정</h4>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card mb-4">
+            <!-- Account -->
+            <div class="card-body">
+              <h5>담당자 정보</h5>
+              <label class="form-label">담당자</label>
+              <input class="form-control" type="text" id="person" name="firstName" placeholder="홍길동" th:value="${contract.who}" />
+            </div>
+            <hr class="m-0">
+            <div style="display:none;" id="selectedJoNo" th:text="${contract.jodalPlanDTO.joNo}"></div>
+            <div style="display:none;" id="selectedconNo" th:text="${contract.conNo}"></div>
+            <div style="display:none;" id="dateString" th:text="${contract.conDate}"></div>
+            <div class="card-body">
+              <div class="mb-3 col-md-6">
+                <h5>공급자 정보</h5>
+                <div class="mb-3">
+                  <button
+                          type="button"
+                          class="btn btn-outline-primary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalScrollable"
+                  >
+                    공급자 선택
+                  </button>
+                </div>
+                <label class="form-label">협력업체명</label>
+                <input class="form-control" type="text" id="partnerName" th:value="${contract.partnerDTO.name}"/>
+                <input class="form-control" type="text" id="partnerNo" style="display:none;" th:value="${contract.partnerDTO.pno}"/>
+              </div>
+              <label class="form-label">첨부 파일</label>
+              <div class="input-group mb-2">
+                <input
+                        type="file"
+                        class="form-control"
+                        aria-label="Upload"
+                        id="uploadFiles1"
+                        multiple
+                />
+                <button class="btn btn-outline-primary" type="button" id="uploadBtn1">업로드</button>
+                <button id="uploadBtn2" style="display:none;"></button>
+              </div>
+              <div class="card shadow-none mb-3" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+                <table style="margin-left: 20px; margin-top: 5px;">
+                  <tbody id="fileTable0"></tbody>
+                  <tbody id="fileTable1"></tbody>
+                </table>
+              </div>
+            </div>
+            <hr class="m-0" />
+            <div class="card-body">
+              <h5>계약 자재 정보</h5>
+              <div class="text-nowrap table-responsive">
+                <table class="table table-bordered mb-4">
+                  <tr>
+                    <th>조달계획번호</th>
+                    <th>자재번호</th>
+                    <th>자재명</th>
+                    <th>단가</th>
+                    <th>수량</th>
+                    <th>체결일</th>
+                  </tr>
+                  <tbody id="insertPoint">
+                    <td>[[${contract.jodalPlanDTO.joNo}]]</td>
+                    <td>[[${contract.jodalPlanDTO.materialDTO.materCode}]]</td>
+                    <td>[[${contract.jodalPlanDTO.materialDTO.name}]]</td>
+                    <td>
+                      <input type="number" style="border:0px; width:150px;"
+                             th:id="'inputCash'+${contract.jodalPlanDTO.joNo}"
+                             th:value="${contract.money}">
+                    </td>
+                    <td>
+                      <input type="number" style="border:0px; width:150px;"
+                             th:id="'inputNum'+${contract.jodalPlanDTO.joNo}"
+                             th:value="${contract.conNum}">
+                    </td>
+                    <td>
+                      <input type="date" style="border:0px; width:150px;"
+                             th:id="'inputDate'+${contract.jodalPlanDTO.joNo}">
+                    </td>
+                  </tbody>
+                </table>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <a th:href="@{/contract/list_contract}">
+                  <button type="button" class="btn btn-outline-secondary">취소</button>
+                </a>
+                <button class="btn btn-primary" onclick="saveContract()">등록</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay -->
+
+    <!--Modal-->
+    <div class="modal fade" id="modalScrollable" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <h5 class="modal-title mb-4">공급자 검색</h5>
+            <div class="row mb-10 mb-2">
+              <label class="form-label col-md-2" style="width: fit-content;">협력회사</label>
+              <div class="col-md-10">
+                <div class="row mb-2">
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartL" onchange="updatePartCode('L')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartM" onchange="updatePartCode('M')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartS" onchange="updatePartCode('S')"></select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="partnerSearch" style="height: 32px; font-size: 12px;" value="">
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn()">검색</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="modal-body" style="height: 350px;">
+            <div id="content1">
+              <table class="table table-hover">
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/Modal-->
+    <!--Script-->
+    <script src="../assets/js/file.js"></script>
+    <script src="../assets/js/new-contract.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const conNo=document.getElementById('selectedconNo').innerText;
+        const joNo=document.getElementById('selectedJoNo').innerText;
+        const dateString=document.getElementById('dateString').innerText;
+        const date=dateString.split('T')[0];
+
+        document.getElementById('inputDate'+joNo).value=date;
+        initProPlanFile(conNo);
+
+        content1.addEventListener("scroll", function () {
+            if(finPage==false){
+                const scrollTop = content1.scrollTop;
+                const scrollHeight = content1.scrollHeight;
+                const clientHeight = content1.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    loadItems('contract');
+                }
+            }
         });
-     </script>
+        loadItems('contract');
+      });
+    </script>
+    <script>
+
+    </script>
 
 
-     <!--Script-->
+    <!--Script-->
   </span>
 
 </th:block>

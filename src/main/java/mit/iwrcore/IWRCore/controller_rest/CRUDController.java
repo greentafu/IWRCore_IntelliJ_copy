@@ -10,10 +10,10 @@ import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveJodalChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveProductDTO;
 import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileMaterialDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProPlanDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProductDTO;
+import mit.iwrcore.IWRCore.security.dto.FileDTO.*;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.LLLSDTO;
 import mit.iwrcore.IWRCore.security.service.*;
+import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
@@ -21,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
+import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +57,10 @@ public class CRUDController {
     private JodalPlanService jodalPlanService;
     @Autowired
     private JodalChasuService jodalChasuService;
+    @Autowired
+    private PartnerService partnerService;
+    @Autowired
+    private ContractService contractService;
 
     // 직원
 
@@ -85,10 +91,10 @@ public class CRUDController {
         List<FileMaterial> exEntityFileList=new ArrayList<>();
         if(exDtoFileList!=null) exDtoFileList.forEach(x->exEntityFileList.add(fileService.mFile_dTe(x)));
 
-        Long materialCode=materialService.saveMaterial(materialDTO, exEntityFileList);
+        MaterialDTO savedMaterial=materialService.saveMaterial(materialDTO, exEntityFileList);
 
         if(deleteFile!=null) fileService.deleteFileRun(deleteFile, "m");
-        if(files!=null) fileService.saveFileRun(files, materialCode, "m");
+        if(files!=null) fileService.saveFileRun(files, savedMaterial.getMaterCode(), "m");
     }
     @GetMapping("/deleteMaterial")
     public void deleteMaterial(@RequestParam(required = false) Long materCode){
@@ -356,5 +362,75 @@ public class CRUDController {
     @GetMapping("/deleteJodalChasu")
     public void deleteJodalChasu(@RequestParam(required = false) Long joNo){
         jodalChasuService.deleteJodalChasuByPlan(joNo);
+    }
+
+    // 계약서
+    @PostMapping("/saveContract")
+    public void saveContract(@RequestParam(name = "conNo", required = false) Long conNo,
+                             @RequestParam(name = "person", required = false) String person,
+                             @RequestParam(name = "partnerNo", required = false) Long partnerNo,
+                             @RequestParam(name = "planData", required = false) String planData,
+                             @RequestParam(name = "files", required = false) MultipartFile[] files,
+                             @RequestParam(name = "deleteFile", required = false) List<String> deleteFile){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
+        MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
+
+        PartnerDTO partnerDTO=partnerService.findPartnerDto(partnerNo, null, null);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<LLLSDTO> quantityList=null;
+        try {
+            quantityList = objectMapper.readValue(planData, new TypeReference<List<LLLSDTO>>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<FileContractDTO> exDtoFileList=fileService.getContractFileList(conNo);
+        List<FileContract> exEntityFileList=new ArrayList<>();
+        if(exDtoFileList!=null) exDtoFileList.forEach(x->exEntityFileList.add(fileService.cFile_dTe(x)));
+
+        List<AttachFileDTO> attachFileDTOs=null;
+        if(files!=null) attachFileDTOs=fileService.fileCopy(files, "c", quantityList.size());
+
+        if(quantityList!=null){
+            int num=0;
+            for(LLLSDTO dto:quantityList){
+                JodalPlanDTO jodalPlanDTO=jodalPlanService.findById(dto.getLong1());
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime date=LocalDateTime.parse(dto.getString()+" 00:00:00", formatter);
+
+                ContractDTO contractDTO=ContractDTO.builder()
+                        .conNo(conNo)
+                        .who(person)
+                        .conNum(dto.getLong3())
+                        .money(dto.getLong2())
+                        .conDate(date)
+                        .jodalPlanDTO(jodalPlanDTO)
+                        .memberDTO(memberDTO)
+                        .partnerDTO(partnerDTO).build();
+                ContractDTO savedContract=contractService.saveContract(contractDTO, exEntityFileList);
+
+                if(deleteFile!=null) fileService.deleteFileRun(deleteFile, "c");
+
+                if(attachFileDTOs!=null) {
+                    int fileSize= attachFileDTOs.size();
+                    int conSize= quantityList.size();
+                    for(int i=num; i<fileSize; i+=conSize){
+                        fileService.saveFile(savedContract.getConNo(), attachFileDTOs.get(i), "c");
+                    }
+                }
+                num++;
+            }
+        }
+    }
+    @GetMapping("/deleteContract")
+    public void deleteContract(@RequestParam(required = false) Long conNo){
+        List<FileContractDTO> fileList=fileService.getContractFileList(conNo);
+        List<String> deleteFile=new ArrayList<>();
+        fileList.forEach(x->deleteFile.add(x.getUuid()));
+        fileService.deleteFileRun(deleteFile, "c");
+        contractService.deleteContract(conNo);
     }
 }

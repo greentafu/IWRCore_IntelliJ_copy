@@ -260,11 +260,10 @@
                   <tr>
                     <th></th>
                     <th>협력업체명</th>
-                    <th>계약서 파일명</th>
                     <th>자재명</th>
                     <th>수량</th>
+                    <th>금액</th>
                     <th>등록일</th>
-                    <th>다운로드</th>
                     <th>수정/삭제</th>
                     <th>
                       <select class="form-select form-select-sm" style="width: fit-content;" id="baljuProgress2">
@@ -474,9 +473,10 @@
               const baljuDTO=x.baljuDTO;
               const conNo=x.contractDTO.conNo;
               const partnerName=x.contractDTO.partnerDTO.name;
-              const fileName=x.contractDTO.filename;
               const materialName=x.contractDTO.jodalPlanDTO.materialDTO.name;
               const conNum=x.contractDTO.conNum;
+              const tempMoney=x.contractDTO.money;
+              const money=(conNum*tempMoney)/10000+'만원';
               const regDate=x.contractDTO.regDate.split('T')[0];
 
               const newRow = document.createElement("tr");
@@ -490,13 +490,9 @@
               partnerNameTd.textContent = partnerName;
               newRow.appendChild(partnerNameTd);
 
-              const fileNameTd = document.createElement("td");
-              fileNameTd.textContent = fileName;
-              newRow.appendChild(fileNameTd);
-
               const materialNameTd = document.createElement("td");
               materialNameTd.id='materialName'+conNo;
-              materialNameTd.textContent = materialName;
+              materialNameTd.innerHTML=`<a href="/contract/contract?conNo=${conNo}">${materialName}</a>`;
               newRow.appendChild(materialNameTd);
 
               const conNumTd = document.createElement("td");
@@ -504,18 +500,14 @@
               conNumTd.textContent = conNum;
               newRow.appendChild(conNumTd);
 
+              const moneyTd = document.createElement("td");
+              moneyTd.textContent = money;
+              newRow.appendChild(moneyTd);
+
               const regDateTd = document.createElement("td");
               regDateTd.id='regDate'+conNo;
               regDateTd.textContent = regDate;
               newRow.appendChild(regDateTd);
-
-              const btn0Td = document.createElement("td");
-              btn0Td.innerHTML=`
-                <button type="button" class="btn btn-sm btn-outline-primary">
-                  <span class="bx bx-arrow-to-bottom"></span>
-                </button>
-              `;
-              newRow.appendChild(btn0Td);
 
               const btn1Td = document.createElement("td");
               btn1Td.innerHTML=`
@@ -596,7 +588,7 @@
       function deleteContract(button){
         var conNo=button.value;
         $.ajax({
-          url:'/contract/delete_contract',
+          url:'/deleteContract',
           method:'GET',
           data:{conNo:conNo},
           success:function(response){

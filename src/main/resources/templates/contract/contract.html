@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html
+        lang="ko" xmlns:th="http://www.thymeleaf.org"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        data-assets-path="../assets/"
+        data-template="vertical-menu-template-free"
+>
+<th:block th:replace="~{layout/mainlayout::all(~{this::#head} ,~{this::#content})}">
+
+  <span id="head">
+    <title>계약서</title>
+      <!--Style-->
+
+      <!--/Style-->
+  </span>
+
+  <span id="content">
+    <!-- Content -->
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">계약서 /</span> 계약서 상세 보기</h4>
+      <!-- Hoverable Table rows -->
+      <div class="card">
+        <div class="table-responsive text-nowrap">
+          <!-- Outline Dropdowns -->
+          <div class="card-body">
+            <label class="form-label">협력업체명</label>
+            <input type="text" class="form-control" th:value="${con.partnerDTO.name}" readonly>
+            <label class="form-label">첨부 파일</label>
+            <button id="uploadBtn1" style="display:none;"></button>
+            <button id="uploadBtn2" style="display:none;"></button>
+            <div class="card shadow-none" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+              <table style="margin-left: 20px; margin-top: 5px;">
+                <tbody id="fileTable0"></tbody>
+                <tbody id="fileTable1"></tbody>
+              </table>
+            </div>
+            <label class="form-label">계약정보</label>
+            <div style="display:none;" id="selectedconNo" th:text="${con.conNo}"></div>
+            <div style="display:none;" id="dateString" th:text="${con.conDate}"></div>
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>자재명</th>
+                  <th>자재번호</th>
+                  <th>수량</th>
+                  <th>단가</th>
+                  <th>계약일</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>[[${con.jodalPlanDTO.materialDTO.name}]]</td>
+                  <td>[[${con.jodalPlanDTO.materialDTO.materCode}]]</td>
+                  <td>[[${con.conNum}]]</td>
+                  <td>[[${con.money}]]</td>
+                  <td id="dateTd"></td>
+                </tr>
+              </tbody>
+            </table>
+            <label class="form-label">미리보기</label>
+            <div class="mb-4">
+              <div style="background-color:#f0f0f0;">
+                <ul id="previewList1"
+                    style="list-style-type: none; padding: 10px; margin: 0; display: flex; justify-content: center; align-items:center;">
+                </ul>
+              </div>
+              <hr class="m-0">
+              <div id="preview1"
+                   style="border: 1px solid #f0f0f0; padding: 10px; margin: 0;display: flex; justify-content: center; align-items: center; overflow-x: auto;">
+              </div>
+            </div>
+            <!--뒤로가기,등록 버튼 세트-->
+            <div class="d-flex justify-content-between w-100">
+              <a th:href="@{/contract/list_contract}">
+                <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
+              </a>
+              <a th:href="@{/contract/modify_contract(conNo=${con.conNo})}">
+                <button class="btn btn-primary">수정</button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Script-->
+    <script src="../assets/js/file.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const conNo=document.getElementById('selectedconNo').innerText;
+        const dateString=document.getElementById('dateString').innerText;
+        const date=dateString.split('T')[0];
+        document.getElementById('dateTd').innerText=date;
+
+        contractFileList(conNo);
+      });
+    </script>
+    <!--Script-->
+  </span>
+</th:block>
+</html>

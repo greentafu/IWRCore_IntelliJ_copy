@@ -54,4 +54,14 @@ public interface JodalPlanRepository extends JpaRepository<JodalPlan, Long>, Jod
             "and j.joNo not in (select jc.jodalPlan.joNo from JodalChasu jc)")
     Page<Object[]> noContract(Pageable pageable);
 
+
+    // 계약서> 선택한 조달계획
+    @EntityGraph(attributePaths = {"proPlan"})
+    @Query("select j, sum(jc.joNum) from JodalPlan j " +
+            "join JodalChasu jc on (j.joNo=jc.jodalPlan.joNo) " +
+            "where j.joNo=:joNo " +
+            "group by j")
+    List<Object[]> selectedJodalPlan(Long joNo);
+
+
 }

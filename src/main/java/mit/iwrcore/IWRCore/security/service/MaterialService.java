@@ -14,7 +14,8 @@ import java.util.List;
 
 public interface MaterialService {
 
-    Long saveMaterial(MaterialDTO dto, List<FileMaterial> fileList);
+    // 자재 저장, 삭제
+    MaterialDTO saveMaterial(MaterialDTO dto, List<FileMaterial> fileList);
     void deleteMaterial(Long materCode);
 
     // 자재 찾기

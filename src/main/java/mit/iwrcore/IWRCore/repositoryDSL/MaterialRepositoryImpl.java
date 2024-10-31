@@ -115,7 +115,6 @@ public class MaterialRepositoryImpl implements MaterialRepositoryCustom{
         }
         if (requestDTO.getBox()!=null) { builder.and(qMaterial.box.boxCode.eq(requestDTO.getBox())); }
 
-
         if (requestDTO.getMaterials()!=null) { builder.and(qMaterial.materCode.notIn(requestDTO.getMaterials())); }
 
         Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());

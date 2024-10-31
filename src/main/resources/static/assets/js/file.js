@@ -350,11 +350,80 @@ function proPlanFileList(proplanNo){
 
                 const newRow = document.createElement('tr');
                 const fileNameTd = document.createElement('td');
-                fileNameTd.innerHTML = `<a href="/file/download?path=${path}&fileName=${originalFileName}&type=pp&uuid=${uuid}">${fileName}</a>`;
+                fileNameTd.innerHTML = `<a href="/file/download?path=${path}&fileName=${originalFileName}&type=c&uuid=${uuid}">${fileName}</a>`;
                 newRow.appendChild(fileNameTd);
                 fileTable0.appendChild(newRow);
 
-                viewList(originalFileName, fileName, fileType, path, 1, "pp");
+                viewList(originalFileName, fileName, fileType, path, 1, "c");
+            });
+        }
+    });
+}
+
+// 계약서 수정 첨부파일 목록 불러오기
+function initProPlanFile(conNo){
+    const fileTable0=document.getElementById('fileTable0');
+    const code=conNo;
+    $.ajax({
+        url:'/file/contractFile',
+        method:'GET',
+        data:{code:code},
+        success:function(data){
+            data.forEach(x=>{
+                const path=x.uploadPath.replaceAll("\\", "/");
+                const uuid=x.uuid;
+                const originalFileName=x.fileName;
+                const fileName=originalFileName.substring(uuid.length+1);
+
+                const temp={uuid: uuid, fileName: fileName};
+                existFile1.push(temp);
+
+                const newRow = document.createElement('tr');
+                const fileNameTd = document.createElement('td');
+                fileNameTd.innerText = fileName+'         ';
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-sm btn-secondary';
+                button.innerText = 'x';
+                button.onclick = (function(fileIndex) {
+                    newRow.remove();
+                    existFile1=existFile1.filter(x => x.uuid !== uuid);
+                    deleteFile1.push(uuid);
+                });
+
+                fileNameTd.appendChild(button);
+                newRow.appendChild(fileNameTd);
+                fileTable0.appendChild(newRow);
+            });
+        }
+    });
+}
+// 계약서 첨부파일 목록 불러오기
+function contractFileList(conNo){
+    const fileTable0=document.getElementById('fileTable0');
+    const code=conNo;
+    $.ajax({
+        url:'/file/contractFile',
+        method:'GET',
+        data:{code:code},
+        success:function(data){
+            document.getElementById('previewList1').innerText='';
+            document.getElementById('preview1').innerText='';
+            data.forEach(x=>{
+                const path=x.uploadPath.replaceAll("\\", "/");
+                const uuid=x.uuid;
+                const originalFileName=x.fileName;
+                const fileName=originalFileName.substring(uuid.length+1);
+                const fileType=x.contentType;
+
+                const newRow = document.createElement('tr');
+                const fileNameTd = document.createElement('td');
+                fileNameTd.innerHTML = `<a href="/file/download?path=${path}&fileName=${originalFileName}&type=c&uuid=${uuid}">${fileName}</a>`;
+                newRow.appendChild(fileNameTd);
+                fileTable0.appendChild(newRow);
+
+                viewList(originalFileName, fileName, fileType, path, 1, "c");
             });
         }
     });

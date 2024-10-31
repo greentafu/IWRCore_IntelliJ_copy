@@ -7,6 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
+
 @Builder
 @AllArgsConstructor
 @Data
@@ -53,4 +55,7 @@ public class PageRequestDTO2 {
     private Long progressContract2;
     // 발주 진행
     private Long baljuProgress2;
+
+    // 계약서등록 중 조달계획들
+    private List<Long> jodalPlans;
 }

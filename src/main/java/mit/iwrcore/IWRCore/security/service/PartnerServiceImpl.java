@@ -48,6 +48,23 @@ public class PartnerServiceImpl implements PartnerService{
 
         return pageResultDTO;
     }
+    // 계약서> 소속회사 외 협력회사 모두 보기
+    @Override
+    public PageResultDTO<PartnerDTO, Partner> getAllPartner(PageRequestDTO requestDTO) {
+        Page<Partner> partnerList=partnerRepository.getAllPartner(requestDTO);
+
+        Function<Partner, PartnerDTO> fn=(entity->partnerTodto(entity));
+        PageResultDTO pageResultDTO=new PageResultDTO<>(partnerList, fn);
+
+        pageResultDTO.setPartL(requestDTO.getPartL());
+        pageResultDTO.setPartM(requestDTO.getPartM());
+        pageResultDTO.setPartS(requestDTO.getPartS());
+        pageResultDTO.setPartnerSearch(requestDTO.getPartnerSearch());
+
+        return pageResultDTO;
+    }
+
+
 
     // 새로운 회사 계정 생성시 사업자등록번호 중복은 1, 아이디 중복은 2, 성공시에는 0
     @Override

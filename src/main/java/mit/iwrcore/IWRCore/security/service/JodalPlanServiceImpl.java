@@ -7,6 +7,7 @@ import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.JodalPlanRepository;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.JodalChasuDateDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.JodalPlanJodalChsuDTO;
@@ -125,6 +126,38 @@ public class JodalPlanServiceImpl implements JodalPlanService {
         return jodalPlanDTO;
     }
 
+
+
+
+
+
+    // 계약서> 계약하지 않은 조달계획 목록
+    @Override
+    public PageResultDTO<JodalPlanJodalChsuDTO, Object[]> noneContractJodalPlan(PageRequestDTO2 requestDTO2){
+        Page<Object[]> entityPage = jodalPlanRepository.noneContractJodalPlan(requestDTO2);
+        return new PageResultDTO<>(entityPage, this::exJodalPlanJodalChsuDTO);
+    }
+    private JodalPlanJodalChsuDTO exJodalPlanJodalChsuDTO(Object[] objects){
+        JodalPlan jodalPlan=(JodalPlan) objects[0];
+        Long allJodalChasuNum=(Long) objects[1];
+
+        JodalPlanDTO jodalPlanDTO=(jodalPlan!=null)? entityToDTO(jodalPlan):null;
+        Long allNum=(allJodalChasuNum!=null)?allJodalChasuNum:0L;
+        return new JodalPlanJodalChsuDTO(jodalPlanDTO, allNum);
+    }
+    // 계약서> 선택한 조달계획
+    @Override
+    public JodalPlanJodalChsuDTO selectedJodalPlan(Long joNo){
+        List<Object[]> entity= jodalPlanRepository.selectedJodalPlan(joNo);
+        return exJodalPlanJodalChsuDTO(entity.get(0));
+    }
+
+
+
+
+
+
+
     @Override
     public JodalPlan dtoToEntity(JodalPlanDTO dto) {
         return JodalPlan.builder()
@@ -194,14 +227,6 @@ public class JodalPlanServiceImpl implements JodalPlanService {
         List<JodalPlanJodalChsuDTO> dtoList=entityList.stream().map(this::exJodalPlanJodalChsuDTO).toList();
         return dtoList;
     }
-    private JodalPlanJodalChsuDTO exJodalPlanJodalChsuDTO(Object[] objects){
-        JodalPlan jodalPlan=(JodalPlan) objects[0];
-        Long allJodalChasuNum=(Long) objects[1];
 
-        JodalPlanDTO jodalPlanDTO=(jodalPlan!=null)? entityToDTO(jodalPlan):null;
-        System.out.println(jodalPlanDTO);
-        Long allNum=(allJodalChasuNum!=null)?allJodalChasuNum:0L;
-        return new JodalPlanJodalChsuDTO(jodalPlanDTO, allNum);
-    }
 
 }

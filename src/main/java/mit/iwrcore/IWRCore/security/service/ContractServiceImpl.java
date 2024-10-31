@@ -76,10 +76,11 @@ public class ContractServiceImpl implements ContractService {
 
 
     @Override
-    public void createContract(ContractDTO contractDTO) {
+    public ContractDTO saveContract(ContractDTO contractDTO, List<FileContract> fileList) {
         Contract contract = convertToEntity(contractDTO);
+        contract.setFiles(fileList);
         Contract savedContract = contractRepository.save(contract);
-
+        return convertToDTO(savedContract);
     }
 
     @Override

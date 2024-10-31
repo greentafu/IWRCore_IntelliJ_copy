@@ -23,11 +23,11 @@ public class MaterialServiceImpl implements MaterialService {
     private final BoxService boxService;
 
     @Override
-    public Long saveMaterial(MaterialDTO dto, List<FileMaterial> fileList) {
+    public MaterialDTO saveMaterial(MaterialDTO dto, List<FileMaterial> fileList) {
         Material material = materdtoToEntity(dto);
         material.setFiles(fileList);
         Material saved=materialRepository.save(material);
-        return saved.getMaterCode();
+        return materTodto(saved);
     }
     @Override
     public void deleteMaterial(Long materCode) {

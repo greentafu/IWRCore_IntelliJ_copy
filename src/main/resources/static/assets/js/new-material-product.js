@@ -84,11 +84,10 @@ function loadItems() {
 
                 firstTbody.appendChild(newRow);
             });
-          }
-        });
-
-        page++;
-    }
+        }
+    });
+    page++;
+}
 
 // 하단에 자재목록 추가
 function addToLowerTable(){
@@ -349,7 +348,7 @@ function saveMaterial(whatButton){
                 if(sel==1) window.location.href = '/material/list_material';
                 if(sel==2) {
                     renewTable();
-                    $('#exLargeModal').modal('hide')
+                    $('#exLargeModal').modal('hide');
                     document.getElementById('materialName').value='';
                     document.getElementById('uploadFiles1').value='';
                     document.getElementById('selectMaterL').value='';

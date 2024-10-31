@@ -1,6 +1,8 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import mit.iwrcore.IWRCore.entity.Contract;
+import mit.iwrcore.IWRCore.entity.FileContract;
+import mit.iwrcore.IWRCore.entity.FileMaterial;
 import mit.iwrcore.IWRCore.security.dto.ContractDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
@@ -20,7 +22,7 @@ public interface ContractService {
     ContractDTO convertToDTO(Contract entity);
 
     // 계약 생성
-    void createContract(ContractDTO contractDTO);
+    ContractDTO saveContract(ContractDTO contractDTO, List<FileContract> fileList);
 
     // 계약 ID로 조회
     ContractDTO getContractById(Long id);

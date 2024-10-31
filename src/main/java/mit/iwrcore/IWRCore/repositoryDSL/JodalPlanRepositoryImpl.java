@@ -1,11 +1,13 @@
 package mit.iwrcore.IWRCore.repositoryDSL;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class JodalPlanRepositoryImpl implements JodalPlanRepositoryCustom {
     private final JPAQueryFactory queryFactory;
@@ -102,5 +105,75 @@ public class JodalPlanRepositoryImpl implements JodalPlanRepositoryCustom {
                 .fetchCount();
 
         return new PageImpl<>(jodalPlanList, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public Page<Object[]> noneContractJodalPlan(PageRequestDTO2 requestDTO2){
+        QJodalPlan qJodalPlan=QJodalPlan.jodalPlan;
+        QJodalChasu qJodalChasu=QJodalChasu.jodalChasu;
+        QContract qContract=QContract.contract;
+
+        QMaterial qMaterial=QMaterial.material;
+        QMaterL qMaterL=QMaterL.materL;
+        QMaterM qMaterM=QMaterM.materM;
+        QMaterS qMaterS=QMaterS.materS;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO2.getMaterL2() != null) { builder.and(qMaterS.materM.materL.materLcode.eq(requestDTO2.getMaterL2())); }
+        if (requestDTO2.getMaterM2() != null) { builder.and(qMaterS.materM.materMcode.eq(requestDTO2.getMaterM2())); }
+        if (requestDTO2.getMaterS2() != null) { builder.and(qMaterS.materScode.eq(requestDTO2.getMaterS2())); }
+        if (requestDTO2.getMaterialSearch2()!=null){
+            builder.and(qMaterial.name.containsIgnoreCase(requestDTO2.getMaterialSearch2())
+                    .or(qMaterial.standard.containsIgnoreCase(requestDTO2.getMaterialSearch2()))
+                    .or(qMaterial.unit.containsIgnoreCase(requestDTO2.getMaterialSearch2())));
+        }
+
+        if (requestDTO2.getJodalPlans()!=null) { builder.and(qJodalPlan.joNo.notIn(requestDTO2.getJodalPlans())); }
+
+        BooleanBuilder havingBuilder=new BooleanBuilder();
+        havingBuilder.and(qContract.count().eq(0L));
+
+        Pageable pageable= PageRequest.of(requestDTO2.getPage2()-1, requestDTO2.getSize2());
+        List<Tuple> tupleList = queryFactory
+                .select(qJodalPlan, qJodalChasu.joNum.sum())
+                .from(qJodalPlan)
+                .leftJoin(qJodalPlan.jodalChasus, qJodalChasu)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qContract).on(qContract.jodalPlan.eq(qJodalPlan))
+                .where(builder)
+                .groupBy(qJodalPlan.joNo)
+                .having(havingBuilder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qJodalPlan.joNo.desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(qJodalPlan, qJodalChasu.joNum.sum())
+                .from(qJodalPlan)
+                .leftJoin(qJodalPlan.jodalChasus, qJodalChasu)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qContract).on(qContract.jodalPlan.eq(qJodalPlan))
+                .where(builder)
+                .groupBy(qJodalPlan.joNo)
+                .having(havingBuilder)
+                .fetchCount();
+
+        List<Object[]> objectList = tupleList.stream()
+                .map(tuple -> new Object[]{
+                        tuple.get(qJodalPlan),
+                        tuple.get(qJodalChasu.joNum.sum())
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(objectList, pageable, total);
     }
 }
