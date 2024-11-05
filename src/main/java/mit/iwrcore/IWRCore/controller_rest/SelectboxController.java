@@ -3,6 +3,7 @@ package mit.iwrcore.IWRCore.controller_rest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.JodalPlan;
+import mit.iwrcore.IWRCore.entity.Location;
 import mit.iwrcore.IWRCore.entity.Material;
 import mit.iwrcore.IWRCore.entity.Partner;
 import mit.iwrcore.IWRCore.security.dto.*;
@@ -25,6 +26,7 @@ import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuJodalChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.JodalPlanJodalChsuDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.NewOrderDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.StockDetailDTO;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +51,7 @@ public class SelectboxController {
     private final ProplanService proplanService;
     private final GumsuChasuService gumsuChasuService;
     private final ContractService contractService;
+    private final LocationService locationService;
 
     @GetMapping("/getPart")
     public PartCodeListDTO getPart(){
@@ -284,5 +287,36 @@ public class SelectboxController {
     @PostMapping("/getOnePartner")
     public PartnerDTO getOnePartner(@RequestParam(required = false) Long pno){
         return partnerService.findPartnerDto(pno, null, null);
+    }
+
+
+    // 발주서> 발주 가능한 협력회사 목록 가져오기
+    @PostMapping("/getBaljuPartner")
+    public PageResultDTO<PartnerDTO, Partner> getBaljuPartner(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) Long selectPartL, @RequestParam(required = false) Long selectPartM,
+            @RequestParam(required = false) Long selectPartS, @RequestParam(required = false) String partnerSearch){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .partL(selectPartL).partM(selectPartM).partS(selectPartS).partnerSearch(partnerSearch)
+                .build();
+        return partnerService.getBaljuPartner(requestDTO);
+    }
+    // 발주서> 회사에 알맞은 발주하지 않은 계약 목록
+    @PostMapping("/getNonBaljuContract")
+    public List<NewOrderDTO> getNonBaljuContract(@RequestParam(required = false) Long pno){
+        List<NewOrderDTO> result=null;
+        if(pno!=null) result=contractService.newOrderContract(pno);
+        return result;
+    }
+    // 발주서> 배송지 목록
+    @PostMapping("/getLocation")
+    public PageResultDTO<LocationDTO, Location> getLocation(
+            @RequestParam(required = false) int page2, @RequestParam(required = false) String word){
+        PageRequestDTO2 requestDTO2=PageRequestDTO2.builder()
+                .page2(page2).size2(15)
+                .loc((word!="")?word:null)
+                .build();
+        return locationService.getLocationList(requestDTO2);
     }
 }

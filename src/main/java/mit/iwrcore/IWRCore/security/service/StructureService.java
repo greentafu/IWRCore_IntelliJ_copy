@@ -9,15 +9,19 @@ import mit.iwrcore.IWRCore.security.dto.StructureDTO;
 
 import java.util.List;
 public interface StructureService {
+    // 저장, 삭제
+    void saveStructure(StructureDTO dto);
+    void deleteStructure(Long id);
+    // 변환
+    Structure dtoToEntity(StructureDTO dto);
+    StructureDTO entityToDto(Structure entity);
 
-    void save(StructureDTO dto);
-    Structure update(StructureDTO structureDTO);
-    void deleteById(Long id);
+    // 조회
+    StructureDTO getStructure(Long sno);
     List<StructureDTO> findByProduct_ManuCode(Long manuCode);
-    StructureDTO findById(Long sno);
 
-    Structure structureDtoToEntity(StructureDTO dto);
-    StructureDTO structureTodto(Structure entity);
+
+
 
 }
 

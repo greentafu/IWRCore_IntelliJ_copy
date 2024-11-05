@@ -23,11 +23,11 @@ public class DevelopmentController {
     public void input_dev(){}
     @GetMapping("/modify_dev")
     public void modify_dev(@RequestParam Long manuCode, Model model){
-        model.addAttribute("product", productService.getProductById(manuCode));
+        model.addAttribute("product", productService.getProduct(manuCode));
     }
     @GetMapping("/detail_dev")
     public void detail_dev(@RequestParam Long manuCode, Model model){
-        model.addAttribute("product", productService.getProductById(manuCode));
+        model.addAttribute("product", productService.getProduct(manuCode));
         model.addAttribute("pFiles", fileService.getProductFileList(manuCode));
         model.addAttribute("structures", structureService.findByProduct_ManuCode(manuCode));
     }

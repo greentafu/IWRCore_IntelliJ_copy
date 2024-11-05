@@ -443,6 +443,7 @@
               const materialNameTd = document.createElement("td");
               materialNameTd.id='materialName'+joNo;
               materialNameTd.textContent = materialName;
+              materialNameTd.innerHTML=`<a href="/jodal/jodal?joNo=${joNo}">${materialName}</a>`;
               newRow.appendChild(materialNameTd);
 
               const numTd = document.createElement("td");
@@ -484,7 +485,7 @@
               }
               if(contractDTO!=null) {
                 btn2Td.innerHTML=`
-                  <a href="/contract/download_contract?conNo=${contractDTO.conNo}">
+                  <a href="/contract/contract?conNo=${contractDTO.conNo}">
                     <button type="button" class="btn btn-secondary">계약서 보기</button>
                   </a>
                 `;

@@ -26,20 +26,20 @@ public class MaterialController {
 
     @GetMapping("/list_material")
     public void list_material(Model model) {
-        model.addAttribute("box_list", boxService.list());
+        model.addAttribute("box_list", boxService.getAllBoxlist());
     }
     @GetMapping("/new_material")
     public void new_material(Model model) {
-        model.addAttribute("boxList", boxService.list());
+        model.addAttribute("boxList", boxService.getAllBoxlist());
     }
     @GetMapping("/modify_material")
     public void modify_material(@RequestParam Long materCode, Model model) {
-        model.addAttribute("material", materialService.findM(materCode));
-        model.addAttribute("boxList", boxService.list());
+        model.addAttribute("material", materialService.getMaterial(materCode));
+        model.addAttribute("boxList", boxService.getAllBoxlist());
     }
     @GetMapping("/material")
     public void material(@RequestParam Long materCode, Model model) {
-        model.addAttribute("material", materialService.findM(materCode));
+        model.addAttribute("material", materialService.getMaterial(materCode));
     }
 }
 

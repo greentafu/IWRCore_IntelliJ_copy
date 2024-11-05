@@ -12,35 +12,40 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Log4j2
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class BoxServiceImpl implements BoxService {
     private final BoxRepository boxRepository;
 
+    // 저장, 삭제
+
+    // 변환
+    @Override
+    public Box dtoToEntity(BoxDTO dto){
+        Box box=null;
+        if(dto!=null) box= Box.builder()
+                .boxCode(dto.getBoxcode())
+                .boxName(dto.getBoxname()).build();
+        return box;
+    }
+    @Override
+    public BoxDTO entityToDto(Box entity){
+        BoxDTO boxDTO=null;
+        if(entity!=null) boxDTO=BoxDTO.builder()
+                .boxcode(entity.getBoxCode())
+                .boxname(entity.getBoxName()).build();
+        return boxDTO;
+    }
+
+    // 조회
     @Override
     public BoxDTO getBox(Long boxId){
-        return entityTodto(boxRepository.getReferenceById(boxId));
+        return entityToDto(boxRepository.getReferenceById(boxId));
     }
-//    public BoxServiceImpl(BoxRepository boxRepository) {
-//        this.boxRepository = boxRepository;
-//    }
-
     @Override
-    public List<BoxDTO> list() {
+    public List<BoxDTO> getAllBoxlist() {
         List<Box> boxes = boxRepository.findAll();
-        return boxes.stream()
-                .map(this::boxTodto)
-                .collect(Collectors.toList());
-    }
-
-    private BoxDTO entityTodto(Box box){
-        return BoxDTO.builder().boxname(box.getBoxName()).boxcode(box.getBoxCode()).build();
+        return boxes.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 }
-
-
-
-
-
-

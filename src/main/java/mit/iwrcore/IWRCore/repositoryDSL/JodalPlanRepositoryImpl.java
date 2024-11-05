@@ -134,6 +134,7 @@ public class JodalPlanRepositoryImpl implements JodalPlanRepositoryCustom {
 
         BooleanBuilder havingBuilder=new BooleanBuilder();
         havingBuilder.and(qContract.count().eq(0L));
+        havingBuilder.and(qJodalChasu.count().ne(0L));
 
         Pageable pageable= PageRequest.of(requestDTO2.getPage2()-1, requestDTO2.getSize2());
         List<Tuple> tupleList = queryFactory

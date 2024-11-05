@@ -49,8 +49,8 @@ public class FileService {
     // 파일 저장
     public void saveFile(Long code, AttachFileDTO attachFileDTO, String where){
         if(where.equals("m")){
-            MaterialDTO materialDTO=materialService.findM(code);
-            Material material=materialService.materdtoToEntity(materialDTO);
+            MaterialDTO materialDTO=materialService.getMaterial(code);
+            Material material=materialService.dtoToEntity(materialDTO);
             FileMaterial fileMaterial=FileMaterial.builder()
                     .uuid(attachFileDTO.getUuid())
                     .fileName(attachFileDTO.getFileName())
@@ -60,8 +60,8 @@ public class FileService {
                     .material(material).build();
             fileMaterialRepository.save(fileMaterial);
         }else if(where.equals("p")){
-            ProductDTO productDTO=productService.getProductById(code);
-            Product product=productService.productDtoToEntity(productDTO);
+            ProductDTO productDTO=productService.getProduct(code);
+            Product product=productService.dtoToEntity(productDTO);
             FileProduct fileProduct=FileProduct.builder()
                     .uuid(attachFileDTO.getUuid())
                     .fileName(attachFileDTO.getFileName())
@@ -71,7 +71,7 @@ public class FileService {
                     .product(product).build();
             fileProductRepository.save(fileProduct);
         }else if(where.equals("pp")){
-            ProplanDTO proplanDTO=proplanService.findById(code);
+            ProplanDTO proplanDTO=proplanService.getProPlan(code);
             ProPlan proPlan=proplanService.dtoToEntity(proplanDTO);
             FileProPlan fileProPlan=FileProPlan.builder()
                     .uuid(attachFileDTO.getUuid())
@@ -248,14 +248,14 @@ public class FileService {
         FileMaterial fileMaterial=FileMaterial.builder()
                 .uuid(dto.getUuid()).fileName(dto.getFileName()).uploadPath(dto.getUploadPath())
                 .contentType(dto.getContentType()).imgType(dto.getImgType())
-                .material(materialService.materdtoToEntity(dto.getMaterialDTO())).build();
+                .material(materialService.dtoToEntity(dto.getMaterialDTO())).build();
         return fileMaterial;
     }
     public FileMaterialDTO mFile_eTd(FileMaterial entity){
         FileMaterialDTO fileMaterialDTO= FileMaterialDTO.builder()
                 .uuid(entity.getUuid()).fileName(entity.getFileName()).uploadPath(entity.getUploadPath())
                 .contentType(entity.getContentType()).imgType(entity.getImgType())
-                .materialDTO(materialService.materTodto(entity.getMaterial())).build();
+                .materialDTO(materialService.entityToDto(entity.getMaterial())).build();
         return fileMaterialDTO;
     }
 
@@ -264,14 +264,14 @@ public class FileService {
         FileProduct fileProduct=FileProduct.builder()
                 .uuid(dto.getUuid()).fileName(dto.getFileName()).uploadPath(dto.getUploadPath())
                 .contentType(dto.getContentType()).imgType(dto.getImgType())
-                .product(productService.productDtoToEntity(dto.getProductDTO())).build();
+                .product(productService.dtoToEntity(dto.getProductDTO())).build();
         return fileProduct;
     }
     public FileProductDTO pFile_eTd(FileProduct entity){
         FileProductDTO fileProductDTO=FileProductDTO.builder()
                 .uuid(entity.getUuid()).fileName(entity.getFileName()).uploadPath(entity.getUploadPath())
                 .contentType(entity.getContentType()).imgType(entity.getImgType())
-                .productDTO(productService.productEntityToDto(entity.getProduct())).build();
+                .productDTO(productService.entityToDto(entity.getProduct())).build();
         return fileProductDTO;
     }
     // 생산계획 파일 entity-dto 변환

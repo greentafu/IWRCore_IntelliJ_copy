@@ -25,15 +25,15 @@ public class ProductionController {
     public void new_manufacture() {}
     @GetMapping("/check_manufacture")
     public void check_manufacture(@RequestParam Long manuCode, Model model) {
-        model.addAttribute("product", productService.getProductById(manuCode));
+        model.addAttribute("product", productService.getProduct(manuCode));
     }
     @GetMapping("/modify_manufacture")
     public void modify_manufacture(@RequestParam Long manuCode, Model model) {
-        model.addAttribute("product", productService.getProductById(manuCode));
+        model.addAttribute("product", productService.getProduct(manuCode));
     }
     @GetMapping("/manufacture")
     public void manufacture(@RequestParam Long manuCode, Model model) {
-        model.addAttribute("product", productService.getProductById(manuCode));
+        model.addAttribute("product", productService.getProduct(manuCode));
         model.addAttribute("pFiles", fileService.getProductFileList(manuCode));
         model.addAttribute("structures", structureService.findByProduct_ManuCode(manuCode));
     }

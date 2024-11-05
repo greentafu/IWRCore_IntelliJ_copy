@@ -63,6 +63,21 @@ public class PartnerServiceImpl implements PartnerService{
 
         return pageResultDTO;
     }
+    // 계약서> 소속회사 외 협력회사 모두 보기
+    @Override
+    public PageResultDTO<PartnerDTO, Partner> getBaljuPartner(PageRequestDTO requestDTO) {
+        Page<Partner> partnerList=partnerRepository.getBaljuPartner(requestDTO);
+
+        Function<Partner, PartnerDTO> fn=(entity->partnerTodto(entity));
+        PageResultDTO pageResultDTO=new PageResultDTO<>(partnerList, fn);
+
+        pageResultDTO.setPartL(requestDTO.getPartL());
+        pageResultDTO.setPartM(requestDTO.getPartM());
+        pageResultDTO.setPartS(requestDTO.getPartS());
+        pageResultDTO.setPartnerSearch(requestDTO.getPartnerSearch());
+
+        return pageResultDTO;
+    }
 
 
 

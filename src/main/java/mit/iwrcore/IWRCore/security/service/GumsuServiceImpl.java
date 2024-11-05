@@ -33,7 +33,7 @@ public class GumsuServiceImpl implements GumsuService{
                 .make(dto.getMake())
                 .who(dto.getWho())
                 .writer(memberService.memberdtoToEntity(dto.getMemberDTO())) // MemberDTO를 Member로 변환
-                .balju(baljuService.convertToEntity(dto.getBaljuDTO()))   // BaljuDTO를 Balju로 변환
+                .balju(baljuService.dtoToEntity(dto.getBaljuDTO()))   // BaljuDTO를 Balju로 변환
                 .build();
     }
 
@@ -44,7 +44,7 @@ public class GumsuServiceImpl implements GumsuService{
                     .gumsuNo(entity.getGumsuNo())
                     .make(entity.getMake())
                     .who(entity.getWho())
-                    .baljuDTO(baljuService.convertToDTO(entity.getBalju())) // Balju를 BaljuDTO로 변환
+                    .baljuDTO(baljuService.entityToDTO(entity.getBalju())) // Balju를 BaljuDTO로 변환
                     .memberDTO(memberService.memberTodto(entity.getWriter())) // Member를 MemberDTO로 변환
                     .build();
         }
@@ -104,7 +104,7 @@ public class GumsuServiceImpl implements GumsuService{
     private BaljuGumsuDTO BaljuGumsuToDTO(Object[] objects){
         Balju balju=(Balju) objects[0];
         Gumsu gumsu=(Gumsu) objects[1];
-        BaljuDTO baljuDTO=(balju!=null)? baljuService.convertToDTO(balju):null;
+        BaljuDTO baljuDTO=(balju!=null)? baljuService.entityToDTO(balju):null;
         GumsuDTO gumsuDTO=(gumsu!=null)? convertToDTO(gumsu):null;
         return new BaljuGumsuDTO(baljuDTO, gumsuDTO);
     }
@@ -126,7 +126,7 @@ public class GumsuServiceImpl implements GumsuService{
     private BaljuJodalChasuDTO baljuJodalChasuToDTO(Object[] objects){
         Balju balju=(Balju) objects[0];
         JodalChasu jodalChasu=(JodalChasu) objects[1];
-        BaljuDTO baljuDTO=(balju!=null)?baljuService.convertToDTO(balju):null;
+        BaljuDTO baljuDTO=(balju!=null)?baljuService.entityToDTO(balju):null;
         JodalChasuDTO jodalChasuDTO=(jodalChasu!=null)?jodalChasuService.convertToDTO(jodalChasu):null;
         return new BaljuJodalChasuDTO(baljuDTO, jodalChasuDTO);
     }

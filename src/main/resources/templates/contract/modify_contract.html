@@ -177,7 +177,7 @@
     <!--/Modal-->
     <!--Script-->
     <script src="../assets/js/file.js"></script>
-    <script src="../assets/js/new-contract.js"></script>
+    <script src="../assets/js/new-contract-order-invoice.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const conNo=document.getElementById('selectedconNo').innerText;
@@ -186,7 +186,7 @@
         const date=dateString.split('T')[0];
 
         document.getElementById('inputDate'+joNo).value=date;
-        initProPlanFile(conNo);
+        initContractFile(conNo);
 
         content1.addEventListener("scroll", function () {
             if(finPage==false){

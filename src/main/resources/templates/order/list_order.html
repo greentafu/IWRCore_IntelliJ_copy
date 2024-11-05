@@ -150,9 +150,9 @@
                   <tr>
                     <th></th>
                     <th>협력업체명</th>
-                    <th>계약서 파일명</th>
                     <th>자재명</th>
                     <th>수량</th>
+                    <th>단가</th>
                     <th>등록일</th>
                     <th>발주하기</th>
                   </tr>
@@ -288,10 +288,10 @@
                   <tr>
                     <th></th>
                     <th>협력업체명</th>
-                    <th>발주서 파일명</th>
                     <th>자재명</th>
-                    <th>수량</th>
-                    <th>다운로드</th>
+                    <th>발주수량/계약수량</th>
+                    <th>배송지</th>
+                    <th>최초발주 예정일</th>
                     <th>수정/삭제</th>
                   </tr>
                 </thead>
@@ -452,14 +452,14 @@
             data.dtoList.forEach(x=>{
               const conNo=x.contractDTO.conNo;
               const partnerName=x.contractDTO.partnerDTO.name;
-              const fileName=x.contractDTO.filename;
               const materialName=x.contractDTO.jodalPlanDTO.materialDTO.name;
-              const pronum=x.contractDTO.jodalPlanDTO.proplanDTO.pronum;
+              const conNum=x.contractDTO.conNum;
+              const money=x.contractDTO.money;
               const regDate=x.contractDTO.regDate.split('T')[0];
 
               const newRow = document.createElement("tr");
 
-              [conNo, partnerName, fileName, materialName, pronum, regDate].forEach(text => {
+              [conNo, partnerName,materialName, conNum, money, regDate].forEach(text => {
                 const item = document.createElement("td");
                 item.textContent = text;
                 newRow.appendChild(item);
@@ -497,13 +497,16 @@
             data.dtoList.forEach(x=>{
               const baljuNo=x.baljuDTO.baljuNo;
               const partnerName=x.contractDTO.partnerDTO.name;
-              const fileName=x.baljuDTO.filename;
               const materialName=x.contractDTO.jodalPlanDTO.materialDTO.name;
               const baljuNum=x.baljuDTO.baljuNum;
+              const conNum=x.contractDTO.conNum;
+              const count=baljuNum+'/'+conNum;
+              const baljuWhere=x.baljuDTO.baljuWhere;
+              const baljuDate=x.baljuDTO.baljuDate.split('T')[0];
 
               const newRow = document.createElement("tr");
 
-              [baljuNo, partnerName, fileName].forEach(text => {
+              [baljuNo, partnerName].forEach(text => {
                 const item = document.createElement("td");
                 item.textContent = text;
                 newRow.appendChild(item);
@@ -511,25 +514,23 @@
 
               const materialNameTd = document.createElement("td");
               materialNameTd.id='materialName'+baljuNo;
-              materialNameTd.textContent = materialName;
+              materialNameTd.innerHTML=`<a href="/order/order?baljuNo=${baljuNo}">${materialName}</a>`;
               newRow.appendChild(materialNameTd);
 
               const baljuNumTd = document.createElement("td");
               baljuNumTd.id='baljuNum'+baljuNo;
-              baljuNumTd.textContent = baljuNum;
+              baljuNumTd.textContent = count;
               newRow.appendChild(baljuNumTd);
 
-              const btn0Td = document.createElement("td");
-              btn0Td.innerHTML=`
-                <button type="button" class="btn btn-sm btn-outline-primary">
-                  <span class="bx bx-arrow-to-bottom"></span>
-                </button>
-              `;
-              newRow.appendChild(btn0Td);
+              [baljuWhere, baljuDate].forEach(text => {
+                const item = document.createElement("td");
+                item.textContent = text;
+                newRow.appendChild(item);
+              });
 
               const btn1Td = document.createElement("td");
               btn1Td.innerHTML=`
-                <a href="/order/modify_order2?baljuNo=${baljuNo}">
+                <a href="/order/modify_order?baljuNo=${baljuNo}">
                   <button class="btn btn-primary">수정</button>
                 </a>
                 <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${baljuNo}" onclick="deleteBtn(this)">삭제</button>
@@ -586,7 +587,7 @@
       function deleteBalju(button){
         var baljuNo=button.value;
         $.ajax({
-          url:'/order/delete_order',
+          url:'/deleteBalju',
           method:'POST',
           data:{baljuNo:baljuNo},
           success:function(response){

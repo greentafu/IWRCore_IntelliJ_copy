@@ -81,7 +81,7 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .bGo(dto.getBGo())
                 .writer(dto.getMemberDTO()!=null ? memberService.memberdtoToEntity(dto.getMemberDTO()) : null)
                 .invoice(dto.getInvoiceDTO() != null ? invoiceService.convertToEntity(dto.getInvoiceDTO()) : null)
-                .balju(dto.getBaljuDTO() != null ? baljuService.convertToEntity(dto.getBaljuDTO()) : null)
+                .balju(dto.getBaljuDTO() != null ? baljuService.dtoToEntity(dto.getBaljuDTO()) : null)
                 .build();
     }
 
@@ -97,7 +97,7 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .regDate(entity.getRegDate())
                 .bGo(entity.getBGo())
                 .invoiceDTO(entity.getInvoice() != null ? invoiceService.convertToDTO(entity.getInvoice()) : null)
-                .baljuDTO(entity.getBalju() != null ? baljuService.convertToDTO(entity.getBalju()) : null)
+                .baljuDTO(entity.getBalju() != null ? baljuService.entityToDTO(entity.getBalju()) : null)
                 .memberDTO(entity.getWriter()!=null ? memberService.memberTodto(entity.getWriter()) : null)
                 .build();
     }
@@ -136,7 +136,7 @@ public class ShipmentServiceImpl implements ShipmentService {
             existingShipment.setInvoice(null);
         }
         if (shipmentDTO.getBaljuDTO() != null) {
-            existingShipment.setBalju(baljuService.convertToEntity(shipmentDTO.getBaljuDTO()));
+            existingShipment.setBalju(baljuService.dtoToEntity(shipmentDTO.getBaljuDTO()));
         } else {
             existingShipment.setBalju(null);
         }

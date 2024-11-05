@@ -20,10 +20,10 @@ public class Balju extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long baljuNo;       // 발주서 번호
     private Long baljuNum;
+    private LocalDateTime baljuDate;
     @NotNull
     private String baljuWhere; // 배송장소
     private String baljuPlz;  // 요청사항
-    private String filename; // 파일
     @NotNull
     private Long finCheck;
 
@@ -45,4 +45,7 @@ public class Balju extends BaseEntity {
     @JoinColumn(name = "contract_id")  // 외래 키 컬럼 이름
     @NotNull
     private Contract contract;  // 연관된 Contract 엔티티
+
+    @OneToMany(mappedBy = "balju", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BaljuChasu> baljuChasus;
 }

@@ -29,32 +29,7 @@ public class BoxServiceTests {
 
     @Autowired
     private ProductService productService;
-    @Test
-    @Transactional
-    @Commit
-    public void test(){
-        ProductDTO productDTO=productService.getProductById(1L);
-        System.out.println("###"+productDTO);
-        System.out.println("@@@"+productService.productDtoToEntity(productDTO));
-    }
 
 
-    @Test
-    public void testList() {
-        // 테스트 데이터를 데이터베이스에 저장
-        Box box1 = Box.builder().boxCode(1L).boxName("A창고").build();
-        Box box2 = Box.builder().boxCode(2L).boxName("B창고").build();
-        Box box3 = Box.builder().boxCode(3L).boxName("C창고").build();
-        boxRepository.save(box1);
-        boxRepository.save(box2);
-        boxRepository.save(box3);
-    }
-
-    @Test
-    @Transactional
-    @Commit
-    public void listbox(){
-        System.out.println("############"+boxService.list());
-    }
 
 }

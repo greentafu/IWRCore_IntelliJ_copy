@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html
+        lang="ko" xmlns:th="http://www.thymeleaf.org"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        data-assets-path="../assets/"
+        data-template="vertical-menu-template-free"
+>
+<th:block th:replace="~{layout/mainlayout::all(~{this::#head} ,~{this::#content})}">
+
+  <span id="head">
+    <title>신규 등록</title>
+    <!--Style-->
+    <style>
+      #content2 {
+        height: 250px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
+  </span>
+
+  <span id="content">
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">발주서 /</span> 발주서 수정</h4>
+      <div class="fullscreen-background">
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5>공급자 정보</h5>
+            <label class="form-label">협력업체명</label>
+            <div class="row">
+              <div class="col-md-6">
+                <input class="form-control" type="text" id="partnerName" th:value="${partner.name}" readonly/>
+              </div>
+            </div>
+            <input class="form-control" type="number" id="partnerNo" style="display:none;" th:value="${partner.pno}"/>
+          </div>
+          <hr class="m-0">
+          <div class="card-body">
+            <div>
+              <label class="col-form-label"><h5>발주 요청 가능 목록</h5></label>
+              <div class="row mb-2">
+                <div class="col-md-2">
+                  <button type="button" class="btn btn-outline-primary" style="width: fit-content;" onclick="autoBtn(4)">
+                    수량 자동입력
+                  </button>&nbsp;
+                </div>
+                <div class="col-md-10">
+                  <div class="row">
+                    <input id="baseDate" type="date" class="form-control col-md-2" placeholder="발주 시작일" style=" width: 200px;">&nbsp;
+                    <span style="width: fit-content;" class="col-md-1">일 기준</span>
+                    <input id="days-input" type="number" class="form-control col-md-2" placeholder="각 항목 간격 (일)" style="width: 200px;" value="15">&nbsp;
+                    <button type="button" class="btn btn-outline-primary col-md-2" style="width: fit-content;" onclick="autoBtn(2)">
+                      발주일 일괄 등록
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-4">
+                <div class="col-md-2">
+                  <input type="number" style="display:none;" value="0" id="checkAllBtn">
+                  <button type="button" class="btn btn-outline-primary" onclick="selectAll()">
+                    모두선택
+                  </button>
+                </div>
+                <div class="col-md-10">
+                  <div class="row">
+                    <button
+                            type="button"
+                            class="btn btn-outline-primary col-md-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalScrollable2"
+                            style=" width: 200px;"
+                    >
+                      배송장소 선택
+                    </button>
+                    <span class="col-md-1"></span>
+                    <input id="loc-input" type="text" class="form-control col-md-2"
+                           placeholder="배송장소" style="width: 200px;">&nbsp;
+                    <button id="bulk-date-button" type="button" class="btn btn-outline-primary col-md-2"
+                            style="width: fit-content;" onclick="autoBtn(3)">
+                      배송장소 일괄 등록
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="setTable">
+              <table class="table table-bordered mb-4" th:each="list:${baljuList}" th:id="'autoTable'+${list.contractDTO.conNo}">
+                <tr>
+                  <th rowspan="6" style="width: 10px;" class="text-center" th:id="'check'+${list.contractDTO.conNo}">
+                    <input type="checkbox" class="form-check-input" th:id="'btn'+${list.contractDTO.conNo}">
+                    <input type="number" style="display:none;" th:value="${list.contractDTO.conNum}" th:id="'contractSum'+${list.contractDTO.conNo}">
+                    <input type="number" style="display:none;" th:value="${list.baljuDTO.baljuNo}" th:id="'baljuNo'+${list.contractDTO.conNo}">
+                  </th>
+                  <th style="width: 200px;" >자재번호</th>
+                  <th>자재명</th>
+                  <th style="width: 80px;" ></th>
+                  <th style="width: 150px;" th:id="'sumCount'+${list.contractDTO.conNo}">
+                    수량
+                    <span th:if="${list.remainder>0}">(+[[${list.remainder}]])</span>
+                    <span th:if="${list.remainder<=0}">([[${list.remainder}]])</span>
+                  </th>
+                  <th>요청일</th>
+                </tr>
+                <tr>
+                  <td rowspan="3">[[${list.contractDTO.jodalPlanDTO.materialDTO.materCode}]]</td>
+                  <td rowspan="3">[[${list.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
+                  <td>1차</td>
+                  <td>
+                    <input type="number" style="border: 0; width: 100%;"
+                           th:value="${list.baljuChasuDTOs[0].balNum}"
+                           th:id="'oneNum'+${list.contractDTO.conNo}"
+                           th:styleappend="${list.remainder<0?'color:red':'color:black'}">
+                  <td>
+                  <input type="date" style="border: 0; width: 100%;"
+                         th:value="${#temporals.format(list.baljuChasuDTOs[0].balDate, 'yyyy-MM-dd')}"
+                         th:id="'oneDate'+${list.contractDTO.conNo}">
+                </td>
+                </tr>
+                <tr>
+                  <td>2차</td>
+                  <td>
+                    <input type="number" style="border: 0; width: 100%;"
+                           th:value="${list.baljuChasuDTOs[1].balNum}"
+                           th:id="'twoNum'+${list.contractDTO.conNo}"
+                           th:styleappend="${list.remainder<0?'color:red':'color:black'}">
+                  </td>
+                  <td>
+                    <input type="date" style="border: 0; width: 100%;"
+                           th:value="${#temporals.format(list.baljuChasuDTOs[1].balDate, 'yyyy-MM-dd')}"
+                           th:id="'twoDate'+${list.contractDTO.conNo}">
+                  </td>
+                </tr>
+                <tr>
+                  <td>3차</td>
+                  <td>
+                    <input type="number" style="border: 0; width: 100%;"
+                           th:value="${list.baljuChasuDTOs[2].balNum}"
+                           th:id="'threeNum'+${list.contractDTO.conNo}"
+                           th:styleappend="${list.remainder<0?'color:red':'color:black'}">
+                  </td>
+                  <td>
+                    <input type="date" style="border: 0; width: 100%;"
+                           th:value="${#temporals.format(list.baljuChasuDTOs[2].balDate, 'yyyy-MM-dd')}"
+                           th:id="'threeDate'+${list.contractDTO.conNo}">
+                  </td>
+                </tr>
+                <tr>
+                  <td>배송장소</td>
+                  <td colspan="4">
+                    <input type="text" style="border: 0; width: 100%;" th:id="'location'+${list.contractDTO.conNo}" th:value="${list.baljuDTO.baljuWhere}">
+                  </td>
+                </tr>
+                <tr>
+                  <td>배송 요청 사항</td>
+                  <td colspan="4">
+                    <textarea style="width: 100%; border: 0;" rows="4" th:id="'text'+${list.contractDTO.conNo}">[[${list.baljuDTO.baljuPlz}]]</textarea>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="d-flex justify-content-between w-100">
+              <button type="button" class="btn btn-outline-secondary" th:onclick="|location.href='@{/order/list_order}'|">취소</button>
+              <button class="btn btn-primary" th:onclick="saveBalju()">수정</button>
+            </div>
+          </div>
+          <!--/Card body-->
+        </div>
+        <!--/ Card-->
+      </div>
+    </div>
+
+    <!--Modal-->
+    <div class="modal fade" id="modalScrollable2" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content" style="width: 500px;">
+          <div class="modal-body">
+            <h5 class="modal-title mb-4">배송지</h5>
+            <div class="row mb-2">
+              <label class="form-label col-md-2" style="width: fit-content;">검색</label>
+              <div class="col-md-10">
+                <input type="text" class="form-control" id="searchLocation" style="height: 32px; font-size: 12px;" placeholder="배송지 검색">
+              </div>
+            </div>
+            <div class="row">
+              <label class="form-label col-md-2" style="width: fit-content;">추가</label>
+              <div class="col-md-7">
+                <input type="text" class="form-control" id="addLocation" style="height: 32px; font-size: 12px;" placeholder="새로운 배송지">
+              </div>
+              <div class="col-md-3">
+                <button type="button" class="btn btn-primary" onclick="saveLocation('balju')">
+                  추가
+                </button>
+              </div>
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="modal-body" style="height: 300px;">
+            <div class="table-responsive text-nowrap">
+              <div id="content2">
+                <table class="table table-hover">
+                  <tbody id="secondTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/Modal-->
+
+    <!--Script-->
+    <script src="../assets/js/new-contract-order-invoice.js"></script>
+    <script src="../assets/js/new-jodalplan.js"></script>
+    <script src="../assets/js/etc-crud.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        content2.addEventListener("scroll", function () {
+            if(finPage2==false){
+                const scrollTop = content2.scrollTop;
+                const scrollHeight = content2.scrollHeight;
+                const clientHeight = content2.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    locationList();
+                }
+            }
+        });
+        locationList();
+
+        const container = document.getElementById('setTable');
+        container.addEventListener('input', function(event) {
+            if (event.target.matches('input[id*="Num"]')) {
+                checkSumBaljuNum(event.target);
+            }
+        });
+
+      });
+
+      let timeout;
+      document.getElementById('searchLocation').addEventListener("input", function(){
+        clearTimeout(timeout);
+        timeout = setTimeout(refreshLocation, 100);
+      });
+    </script>
+    <!--Script-->
+
+  </span>
+
+</th:block>
+</html>

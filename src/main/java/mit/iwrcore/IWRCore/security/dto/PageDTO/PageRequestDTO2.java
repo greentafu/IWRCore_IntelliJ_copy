@@ -58,4 +58,6 @@ public class PageRequestDTO2 {
 
     // 계약서등록 중 조달계획들
     private List<Long> jodalPlans;
+    // 배송지
+    private String loc;
 }

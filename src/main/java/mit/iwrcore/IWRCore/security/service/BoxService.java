@@ -7,16 +7,13 @@ import mit.iwrcore.IWRCore.security.dto.BoxDTO;
 import java.util.List;
 
 public interface BoxService {
-    List<BoxDTO> list();
+    // 저장, 삭제
 
+    // 변환
+    Box dtoToEntity(BoxDTO dto);
+    BoxDTO entityToDto(Box entity);
+
+    // 조회
     BoxDTO getBox(Long boxId);
-
-    // dto를 entity로
-    default Box boxdtoToEntity(BoxDTO dto){
-        return Box.builder().boxCode(dto.getBoxcode()).boxName(dto.getBoxname()).build();
-    }
-    // entity를 dto로
-    default BoxDTO boxTodto(Box entity){
-        return BoxDTO.builder().boxcode(entity.getBoxCode()).boxname(entity.getBoxName()).build();
-    }
+    List<BoxDTO> getAllBoxlist();
 }

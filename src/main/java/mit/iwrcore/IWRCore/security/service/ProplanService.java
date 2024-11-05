@@ -1,6 +1,5 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import mit.iwrcore.IWRCore.entity.FileMaterial;
 import mit.iwrcore.IWRCore.entity.FileProPlan;
 import mit.iwrcore.IWRCore.entity.ProPlan;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
@@ -11,17 +10,20 @@ import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanContractNumDTO;
 import java.util.List;
 
 public interface ProplanService {
+    // 저장, 삭제
     ProplanDTO saveProPlan(ProplanDTO dto, List<FileProPlan> fileList);
     void update(ProplanDTO dto);
     void deleteById(Long id);
-    ProplanDTO findById(Long id);
-    PageResultDTO<ProplanDTO, ProPlan> proplanList(PageRequestDTO2 requestDTO);
-    PageResultDTO<ProPlanContractNumDTO, Object[]> proplanList2(PageRequestDTO2 requestDTO);
-//    List<ProplanDTO> findByPlanId(Long planId);
 
+    // 변환
     ProPlan dtoToEntity(ProplanDTO dto);
     ProplanDTO entityToDTO(ProPlan entity);
 
+    // 조회
+    ProplanDTO getProPlan(Long id);
     Long checkProPlan(Long manuCode);
 
+
+    // 생산팀> 모든 생산계획 목록
+    PageResultDTO<ProPlanContractNumDTO, Object[]> getAllProPlans(PageRequestDTO2 requestDTO);
 }

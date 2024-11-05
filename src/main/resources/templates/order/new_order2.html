@@ -12,9 +12,18 @@
 
   <span id="head">
     <title>신규 등록</title>
-      <!--Style-->
-
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 250px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content2 {
+        height: 250px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
     <span id="content">
@@ -23,113 +32,78 @@
       <div class="fullscreen-background">
         <div class="card mb-4">
           <div class="card-body">
+            <h5>공급자 정보</h5>
+            <label class="form-label">협력업체명</label>
+            <div class="row">
+              <div class="col-md-6">
+                <input class="form-control" type="text" id="partnerName" th:value="${partner.name}"/>
+              </div>
+              <div class="col-md-6">
+                <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalScrollable"
+                >공급자 선택
+                </button>
+              </div>
+            </div>
+            <input class="form-control" type="number" id="partnerNo" style="display:none;" th:value="${partner.pno}"/>
+          </div>
+          <hr class="m-0">
+          <div class="card-body">
             <div>
-              <label class="col-form-label mb-4"><h5>발주 요청 가능 목록</h5></label>
+              <label class="col-form-label"><h5>발주 요청 가능 목록</h5></label>
+              <div class="row mb-2">
+                <div class="col-md-2">
+                  <button type="button" class="btn btn-outline-primary" style="width: fit-content;" onclick="autoBtn(4)">
+                    수량 자동입력
+                  </button>&nbsp;
+                </div>
+                <div class="col-md-10">
+                  <div class="row">
+                    <input id="baseDate" type="date" class="form-control col-md-2" placeholder="발주 시작일" style=" width: 200px;">&nbsp;
+                    <span style="width: fit-content;" class="col-md-1">일 기준</span>
+                    <input id="days-input" type="number" class="form-control col-md-2" placeholder="각 항목 간격 (일)" style="width: 200px;" value="15">&nbsp;
+                    <button type="button" class="btn btn-outline-primary col-md-2" style="width: fit-content;" onclick="autoBtn(2)">
+                      발주일 일괄 등록
+                    </button>
+                  </div>
+                </div>
+              </div>
               <div class="row mb-4">
                 <div class="col-md-2">
                   <input type="number" style="display:none;" value="0" id="checkAllBtn">
-                  <button type="button" class="btn btn-outline-primary mb-4" onclick="selectAll()">
+                  <button type="button" class="btn btn-outline-primary" onclick="selectAll()">
                     모두선택
                   </button>
                 </div>
                 <div class="col-md-10">
                   <div class="row">
+                    <button
+                            type="button"
+                            class="btn btn-outline-primary col-md-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalScrollable2"
+                            style=" width: 200px;"
+                    >
+                      배송장소 선택
+                    </button>
+                    <span class="col-md-1"></span>
                     <input id="loc-input" type="text" class="form-control col-md-2"
                            placeholder="배송장소" style="width: 200px;">&nbsp;
                     <button id="bulk-date-button" type="button" class="btn btn-outline-primary col-md-2"
-                            style="width: fit-content;" onclick="fillLocation()">
+                            style="width: fit-content;" onclick="autoBtn(3)">
                       배송장소 일괄 등록
                     </button>
                   </div>
                 </div>
               </div>
-              <table class="table table-bordered mb-4" th:each="list:${contract_list}" th:id="'shipmentTable'+${list.contractDTO.conNo}">
-                <tr>
-                  <th rowspan="6" style="width: 10px;" class="text-center">
-                    <input type="checkbox" class="form-check-input" th:id="'checkBox'+${list.contractDTO.conNo}">
-                    <input type="number" style="display:none;" th:value="${list.contractDTO.conNo}" th:id="'contractNo'+${list.contractDTO.conNo}">
-                  </th>
-                  <th style="width: 200px;" >자재번호</th>
-                  <th>자재명</th>
-                  <th style="width: 80px;" ></th>
-                  <th style="width: 150px;" >수량</th>
-                  <th>요청일</th>
-                </tr>
-                <tr>
-                  <td rowspan="3">[[${list.contractDTO.jodalPlanDTO.materialDTO.materCode}]]</td>
-                  <td rowspan="3">[[${list.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
-                  <td>
-                    1차
-                    <input type="number" style="display:none;"
-                           th:value="${list.jodalChasuDTOs[0].jcnum}"
-                           th:id="'JodlaNo'+${list.jodalChasuDTOs[0].jcnum}"
-                    >
-                  </td>
-                  <td>
-                    <input type="number" style="border: 0; width: 100%;"
-                           th:value="${list.jodalChasuDTOs[0].joNum}"
-                           th:id="'JodlaNum'+${list.jodalChasuDTOs[0].jcnum}">
-                  <td>
-                    <input type="date" style="border: 0; width: 100%;"
-                           th:value="${#temporals.format(list.jodalChasuDTOs[0].joDate, 'yyyy-MM-dd')}"
-                           th:id="'JodlaDate'+${list.jodalChasuDTOs[0].jcnum}">
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    2차
-                    <input type="number" style="display:none;"
-                           th:value="${list.jodalChasuDTOs[1].jcnum}"
-                           th:id="'JodlaNo'+${list.jodalChasuDTOs[1].jcnum}"
-                    >
-                  </td>
-                  <td>
-                    <input type="number" style="border: 0; width: 100%;"
-                           th:value="${list.jodalChasuDTOs[1].joNum}"
-                           th:id="'JodlaNum'+${list.jodalChasuDTOs[1].jcnum}">
-                  </td>
-                  <td>
-                    <input type="date" style="border: 0; width: 100%;"
-                           th:value="${#temporals.format(list.jodalChasuDTOs[1].joDate, 'yyyy-MM-dd')}"
-                           th:id="'JodlaDate'+${list.jodalChasuDTOs[1].jcnum}">
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    3차
-                    <input type="number" style="display:none;"
-                           th:value="${list.jodalChasuDTOs[2].jcnum}"
-                           th:id="'JodlaNo'+${list.jodalChasuDTOs[2].jcnum}"
-                    >
-                  </td>
-                  <td>
-                    <input type="number" style="border: 0; width: 100%;"
-                           th:value="${list.jodalChasuDTOs[2].joNum}"
-                           th:id="'JodlaNum'+${list.jodalChasuDTOs[2].jcnum}">
-                  </td>
-                  <td>
-                    <input type="date" style="border: 0; width: 100%;"
-                           th:value="${#temporals.format(list.jodalChasuDTOs[2].joDate, 'yyyy-MM-dd')}"
-                           th:id="'JodlaDate'+${list.jodalChasuDTOs[2].jcnum}">
-                  </td>
-                </tr>
-                <tr>
-                  <td>배송장소</td>
-                  <td colspan="4">
-                    <input type="text" style="border: 0; width: 100%;" th:id="'location'+${list.contractDTO.conNo}">
-                  </td>
-                </tr>
-                <tr>
-                  <td>배송 요청 사항</td>
-                  <td colspan="4">
-                    <textarea style="width: 100%; border: 0;" rows="4" th:id="'text'+${list.contractDTO.conNo}"></textarea>
-                  </td>
-                </tr>
-              </table>
             </div>
+            <div id="setTable"></div>
             <div class="d-flex justify-content-between w-100">
               <button type="reset" class="btn btn-outline-secondary" th:onclick="|location.href='@{/order/list_order}'|">취소</button>
-              <button class="btn btn-primary" th:onclick="addBalju()">등록</button>
+              <button class="btn btn-primary" th:onclick="saveBalju()">등록</button>
             </div>
           </div>
           <!--/Card body-->
@@ -139,82 +113,148 @@
     </div>
 
     <!--Modal-->
-
+    <!--Modal1-->
+    <div class="modal fade" id="modalScrollable" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <h5 class="modal-title mb-4">공급자 검색</h5>
+            <div class="row mb-10 mb-2">
+              <label class="form-label col-md-2" style="width: fit-content;">협력회사</label>
+              <div class="col-md-10">
+                <div class="row mb-2">
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartL" onchange="updatePartCode('L')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartM" onchange="updatePartCode('M')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartS" onchange="updatePartCode('S')"></select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="partnerSearch" style="height: 32px; font-size: 12px;" value="">
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn()">검색</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="modal-body" style="height: 350px;">
+            <div id="content1">
+              <table class="table table-hover">
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Modal1-->
+    <!--Modal2-->
+    <div class="modal fade" id="modalScrollable2" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content" style="width: 500px;">
+          <div class="modal-body">
+            <h5 class="modal-title mb-4">배송지</h5>
+            <div class="row mb-2">
+              <label class="form-label col-md-2" style="width: fit-content;">검색</label>
+              <div class="col-md-10">
+                <input type="text" class="form-control" id="searchLocation" style="height: 32px; font-size: 12px;" placeholder="배송지 검색">
+              </div>
+            </div>
+            <div class="row">
+              <label class="form-label col-md-2" style="width: fit-content;">추가</label>
+              <div class="col-md-7">
+                <input type="text" class="form-control" id="addLocation" style="height: 32px; font-size: 12px;" placeholder="새로운 배송지">
+              </div>
+              <div class="col-md-3">
+                <button type="button" class="btn btn-primary" onclick="saveLocation('balju')">
+                  추가
+                </button>
+              </div>
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="modal-body" style="height: 300px;">
+            <div class="table-responsive text-nowrap">
+              <div id="content2">
+                <table class="table table-hover">
+                  <tbody id="secondTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/Modal2-->
     <!--/Modal-->
 
     <!--Script-->
+    <script src="../assets/js/new-contract-order-invoice.js"></script>
+    <script src="../assets/js/new-jodalplan.js"></script>
+    <script src="../assets/js/etc-crud.js"></script>
     <script>
-      function selectAll(){
-        var checkAllBtn = document.getElementById('checkAllBtn');
-        var allTable=document.querySelectorAll('[id^="shipmentTable"]');
-        var isChecked = checkAllBtn.value === '1';
-        allTable.forEach(x=> {
-           x.querySelectorAll('input[type="checkbox"]').forEach(box => {
-             box.checked = !isChecked;
-          });
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+            if(finPage==false){
+                const scrollTop = content1.scrollTop;
+                const scrollHeight = content1.scrollHeight;
+                const clientHeight = content1.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    loadItems('balju');
+                }
+            }
         });
-        checkAllBtn.value = isChecked ? '0' : '1';
-      }
+        content2.addEventListener("scroll", function () {
+            if(finPage2==false){
+                const scrollTop = content2.scrollTop;
+                const scrollHeight = content2.scrollHeight;
+                const clientHeight = content2.clientHeight;
 
-      function addBalju(){
-        var allTable=document.querySelectorAll('[id^="shipmentTable"]');
-        var baljuDataList=[];
-
-        allTable.forEach(x=>{
-          var tableId=x.id;
-          var conNo=tableId.substr(13);
-          var boxId='checkBox'+conNo;
-          var box=document.getElementById(boxId);
-
-          if(box.checked==true){
-            var chasuList=[];
-
-            var locationId='location'+conNo;
-            var textId='text'+conNo;
-            var baljuWhere=document.getElementById(locationId).value;
-            var baljuPlz=document.getElementById(textId).value;
-
-            var allChasu=x.querySelectorAll('[id^="JodlaNo"]');
-
-            allChasu.forEach(y=>{
-
-              var chasuNo=y.value;
-              var JodlaNumId='JodlaNum'+chasuNo;
-              var JodlaDateId='JodlaDate'+chasuNo;
-              var JodlaNum=document.getElementById(JodlaNumId).value;
-              var JodlaDate=document.getElementById(JodlaDateId).value;
-
-              var detailChasu={jodalNo:chasuNo, JodlaNum:JodlaNum, JodlaDate:JodlaDate};
-
-              chasuList.push(detailChasu);
-            });
-            baljuDataList.push({conNo:conNo, baljuWhere:baljuWhere, baljuPlz:baljuPlz, chasuList:chasuList});
-          }
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    locationList();
+                }
+            }
         });
 
-        $.ajax({
-          url:'/order/saveBalju',
-          method:'POST',
-          contentType:'application/json',
-          data: JSON.stringify(baljuDataList),
-          success: function(response) {
-            console.log("성공");
-            window.location.href = '/order/list_order';
-          },
-          error: function(xhr, status, error) {
-            console.log("실패");
-            window.location.href = '/order/list_order';
-          }
-        });
-      }
+        loadItems('balju');
+        locationList();
 
-      function fillLocation(){
-        const location=document.getElementById('loc-input').value;
-        const allLoc=document.querySelectorAll('[id^="location"]');
-        allLoc.forEach(x=>{
-          x.value=location;
+        const container = document.getElementById('setTable');
+        container.addEventListener('input', function(event) {
+            if (event.target.matches('input[id*="Num"]')) {
+                checkSumBaljuNum(event.target);
+            }
         });
-      }
+
+      });
+
+      const pno=document.getElementById('partnerNo').value;
+      if(pno) getNonBaljuContract(pno);
+
+      let timeout;
+      document.getElementById('searchLocation').addEventListener("input", function(){
+        clearTimeout(timeout);
+        timeout = setTimeout(refreshLocation, 100);
+      });
     </script>
     <!--Script-->
   </span>

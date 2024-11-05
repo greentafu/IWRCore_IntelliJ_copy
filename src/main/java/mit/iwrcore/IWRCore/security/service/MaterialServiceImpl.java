@@ -22,67 +22,22 @@ public class MaterialServiceImpl implements MaterialService {
     private final MaterService materService;
     private final BoxService boxService;
 
+    // 저장, 삭제
     @Override
     public MaterialDTO saveMaterial(MaterialDTO dto, List<FileMaterial> fileList) {
-        Material material = materdtoToEntity(dto);
+        Material material = dtoToEntity(dto);
         material.setFiles(fileList);
         Material saved=materialRepository.save(material);
-        return materTodto(saved);
+        return entityToDto(saved);
     }
     @Override
     public void deleteMaterial(Long materCode) {
-        log.info("Deleting material with code: {}", materCode);
         materialRepository.deleteById(materCode);
     }
+
+    // 변환
     @Override
-    public MaterialDTO findM(Long materCode) {
-        log.info("Finding material with code: {}", materCode);
-        return materialRepository.findById(materCode)
-                .map(this::materTodto)
-                .orElseThrow(() -> new RuntimeException("Material not found"));
-    }
-
-    @Override
-    public PageResultDTO<MaterialDTO, Material> findMaterialAll(PageRequestDTO requestDTO) {
-        Page<Material> entityPage = materialRepository.findMaterialByCustomQuery(requestDTO);
-        Function<Material, MaterialDTO> fn = (entity -> materTodto(entity));
-
-        PageResultDTO pageResultDTO = new PageResultDTO<>(entityPage, fn);
-
-        pageResultDTO.setMaterL(requestDTO.getMaterL());
-        pageResultDTO.setMaterM(requestDTO.getMaterM());
-        pageResultDTO.setMaterS(requestDTO.getMaterS());
-        pageResultDTO.setMaterialSearch(requestDTO.getMaterialSearch());
-        pageResultDTO.setBox(requestDTO.getBox());
-        pageResultDTO.setProL(requestDTO.getProL());
-        pageResultDTO.setProM(requestDTO.getProM());
-        pageResultDTO.setProS(requestDTO.getProS());
-        pageResultDTO.setProductSearch(requestDTO.getProductSearch());
-
-        return pageResultDTO;
-    }
-    @Override
-    public PageResultDTO<MaterialDTO, Material> productMaterialList(PageRequestDTO requestDTO) {
-        Page<Material> entityPage = materialRepository.findMaterialByCustomQuery2(requestDTO);
-        Function<Material, MaterialDTO> fn = (entity -> materTodto(entity));
-        return new PageResultDTO<>(entityPage, fn);
-    }
-
-    @Override
-    public List<Material> findMaterialPart(Long boxcode, Long materscode) {
-        return materialRepository.materialListPart(boxcode, materscode);
-    }
-
-    @Override
-    public List<MaterialDTO> materialList() {
-        return materialRepository.findAll().stream().map(this::materTodto).toList();
-    }
-
-
-
-    // dto를 entity로
-    @Override
-    public Material materdtoToEntity(MaterialDTO dto) {
+    public Material dtoToEntity(MaterialDTO dto) {
         Material entity = Material.builder()
                 .materCode(dto.getMaterCode())
                 .name(dto.getName())
@@ -92,14 +47,12 @@ public class MaterialServiceImpl implements MaterialService {
                 .file(dto.getFile())
                 .writer(memberService.memberdtoToEntity(dto.getMemberDTO()))
                 .materS(materService.materSdtoToEntity(dto.getMaterSDTO()))
-                .box(boxService.boxdtoToEntity(dto.getBoxDTO()))
+                .box(boxService.dtoToEntity(dto.getBoxDTO()))
                 .build();
         return entity;
     }
-
-    // entity를 dto로
     @Override
-    public MaterialDTO materTodto(Material entity) {
+    public MaterialDTO entityToDto(Material entity) {
         MaterialDTO dto = MaterialDTO.builder()
                 .materCode(entity.getMaterCode())
                 .name(entity.getName())
@@ -109,11 +62,33 @@ public class MaterialServiceImpl implements MaterialService {
                 .file(entity.getFile())
                 .memberDTO(memberService.memberTodto(entity.getWriter()))
                 .materSDTO(materService.materSTodto(entity.getMaterS()))
-                .boxDTO(boxService.boxTodto(entity.getBox()))
+                .boxDTO(boxService.entityToDto(entity.getBox()))
                 .build();
         return dto;
     }
 
+    // 조회
+    @Override
+    public MaterialDTO getMaterial(Long materCode) {
+        Material material=materialRepository.findById(materCode).get();
+        return entityToDto(material);
+    }
+
+
+    // 자재관리> 모든 자재 목록
+    @Override
+    public PageResultDTO<MaterialDTO, Material> findMaterialAll(PageRequestDTO requestDTO) {
+        Page<Material> entityPage = materialRepository.findMaterialByCustomQuery(requestDTO);
+        Function<Material, MaterialDTO> fn = (entity -> entityToDto(entity));
+        return new PageResultDTO<>(entityPage, fn);
+    }
+    // 제품등록> 제품에 선택되지 않은 자재 목록
+    @Override
+    public PageResultDTO<MaterialDTO, Material> productMaterialList(PageRequestDTO requestDTO) {
+        Page<Material> entityPage = materialRepository.findMaterialByCustomQuery2(requestDTO);
+        Function<Material, MaterialDTO> fn = (entity -> entityToDto(entity));
+        return new PageResultDTO<>(entityPage, fn);
+    }
 }
 
 

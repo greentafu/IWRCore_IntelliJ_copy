@@ -39,7 +39,7 @@ public class EmergencyServiceImpl implements EmergencyService{
                 .emerDate(dto.getEmerDate())
                 .who(dto.getWho())
                 .emcheck(dto.getEmcheck())
-                .balju(dto.getBaljuDTO() != null ? baljuService.convertToEntity(dto.getBaljuDTO()) : null)
+                .balju(dto.getBaljuDTO() != null ? baljuService.dtoToEntity(dto.getBaljuDTO()) : null)
                 .writer(dto.getMemberDTO() != null ? memberService.memberdtoToEntity(dto.getMemberDTO()) : null)
                 .build();
 
@@ -60,7 +60,7 @@ public class EmergencyServiceImpl implements EmergencyService{
 
         BaljuDTO baljuDTO = null;
         if (entity.getBalju() != null) {
-            baljuDTO = baljuService.convertToDTO(entity.getBalju());
+            baljuDTO = baljuService.entityToDTO(entity.getBalju());
         }
 
         MemberDTO memberDTO = null;

@@ -15,42 +15,52 @@ function selectAll(whatButton){
 // 자동 버튼
 function autoBtn(whatButton){
     const sel=whatButton;
+    const startDateInput=document.getElementById('baseDate').value;
 
-    const allTable=document.querySelectorAll('[id^="autoTable"]');
-    allTable.forEach(table=>{
-        const tbody = table.querySelector('tbody');
-        if (tbody) {
-            const rows = tbody.querySelectorAll('tr');
-            rows.forEach(row=>{
-                const no=row.querySelector('[id^="check"]').id.substring(5);
-                if(sel===1) autoFillNum(no);
-                if(sel===2) autoFillDate(no);
-            });
-        }
-    });
+    if(sel===2 && startDateInput===''){
+        alert('기준 날짜를 입력해 주세요.');
+    }else{
+        const allTable=document.querySelectorAll('[id^="autoTable"]');
+        allTable.forEach(table=>{
+            const tbody = table.querySelector('tbody');
+            if (tbody) {
+                const rows = tbody.querySelectorAll('tr');
+                rows.forEach(row=>{
+                    const checkElement = row.querySelector('[id^="check"]');
+                    if(checkElement){
+                        const no=checkElement.id.substring(5);
+                        if(sel===1) autoFillNum(no);
+                        if(sel===2) autoFillDate(no);
+                        if(sel===3) fillLocation(no);
+                        if(sel===4) autoFillBaljuNum(no);
+                    }
+                });
+            }
+        });
+    }
 }
 // 수량 자동 넣기
 function autoFillNum(number){
     const no=number;
     const checkbox=document.getElementById('btn'+no);
-    if(checkbox){
-        if(checkbox.checked){
-            const totalNum=document.getElementById('totalNum'+no).innerText;
-            const stockNum=document.getElementById('stockNum'+no).innerText;
-            const quantity=totalNum-stockNum;
+    if(checkbox && checkbox.checked){
+        const totalNum=document.getElementById('totalNum'+no).innerText;
+        const stockNum=document.getElementById('stockNum'+no).innerText;
+        const quantity=totalNum-stockNum;
 
-            const eachQuantity=Math.floor(quantity/3);
-            const remainder=quantity%3;
-            const thirdQuantity=eachQuantity+remainder;
+        const eachQuantity=Math.floor(quantity/3);
+        const remainder=quantity%3;
+        const thirdQuantity=eachQuantity+remainder;
 
-            document.getElementById('oneNum'+no).value=eachQuantity;
-            document.getElementById('twoNum'+no).value=eachQuantity;
-            document.getElementById('threeNum'+no).value=thirdQuantity;
+        document.getElementById('oneNum'+no).value=eachQuantity;
+        document.getElementById('twoNum'+no).value=eachQuantity;
+        document.getElementById('threeNum'+no).value=thirdQuantity;
 
-            document.getElementById('oneNum'+no).style.color = 'black';
-            document.getElementById('twoNum'+no).style.color = 'black';
-            document.getElementById('threeNum'+no).style.color = 'black';
-        }
+        document.getElementById('oneNum'+no).style.color = 'black';
+        document.getElementById('twoNum'+no).style.color = 'black';
+        document.getElementById('threeNum'+no).style.color = 'black';
+
+        document.getElementById('needNum'+no).innerText = 0;
     }
 }
 // 날짜 자동 넣기
@@ -58,39 +68,37 @@ function autoFillDate(number){
     const no=number;
     const startDateInput=document.getElementById('baseDate').value;
     const checkbox=document.getElementById('btn'+no);
-    if(checkbox){
-        if(checkbox.checked){
-            const interDate = parseInt(document.getElementById('days-input').value, 10);
+    if(checkbox && checkbox.checked){
+        const interDate = parseInt(document.getElementById('days-input').value, 10);
 
-            const realtoday = new Date(startDateInput);
+        const realtoday = new Date(startDateInput);
 
-            const today=new Date(realtoday);
-            let year = today.getFullYear();
-            let month = today.getMonth() + 1;
-            let day = today.getDate();
-            let formattedDate = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
-            document.getElementById('oneDate' + no).value = formattedDate;
+        const today=new Date(realtoday);
+        let year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let day = today.getDate();
+        let formattedDate = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+        document.getElementById('oneDate' + no).value = formattedDate;
 
-            const futureDate1 = new Date(today);
-            futureDate1.setDate(today.getDate() + interDate);
-            year = futureDate1.getFullYear();
-            month = futureDate1.getMonth() + 1;
-            day = futureDate1.getDate();
-            formattedDate = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
-            document.getElementById('twoDate' + no).value = formattedDate;
+        const futureDate1 = new Date(today);
+        futureDate1.setDate(today.getDate() + interDate);
+        year = futureDate1.getFullYear();
+        month = futureDate1.getMonth() + 1;
+        day = futureDate1.getDate();
+        formattedDate = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+        document.getElementById('twoDate' + no).value = formattedDate;
 
-            const futureDate2 = new Date(today);
-            futureDate2.setDate(today.getDate() + interDate * 2);
-            year = futureDate2.getFullYear();
-            month = futureDate2.getMonth() + 1;
-            day = futureDate2.getDate();
-            formattedDate = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
-            document.getElementById('threeDate' + no).value = formattedDate;
-        }
+        const futureDate2 = new Date(today);
+        futureDate2.setDate(today.getDate() + interDate * 2);
+        year = futureDate2.getFullYear();
+        month = futureDate2.getMonth() + 1;
+        day = futureDate2.getDate();
+        formattedDate = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
+        document.getElementById('threeDate' + no).value = formattedDate;
     }
 }
 
-// 조달차수 저장
+// 조달계획> 조달차수 저장
 function saveChasu(){
     const chasuRows=document.querySelectorAll('#contentTbody tr');
     const chasuData=[];
@@ -101,17 +109,17 @@ function saveChasu(){
 
     chasuRows.forEach(x=>{
         const checkbox=x.querySelector('input[type="checkbox"]');
-        if(checkbox&&checkbox.checked){
+        if(checkbox && checkbox.checked){
             const cells=x.querySelectorAll('td');
-            const id=cells[11].innerText;
+            const id=cells[12].innerText;
 
             const oneNumInput=document.getElementById('oneNum'+id);
             const twoNumInput=document.getElementById('twoNum'+id);
             const threeNumInput=document.getElementById('threeNum'+id);
 
-            const oneNum=oneNumInput.value;
-            const twoNum=twoNumInput.value;
-            const threeNum=threeNumInput.value;
+            const oneNum=Number(oneNumInput.value);
+            const twoNum=Number(twoNumInput.value);
+            const threeNum=Number(threeNumInput.value);
             const oneDate=document.getElementById('oneDate'+id).value;
             const twoDate=document.getElementById('twoDate'+id).value;
             const threeDate=document.getElementById('threeDate'+id).value;
@@ -123,6 +131,8 @@ function saveChasu(){
             if(oneNum<0 || oneNum===null || oneNum=='') trueNum=true;
             if(twoNum<0 || twoNum===null || twoNum=='') trueNum=true;
             if(threeNum<0 || threeNum===null || threeNum=='') trueNum=true;
+
+            if(!Number.isInteger(oneNum) || !Number.isInteger(twoNum) || !Number.isInteger(threeNum)) trueNum=true;
 
             if(oneDate===null || twoDate===null || threeDate===null) trueDate=true;
             if(oneDate>=twoDate || twoDate>=threeDate) trueDate=true;
@@ -155,8 +165,8 @@ function saveChasu(){
         });
     }
 }
-// 생산계획 수량 확인
-function checkSumNum(whatInput){
+// 조달계획> 조달계획 수량 확인
+function checkSumJodalNum(whatInput){
     const input=whatInput;
     let no="";
     if(input.id.startsWith('three')) no=input.id.substring(8);
@@ -182,4 +192,7 @@ function checkSumNum(whatInput){
         twoNumInput.style.color = 'black';
         threeNumInput.style.color = 'black';
     }
+
+    const remainder=quantity-(oneNum+twoNum+threeNum);
+    document.getElementById('needNum'+no).innerText = remainder;
 };

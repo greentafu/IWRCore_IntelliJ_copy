@@ -151,6 +151,7 @@ public class ContractServiceImpl implements ContractService {
         return contractDTO;
     }
 
+    // 발주서> 발주하지 않은 계약목록(회사별)
     @Override
     public List<NewOrderDTO> newOrderContract(Long pno){
         List<Object[]> entityList=contractRepository.newOrderContract(pno);
@@ -195,7 +196,7 @@ public class ContractServiceImpl implements ContractService {
         Long tempSumReq=(Long) objects[3];
         Long tempCountBal=(Long) objects[4];
 
-        MaterialDTO materialDTO=(material!=null)?materialService.materTodto(material):null;
+        MaterialDTO materialDTO=(material!=null)?materialService.entityToDto(material):null;
         Long money=(tempMoney!=null)?tempMoney:0L;
         Long sumShip=(tempSumShip!=null)?tempSumShip:0L;
         Long sumReq=(tempSumReq!=null)?tempSumReq:0L;

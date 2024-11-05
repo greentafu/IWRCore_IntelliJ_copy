@@ -163,7 +163,7 @@ public class JodalChasuServiceImpl implements JodalChasuService {
 
         System.out.println(jodalPlan.getJoNo()+":"+countContract);
 
-        StructureDTO structureDTO = (structure != null) ? structureService.structureTodto(structure) : null;
+        StructureDTO structureDTO = (structure != null) ? structureService.entityToDto(structure) : null;
         Long sumRequest = (tempSumRequest != null) ? tempSumRequest : 0L;
         Long sumShip = (tempSumShip != null) ? tempSumShip : 0L;
         JodalPlanDTO jodalPlanDTO = (jodalPlan != null) ? jodalPlanService.entityToDTO(jodalPlan) : null;

@@ -39,7 +39,7 @@ public class JodalController {
     public void list_jodal() {}
     @GetMapping("/jodal_ready")
     public void jodalReady(@RequestParam(required = false) Long joNo, Model model) {
-        JodalPlanDTO jodalPlanDTO=jodalPlanService.findById(joNo);
+        JodalPlanDTO jodalPlanDTO=jodalPlanService.getJodalPlan(joNo);
         model.addAttribute("jodalPlan", jodalPlanDTO);
 
         List<ProPlanSturctureDTO> list=jodalChasuService.modifyJodalChasu(jodalPlanDTO.getProplanDTO().getProplanNo());
@@ -98,7 +98,7 @@ public class JodalController {
     }
     @GetMapping("/modify_jodal")
     public void modify_jodal(@RequestParam(required = false) Long joNo, Model model){
-        JodalPlanDTO jodalPlanDTO=jodalPlanService.findById(joNo);
+        JodalPlanDTO jodalPlanDTO=jodalPlanService.getJodalPlan(joNo);
         model.addAttribute("jodalPlan", jodalPlanDTO);
 
         List<ProPlanSturctureDTO> list=jodalChasuService.modifyJodalChasu(jodalPlanDTO.getProplanDTO().getProplanNo());
@@ -152,6 +152,65 @@ public class JodalController {
             if(tempsize==realsize){
                 dtoList.add(new ProPlanSturcture2DTO(tempProPlanDTO, tempStructureDTO, tempSumRequest,
                         tempSumShip, tempJodalPlanDTO, (tempDtoList.size()!=0)?new ArrayList<>(tempDtoList):null, tempCountContract));
+            }
+        }
+
+        model.addAttribute("structure_list", dtoList);
+    }
+    @GetMapping("/jodal")
+    public void jodal(@RequestParam(required = false) Long joNo, Model model) {
+        JodalPlanDTO jodalPlanDTO=jodalPlanService.getJodalPlan(joNo);
+        model.addAttribute("jodalPlan", jodalPlanDTO);
+
+        List<ProPlanSturctureDTO> list=jodalChasuService.modifyJodalChasu(jodalPlanDTO.getProplanDTO().getProplanNo());
+
+        LocalDateTime startDate=list.get(0).getProplanDTO().getStartDate();
+        LocalDateTime minusDate=startDate.minusDays(3L);
+        model.addAttribute("baseDate", minusDate);
+
+        // 최종적으로 보낼 list
+        List<ProPlanSturcture2DTO> dtoList=new ArrayList<>();
+
+        // 임시저장용
+        int realsize=list.size();
+        int tempsize=0;
+        Long tempJoNo=0L;
+
+        ProplanDTO tempProPlanDTO=null;
+        StructureDTO tempStructureDTO=null;
+        Long tempSumRequest=0L;
+        Long tempSumShip=0L;
+        JodalPlanDTO tempJodalPlanDTO=null;
+        List<JodalChasuDateDTO> tempDtoList=new ArrayList<>();
+
+        // 반복문
+        for(ProPlanSturctureDTO item:list){
+            if(tempJoNo==0L) {
+                tempJoNo=item.getJodalPlanDTO().getJoNo();
+            }else if(tempJoNo!=item.getJodalPlanDTO().getJoNo()){
+                dtoList.add(new ProPlanSturcture2DTO(tempProPlanDTO, tempStructureDTO, tempSumRequest,
+                        tempSumShip, tempJodalPlanDTO, (tempDtoList.size()!=0)?new ArrayList<>(tempDtoList):null, null));
+                tempDtoList.clear();
+                tempJoNo=item.getJodalPlanDTO().getJoNo();
+            }
+            tempProPlanDTO=item.getProplanDTO();
+            tempStructureDTO=item.getStructureDTO();
+            tempSumRequest= item.getSumRequest();
+            tempSumShip= item.getSumShip();
+            tempJodalPlanDTO=item.getJodalPlanDTO();
+
+            if(item.getJodalChasuDTO()!=null){
+                Long jcnum=item.getJodalChasuDTO().getJcnum();
+                Long juNum=item.getJodalChasuDTO().getJoNum();
+                String joDate=item.getJodalChasuDTO().getJoDate().toString().split("T")[0];
+                tempDtoList.add(new JodalChasuDateDTO(jcnum, juNum, joDate));
+            }
+
+            tempsize+=1;
+
+            if(tempsize==realsize){
+                dtoList.add(new ProPlanSturcture2DTO(tempProPlanDTO, tempStructureDTO, tempSumRequest,
+                        tempSumShip, tempJodalPlanDTO, (tempDtoList.size()!=0)?new ArrayList<>(tempDtoList):null, null));
             }
         }
 

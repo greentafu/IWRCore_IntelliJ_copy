@@ -17,6 +17,8 @@ public interface PartnerService {
     PageResultDTO<PartnerDTO, Partner> findPartnerList(PageRequestDTO pageRequestDTO);
     // 계약서> 소속회사 외 협력회사 모두 보기
     PageResultDTO<PartnerDTO, Partner> getAllPartner(PageRequestDTO pageRequestDTO);
+    // 발주서> 소속회사 외 발주가능한 협력회사 모두 보기
+    PageResultDTO<PartnerDTO, Partner> getBaljuPartner(PageRequestDTO pageRequestDTO);
 
     // 회사 추가, 삭제
     Integer insertPartner(PartnerDTO dto);

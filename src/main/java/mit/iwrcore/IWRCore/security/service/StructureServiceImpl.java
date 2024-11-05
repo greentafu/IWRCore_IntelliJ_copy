@@ -22,37 +22,49 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class StructureServiceImpl implements StructureService {
-    @Autowired
     private final StructureRepository structureRepository;
-    @Autowired
     private final ProductService productService;
-    @Autowired
     private final MaterialService materialService;
 
+    // 저장, 삭제
     @Override
-    public void save(StructureDTO dto) {
-        Structure structure = structureDtoToEntity(dto); // DTO를 엔티티로 변환
+    public void saveStructure(StructureDTO dto) {
+        Structure structure = dtoToEntity(dto); // DTO를 엔티티로 변환
         structureRepository.save(structure);    // 엔티티를 저장
     }
-
     @Override
-    public Structure update(StructureDTO structureDTO) {
-        Structure structure=structureDtoToEntity(structureDTO);
-        if (structure.getSno() == null || !structureRepository.existsById(structure.getSno())) {
-            throw new IllegalArgumentException("Structure with id " + structure.getSno() + " not found.");
-        }
-        return structureRepository.save(structure);
+    public void deleteStructure(Long id) {
+        structureRepository.deleteById(id);
     }
 
+    // 변환
     @Override
-    public void deleteById(Long id) {
-        if (structureRepository.existsById(id)) {
-            structureRepository.deleteById(id);
-        } else {
-            throw new IllegalArgumentException("Structure with id " + id + " not found.");
-        }
+    public Structure dtoToEntity(StructureDTO dto){
+        Structure entity=Structure.builder()
+                .sno(dto.getSno())
+                .material(materialService.dtoToEntity(dto.getMaterialDTO()))
+                .product(productService.dtoToEntity(dto.getProductDTO()))
+                .quantity(dto.getQuantity())
+                .build();
+        return entity;
+    }
+    @Override
+    public StructureDTO entityToDto(Structure entity){
+        StructureDTO dto=StructureDTO.builder()
+                .sno(entity.getSno())
+                .productDTO(productService.entityToDto(entity.getProduct()))
+                .materialDTO(materialService.entityToDto(entity.getMaterial()))
+                .quantity(entity.getQuantity())
+                .build();
+        return dto;
     }
 
+    // 조회
+    @Override
+    public StructureDTO getStructure(Long sno){
+        Structure structure=structureRepository.findById(sno).get();
+        return entityToDto(structure);
+    };
     @Override
     public List<StructureDTO> findByProduct_ManuCode(Long manuCode) {
         List<Object[]> list=structureRepository.findByProduct_ManuCode(manuCode);
@@ -60,37 +72,6 @@ public class StructureServiceImpl implements StructureService {
     }
     private StructureDTO exStruct(Object[] objects){
         Structure structure=(Structure) objects[0];
-        StructureDTO structureDTO=(structure!=null)?structureTodto(structure):null;
-        return structureDTO;
+        return (structure!=null)?entityToDto(structure):null;
     }
-
-    @Override
-    public StructureDTO findById(Long sno){
-        Structure structure=structureRepository.findById(sno).get();
-        return structureTodto(structure);
-    };
-
-    // dto를 entity로
-    @Override
-    public Structure structureDtoToEntity(StructureDTO dto){
-        Structure entity=Structure.builder()
-                .sno(dto.getSno())
-                .material(materialService.materdtoToEntity(dto.getMaterialDTO()))
-                .product(productService.productDtoToEntity(dto.getProductDTO()))
-                .quantity(dto.getQuantity())
-                .build();
-        return entity;
-    }
-    // entity를 dto로
-    @Override
-    public StructureDTO structureTodto(Structure entity){
-        StructureDTO dto=StructureDTO.builder()
-                .sno(entity.getSno())
-                .productDTO(productService.productEntityToDto(entity.getProduct()))
-                .materialDTO(materialService.materTodto(entity.getMaterial()))
-                .quantity(entity.getQuantity())
-                .build();
-        return dto;
-    }
-
 }

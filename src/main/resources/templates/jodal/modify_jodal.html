@@ -39,33 +39,40 @@
           <h5>생산제품: [[${structure_list[0].proplanDTO.productDTO.name}]]([[${structure_list[0].proplanDTO.productDTO.manuCode}]])</h5>
           <h5>생산예정일: [[${#temporals.format(structure_list[0].proplanDTO.startDate, 'yyyy-MM-dd')}]]~[[${#temporals.format(structure_list[0].proplanDTO.endDate, 'yyyy-MM-dd')}]]</h5>
           <div style="display:none;" id="proStart">[[${#temporals.format(baseDate, 'yyyy-MM-dd')}]]</div>
-          <div class="text-nowrap table-responsive">
+          <div class="text-nowrap table-responsive" id="setTable">
             <table class="table table-bordered mb-4" id="autoTable">
               <thead>
                 <tr>
-                  <th>
+                  <th rowspan="2" class="text-center">
                     <button type="button" class="btn btn-sm btn-outline-primary" onclick="selectAll(1)">
                       <i class="bx bx-check"></i>
                     </button>
                   </th>
-                  <th>자재번호</th>
-                  <th>자재명</th>
-                  <th>요청수량</th>
-                  <th>재고수량</th>
-                  <th>1차수량</th>
-                  <th>1차예정일</th>
-                  <th>2차수량</th>
-                  <th>2차예정일</th>
-                  <th>3차수량</th>
-                  <th>3차예정일</th>
+                  <th rowspan="2" class="text-center">자재번호</th>
+                  <th rowspan="2" class="text-center">자재명</th>
+                  <th colspan="3" class="text-center">수량</th>
+                  <th colspan="2" class="text-center">1차</th>
+                  <th colspan="2" class="text-center">2차</th>
+                  <th colspan="2" class="text-center">3차</th>
+                </tr>
+                <tr>
+                  <th class="text-center">요청</th>
+                  <th class="text-center">재고</th>
+                  <th class="text-center">필요</th>
+                  <th class="text-center">수량</th>
+                  <th class="text-center">예정일</th>
+                  <th class="text-center">수량</th>
+                  <th class="text-center">예정일</th>
+                  <th class="text-center">수량</th>
+                  <th class="text-center">예정일</th>
                 </tr>
               </thead>
               <tbody id="contentTbody">
                 <tr th:each="list:${structure_list}" th:style="${(list.jodalChasuDateDTOList == null || list.countContract != 0 ? 'background-color: beige' : '')+(list.jodalPlanDTO.joNo == jodalPlan.joNo ? 'border: solid 3px' : '')}">
-                  <th:block th:if="${list.jodalChasuDateDTOList == null || list.countContract != 0}">
+                  <th:block th:if="${list.jodalChasuDateDTOList == null || list.countContract != 0}" class="text-center">
                     <td th:id="'check'+${list.jodalPlanDTO.joNo}"></td>
                   </th:block>
-                  <th:block th:if="${list.jodalChasuDateDTOList != null && list.countContract == 0}">
+                  <th:block th:if="${list.jodalChasuDateDTOList != null && list.countContract == 0}" class="text-center">
                     <td th:id="'check'+${list.jodalPlanDTO.joNo}">
                       <input type="checkbox" class="form-check-input" th:id="'btn'+${list.jodalPlanDTO.joNo}">
                     </td>
@@ -77,6 +84,9 @@
                   </td>
                   <td th:id="'stockNum'+${list.jodalPlanDTO.joNo}">
                     [[${list.sumShip-list.sumRequest}]]
+                  </td>
+                  <td th:id="'needNum'+${list.jodalPlanDTO.joNo}">
+                    [[${(list.structureDTO.quantity*list.proplanDTO.pronum)-(list.sumShip-list.sumRequest)}]]
                   </td>
                   <th:block th:if="${list.jodalChasuDateDTOList == null && list.countContract == 0}">
                     <td></td>
@@ -136,6 +146,13 @@
         const startdate=document.getElementById('proStart').innerText;
         const date=startdate.split('T')[0];
         document.getElementById('baseDate').value=date;
+
+        const container = document.getElementById('setTable');
+        container.addEventListener('input', function(event) {
+            if (event.target.matches('input[id*="Num"]')) {
+                checkSumJodalNum(event.target);
+            }
+        });
       });
     </script>
     <!--/script-->

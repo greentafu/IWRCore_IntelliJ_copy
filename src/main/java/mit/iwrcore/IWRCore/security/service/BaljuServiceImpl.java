@@ -21,8 +21,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
-
 public class BaljuServiceImpl implements BaljuService {
 
     private final BaljuRepository baljuRepository; // Balju 엔티티를 위한 리포지토리
@@ -31,82 +29,103 @@ public class BaljuServiceImpl implements BaljuService {
     private final JodalChasuService jodalChasuService;
     private final ProductService productService;
 
-    // DTO를 엔티티로 변환
+    // 추가, 삭제
     @Override
-    public Balju convertToEntity(BaljuDTO dto) {
-        return Balju.builder()
+    public BaljuDTO saveBalju(BaljuDTO baljuDTO, List<BaljuChasu> baljuChasuList) {
+        Balju savedBalju=null;
+        if(baljuChasuList==null){
+            Balju balju = dtoToEntity(baljuDTO);
+            savedBalju = baljuRepository.save(balju);
+        }else{
+            Balju balju=baljuRepository.findById(baljuDTO.getBaljuNo())
+                    .orElseThrow(IllegalArgumentException::new);
+            balju.getBaljuChasus().removeAll(baljuChasuList);
+            balju.setBaljuNum(baljuDTO.getBaljuNum());
+            balju.setBaljuDate(baljuDTO.getBaljuDate());
+            balju.setBaljuWhere(baljuDTO.getBaljuWhere());
+            balju.setBaljuPlz(baljuDTO.getBaljuPlz());
+            savedBalju = baljuRepository.save(balju);
+        }
+        return entityToDTO(savedBalju);
+    }
+    @Override
+    public void deleteBalju(Long id) {
+        baljuRepository.deleteById(id);
+    }
+
+    // 변환
+    @Override
+    public Balju dtoToEntity(BaljuDTO dto) {
+        Balju balju=null;
+        if(dto!=null) balju=Balju.builder()
                 .baljuNo(dto.getBaljuNo())
                 .baljuNum(dto.getBaljuNum())
+                .baljuDate(dto.getBaljuDate())
                 .baljuWhere(dto.getBaljuWhere())
                 .baljuPlz(dto.getBaljuPlz())
-                .filename(dto.getFilename())
                 .finCheck(dto.getFinCheck())
                 .writer(memberService.memberdtoToEntity(dto.getMemberDTO())) // DTO를 엔티티로 변환
                 .contract(contractService.convertToEntity(dto.getContractDTO())) // DTO를 엔티티로 변환
                 .build();
+        return balju;
     }
-
-    // 엔티티를 DTO로 변환
     @Override
-    public BaljuDTO convertToDTO(Balju entity) {
-        ContractDTO contractDTO = contractService.convertToDTO(entity.getContract());
-
-        // Contract의 연관 데이터들까지 모두 DTO로 변환
-        JodalPlanDTO jodalPlanDTO = contractDTO.getJodalPlanDTO();
-        ProplanDTO proplanDTO = jodalPlanDTO.getProplanDTO();
-        MaterialDTO materialDTO = jodalPlanDTO.getMaterialDTO();
-
-        return BaljuDTO.builder()
+    public BaljuDTO entityToDTO(Balju entity) {
+        BaljuDTO baljuDTO=null;
+        if(entity!=null) baljuDTO=BaljuDTO.builder()
                 .baljuNo(entity.getBaljuNo())
                 .baljuNum(entity.getBaljuNum())
+                .baljuDate(entity.getBaljuDate())
                 .baljuWhere(entity.getBaljuWhere())
                 .baljuPlz(entity.getBaljuPlz())
-                .filename(entity.getFilename())
                 .finCheck(entity.getFinCheck())
                 .regDate(entity.getRegDate())
                 .memberDTO(memberService.memberTodto(entity.getWriter()))
-                .contractDTO(contractDTO) // 필요한 모든 데이터를 포함한 ContractDTO
+                .contractDTO(contractService.convertToDTO(entity.getContract()))
                 .build();
+        return baljuDTO;
     }
 
-
-    @Override
-    public BaljuDTO createBalju(BaljuDTO baljuDTO) {
-        Balju balju = convertToEntity(baljuDTO);
-        Balju savedBalju = baljuRepository.save(balju);
-        return convertToDTO(savedBalju);
-    }
-
+    // 조회
     @Override
     public BaljuDTO getBaljuById(Long id) {
-        List<Object[]> list=baljuRepository.findBaljuFromNo(id);
-        Balju balju=(Balju) list.get(0)[0];
-        return convertToDTO(balju);
+        BaljuDTO baljuDTO=null;
+        if(id!=null) baljuDTO=entityToDTO(baljuRepository.getById(id));
+        return baljuDTO;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Override
     public BaljuDTO updateBalju(Long id, BaljuDTO baljuDTO) {
         if (!baljuRepository.existsById(id)) {
             throw new RuntimeException("ID가 " + id + "인 BaljuDTO를 찾을 수 없습니다.");
         }
-        Balju balju = convertToEntity(baljuDTO);
+        Balju balju = dtoToEntity(baljuDTO);
         balju.setBaljuNo(id); // 수정할 때 ID를 설정합니다.
         Balju updatedBalju = baljuRepository.save(balju);
-        return convertToDTO(updatedBalju);
+        return entityToDTO(updatedBalju);
     }
 
-    @Override
-    public void deleteBalju(Long id) {
-        if (!baljuRepository.existsById(id)) {
-            throw new RuntimeException("ID가 " + id + "인 BaljuDTO를 찾을 수 없습니다.");
-        }
-        baljuRepository.deleteById(id);
-    }
+
 
     @Override
     public List<BaljuDTO> getAllBaljus() {
         return baljuRepository.findAll().stream()
-                .map(this::convertToDTO)
+                .map(this::entityToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -115,7 +134,7 @@ public class BaljuServiceImpl implements BaljuService {
     public PageResultDTO<BaljuDTO, Balju> finishedBalju(PageRequestDTO2 requestDTO) {
         Pageable pageable=requestDTO.getPageable(Sort.by("baljuNo").descending());
         Page<Balju> entityPage=baljuRepository.finishBalju(pageable);
-        Function<Balju, BaljuDTO> fn=(entity->convertToDTO(entity));
+        Function<Balju, BaljuDTO> fn=(entity->entityToDTO(entity));
         return new PageResultDTO<>(entityPage, fn);
     }
 
@@ -138,7 +157,7 @@ public class BaljuServiceImpl implements BaljuService {
         Contract contract=(Contract) objects[0];
         Balju balju=(Balju) objects[1];
         ContractDTO contractDTO=contractService.convertToDTO(contract);
-        BaljuDTO baljuDTO=(balju!=null)? convertToDTO(balju):null;
+        BaljuDTO baljuDTO=(balju!=null)? entityToDTO(balju):null;
         return new ContractBaljuDTO(contractDTO, baljuDTO);
     }
 
@@ -158,7 +177,7 @@ public class BaljuServiceImpl implements BaljuService {
     }
     private BaljuDTO extractBaljuDTO(Object[] objects){
         Balju balju=(Balju) objects[0];
-        BaljuDTO baljuDTO=(balju!=null)?convertToDTO(balju):null;
+        BaljuDTO baljuDTO=(balju!=null)?entityToDTO(balju):null;
         return baljuDTO;
     }
 
@@ -176,7 +195,7 @@ public class BaljuServiceImpl implements BaljuService {
             Balju balju=(Balju) objects[2];
             ContractDTO contractDTO=(contract!=null)?contractService.convertToDTO(contract):null;
             JodalChasuDTO jodalChasuDTO=(jodalChasu!=null)?jodalChasuService.convertToDTO(jodalChasu):null;
-            BaljuDTO baljuDTO=(balju!=null)?convertToDTO(balju):null;
+            BaljuDTO baljuDTO=(balju!=null)?entityToDTO(balju):null;
             contractDTOSet.add(contractDTO);
             jodalChasuDTOSet.add(jodalChasuDTO);
             baljuDTOSet.add(baljuDTO);
@@ -207,7 +226,7 @@ public class BaljuServiceImpl implements BaljuService {
     }
     private ProductDTO ObjectToProductDTO(Object[] objects){
         Product product=(Product) objects[0];
-        ProductDTO productDTO=(product!=null)?productService.productEntityToDto(product):null;
+        ProductDTO productDTO=(product!=null)?productService.entityToDto(product):null;
         return productDTO;
     }
 }

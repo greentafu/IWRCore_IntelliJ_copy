@@ -10,9 +10,14 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class SaveBaljuDTO {
-    private String baljuNo;
-    private String conNo;
+    private Long baljuNo;
+    private Long conNo;
     private String baljuWhere;
     private String baljuPlz;
-    private List<MiniJodalChasuDTO> chasuList;
+    private Long oneNum;
+    private String oneDate;
+    private Long twoNum;
+    private String twoDate;
+    private Long threeNum;
+    private String threeDate;
 }

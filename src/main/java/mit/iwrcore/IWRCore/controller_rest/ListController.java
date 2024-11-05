@@ -127,7 +127,7 @@ public class ListController {
                 .proL2(selectProL2).proM2(selectProM2).proS2(selectProS2).productSearch2(productSearch2)
                 .proplanProgress2(proplanProgress2).build();
 
-        return proplanService.proplanList2(requestDTO);
+        return proplanService.getAllProPlans(requestDTO);
     }
 
     @GetMapping("/nonChasuJodalPlan")

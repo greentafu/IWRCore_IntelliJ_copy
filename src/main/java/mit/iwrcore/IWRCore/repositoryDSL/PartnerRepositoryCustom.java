@@ -9,4 +9,6 @@ public interface PartnerRepositoryCustom {
 
     // 계약서> 소속회사 외 협력회사 모두 보기
     Page<Partner> getAllPartner(PageRequestDTO requestDTO);
+    // 발주서> 소속회사 외 발주가능한 협력회사 모두 보기
+    Page<Partner> getBaljuPartner(PageRequestDTO requestDTO);
 }

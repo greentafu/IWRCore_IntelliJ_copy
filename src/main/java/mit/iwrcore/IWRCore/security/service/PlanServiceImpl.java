@@ -61,7 +61,7 @@ public class PlanServiceImpl implements PlanService{
         Plan entity=Plan.builder()
                 .plancode(dto.getPlancode())
                 .line(lineService.stringToLine(dto.getLine()))
-                .product(productServiceImpl.productDtoToEntity(dto.getProductDTO()))
+                .product(productServiceImpl.dtoToEntity(dto.getProductDTO()))
                 .quantity(dto.getQuantity())
                 .build();
         return entity;
@@ -72,7 +72,7 @@ public class PlanServiceImpl implements PlanService{
         PlanDTO dto=PlanDTO.builder()
                 .plancode(entity.getPlancode())
                 .line(lineService.lineToString(entity.getLine()))
-                .productDTO(productServiceImpl.productEntityToDto(entity.getProduct()))
+                .productDTO(productServiceImpl.entityToDto(entity.getProduct()))
                 .quantity(entity.getQuantity())
                 .build();
         return dto;

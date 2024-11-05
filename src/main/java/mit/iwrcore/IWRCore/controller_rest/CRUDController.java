@@ -5,25 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.*;
-import mit.iwrcore.IWRCore.security.dto.AjaxDTO.MaterQuantityDTO;
-import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveJodalChasuDTO;
-import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveProductDTO;
+import mit.iwrcore.IWRCore.security.dto.AjaxDTO.*;
 import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.*;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.LLLSDTO;
 import mit.iwrcore.IWRCore.security.service.*;
-import net.coobird.thumbnailator.Thumbnailator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.net.URLDecoder;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -61,6 +54,12 @@ public class CRUDController {
     private PartnerService partnerService;
     @Autowired
     private ContractService contractService;
+    @Autowired
+    private LocationService locationService;
+    @Autowired
+    private BaljuService baljuService;
+    @Autowired
+    private BaljuChasuService baljuChasuService;
 
     // 직원
 
@@ -71,6 +70,17 @@ public class CRUDController {
     // 카테고리(제품)
 
     // 카테고리(자재)
+
+    // 창고
+
+    // 배송지
+    @PostMapping("/saveLocation")
+    public void saveLocation(@RequestParam(name = "location") String location){
+        LocationDTO dto=LocationDTO.builder().location(location).build();
+        locationService.saveLocation(dto);
+    }
+    @GetMapping("/deleteLocation")
+    public void deleteLocation(Long lno){}
 
     // 자재
     @PostMapping("/saveMaterial")
@@ -163,7 +173,7 @@ public class CRUDController {
             quantityList.forEach(x->addStructure(savedProductDTO, x, x.getSno()));
         }else if(stlist!=null && quantityList==null){
             // 기존 structure 삭제
-            stlist.forEach(x->structureService.deleteById(x.getSno()));
+            stlist.forEach(x->structureService.deleteStructure(x.getSno()));
         }else if(stlist!=null && quantityList!=null){
             Iterator<StructureDTO> iterator1 = stlist.iterator();
             Iterator<MaterQuantityDTO> iterator2 = quantityList.iterator();
@@ -189,7 +199,7 @@ public class CRUDController {
                 quantityList.forEach(x->addStructure(savedProductDTO, x, x.getSno()));
             }else if(stlist!=null && quantityList==null) {
                 // 남은 기존 structure 삭제
-                stlist.forEach(x->structureService.deleteById(x.getSno()));
+                stlist.forEach(x->structureService.deleteStructure(x.getSno()));
             }else if(stlist!=null && quantityList!=null) {
                 // 기존 structure가 많거나 같을 경우
                 iterator1 = stlist.iterator();
@@ -205,7 +215,7 @@ public class CRUDController {
                             break;
                         }
                     }
-                    if(stlist!=null) stlist.forEach(x->structureService.deleteById(x.getSno()));
+                    if(stlist!=null) stlist.forEach(x->structureService.deleteStructure(x.getSno()));
                     // 기존 structure가 적을 경우
                 }else if(stlist.size()<quantityList.size()){
                     while (iterator1.hasNext()) {
@@ -224,19 +234,19 @@ public class CRUDController {
         }
     }
     private void addStructure(ProductDTO productDTO, MaterQuantityDTO materQuantityDTO, Long sno){
-        MaterialDTO materialDTO=materialService.findM(materQuantityDTO.getCode());
+        MaterialDTO materialDTO=materialService.getMaterial(materQuantityDTO.getCode());
         StructureDTO structureDTO=StructureDTO.builder()
                 .sno(sno)
                 .productDTO(productDTO)
                 .materialDTO(materialDTO)
                 .quantity(materQuantityDTO.getQuantity())
                 .build();
-        structureService.save(structureDTO);
+        structureService.saveStructure(structureDTO);
     }
     @GetMapping("/deleteProduct")
     public void deleteProduct(@RequestParam(required = false) Long manuCode){
         List<StructureDTO> structureDTOList=structureService.findByProduct_ManuCode(manuCode);
-        structureDTOList.forEach(x->structureService.deleteById(x.getSno()));
+        structureDTOList.forEach(x->structureService.deleteStructure(x.getSno()));
         List<FileProductDTO> fileList=fileService.getProductFileList(manuCode);
         List<String> deleteFile=new ArrayList<>();
         fileList.forEach(x->deleteFile.add(x.getUuid()));
@@ -253,7 +263,7 @@ public class CRUDController {
     @GetMapping("/saveLine")
     public List<Long> saveLine(@RequestParam(required = false) Long manuCode,
                                @RequestParam(required = false) List<Long> quantityList){
-        ProductDTO productDTO=productService.getProductById(manuCode);
+        ProductDTO productDTO=productService.getProduct(manuCode);
         List<PlanDTO> planDTOs=planService.findByProductId(manuCode);
 
         List<String> lines=lineService.getLines();
@@ -286,7 +296,7 @@ public class CRUDController {
         MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
         proplanDTO.setMemberDTO(memberDTO);
 
-        ProductDTO productDTO=productService.getProductById(manuCode);
+        ProductDTO productDTO=productService.getProduct(manuCode);
         proplanDTO.setProductDTO(productDTO);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -307,7 +317,7 @@ public class CRUDController {
         if(deleteFile!=null) fileService.deleteFileRun(deleteFile, "pp");
         if(files!=null) fileService.saveFileRun(files, proplanNo, "pp");
 
-        if(proplanDTO.getProplanNo()==null) jodalPlanService.saveFromProplan(savedProplanDTO, memberDTO);
+        if(proplanDTO.getProplanNo()==null) jodalPlanService.saveJodalPlanFromProplan(savedProplanDTO, memberDTO);
     }
     @GetMapping("/deleteProPlan")
     public void deleteProPlan(@RequestParam(required = false) Long proplanNo){
@@ -319,7 +329,7 @@ public class CRUDController {
         }
 
         List<JodalPlanDTO> jodalPlanDTOs=jodalPlanService.findJodalPlanByProPlan(proplanNo);
-        if(jodalPlanDTOs!=null) jodalPlanDTOs.forEach(x->jodalPlanService.deleteById(x.getJoNo()));
+        if(jodalPlanDTOs!=null) jodalPlanDTOs.forEach(x->jodalPlanService.deleteJodalPlan(x.getJoNo()));
 
         proplanService.deleteById(proplanNo);
     }
@@ -332,13 +342,13 @@ public class CRUDController {
         MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
 
         for(SaveJodalChasuDTO dto:list){
-            JodalPlanDTO jodalPlanDTO=jodalPlanService.findById(Long.valueOf(dto.getId()));
+            JodalPlanDTO jodalPlanDTO=jodalPlanService.getJodalPlan(Long.valueOf(dto.getId()));
 
             List<JodalChasuDTO> jodalChasuDTOs=jodalChasuService.findJCfromJP(jodalPlanDTO.getJoNo());
 
             List<Long> longs=new ArrayList<>();
             longs.add(Long.valueOf(dto.getOneNum()));
-            longs.add(Long.valueOf(dto.getOneNum()));
+            longs.add(Long.valueOf(dto.getTwoNum()));
             longs.add(Long.valueOf(dto.getThreeNum()));
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -396,7 +406,7 @@ public class CRUDController {
         if(quantityList!=null){
             int num=0;
             for(LLLSDTO dto:quantityList){
-                JodalPlanDTO jodalPlanDTO=jodalPlanService.findById(dto.getLong1());
+                JodalPlanDTO jodalPlanDTO=jodalPlanService.getJodalPlan(dto.getLong1());
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 LocalDateTime date=LocalDateTime.parse(dto.getString()+" 00:00:00", formatter);
@@ -432,5 +442,87 @@ public class CRUDController {
         fileList.forEach(x->deleteFile.add(x.getUuid()));
         fileService.deleteFileRun(deleteFile, "c");
         contractService.deleteContract(conNo);
+    }
+
+    // 발주서
+    @PostMapping("/saveBalju")
+    @ResponseBody
+    public void saveBalju(@RequestBody List<SaveBaljuDTO> baljuDataList){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
+        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
+
+        for(SaveBaljuDTO preBaljuDTO:baljuDataList){
+            ContractDTO contractDTO=contractService.getContractById(preBaljuDTO.getConNo());
+            Long sum=preBaljuDTO.getOneNum()+preBaljuDTO.getTwoNum()+preBaljuDTO.getThreeNum();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime oneDay=LocalDateTime.parse(preBaljuDTO.getOneDate()+" 00:00:00", formatter);
+
+            BaljuDTO savedBaljuDTO=null;
+            if(preBaljuDTO.getBaljuNo()==null){
+                BaljuDTO baljuDTO=BaljuDTO.builder()
+                        .baljuNo(preBaljuDTO.getBaljuNo())
+                        .baljuNum(sum)
+                        .baljuDate(oneDay)
+                        .baljuWhere(preBaljuDTO.getBaljuWhere())
+                        .baljuPlz(preBaljuDTO.getBaljuPlz())
+                        .finCheck(0L)
+                        .contractDTO(contractDTO)
+                        .memberDTO(memberDTO).build();
+                savedBaljuDTO=baljuService.saveBalju(baljuDTO, null);
+                saveBaljuChasu(null, preBaljuDTO, savedBaljuDTO);
+            }else{
+                List<Long> idx=new ArrayList<>();
+                List<BaljuChasu> baljuChasus=new ArrayList<>();
+                List<BaljuChasuDTO> baljuChasuDTOs=baljuChasuService.getBaljuChasuListByBaljuNo(preBaljuDTO.getBaljuNo());
+                baljuChasuDTOs.forEach(x->{
+                    baljuChasus.add(baljuChasuService.dtoToEntity(x));
+                    idx.add(x.getBalNo());
+                    x.setBaljuDTO(null);
+                    baljuChasuService.saveBaljuChasu(x);
+                });
+                BaljuDTO baljuDTO=baljuService.getBaljuById(preBaljuDTO.getBaljuNo());
+                baljuDTO.setBaljuNum(sum);
+                baljuDTO.setBaljuDate(oneDay);
+                baljuDTO.setBaljuWhere(preBaljuDTO.getBaljuWhere());
+                baljuDTO.setBaljuPlz(preBaljuDTO.getBaljuPlz());
+
+                savedBaljuDTO=baljuService.saveBalju(baljuDTO, baljuChasus);
+                saveBaljuChasu(idx, preBaljuDTO, savedBaljuDTO);
+            }
+        }
+    }
+    private void saveBaljuChasu(List<Long> idx, SaveBaljuDTO preBaljuDTO, BaljuDTO savedBaljuDTO){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime oneDay=LocalDateTime.parse(preBaljuDTO.getOneDate()+" 00:00:00", formatter);
+        LocalDateTime twoDay=LocalDateTime.parse(preBaljuDTO.getTwoDate()+" 00:00:00", formatter);
+        LocalDateTime threeDay=LocalDateTime.parse(preBaljuDTO.getThreeDate()+" 00:00:00", formatter);
+
+        BaljuChasuDTO baljuChasuDTO1=BaljuChasuDTO.builder()
+                .balNo((idx!=null)?idx.get(0):null)
+                .balNum(preBaljuDTO.getOneNum())
+                .balDate(oneDay)
+                .baljuDTO(savedBaljuDTO)
+                .build();
+        baljuChasuService.saveBaljuChasu(baljuChasuDTO1);
+        BaljuChasuDTO baljuChasuDTO2=BaljuChasuDTO.builder()
+                .balNo((idx!=null)?idx.get(1):null)
+                .balNum(preBaljuDTO.getTwoNum())
+                .balDate(twoDay)
+                .baljuDTO(savedBaljuDTO)
+                .build();
+        baljuChasuService.saveBaljuChasu(baljuChasuDTO2);
+        BaljuChasuDTO baljuChasuDTO3=BaljuChasuDTO.builder()
+                .balNo((idx!=null)?idx.get(2):null)
+                .balNum(preBaljuDTO.getThreeNum())
+                .balDate(threeDay)
+                .baljuDTO(savedBaljuDTO)
+                .build();
+        baljuChasuService.saveBaljuChasu(baljuChasuDTO3);
+    }
+    @PostMapping("/deleteBalju")
+    public void deleteBalju(@RequestParam(required = false) Long baljuNo){
+        baljuService.deleteBalju(baljuNo);
     }
 }

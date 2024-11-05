@@ -350,18 +350,18 @@ function proPlanFileList(proplanNo){
 
                 const newRow = document.createElement('tr');
                 const fileNameTd = document.createElement('td');
-                fileNameTd.innerHTML = `<a href="/file/download?path=${path}&fileName=${originalFileName}&type=c&uuid=${uuid}">${fileName}</a>`;
+                fileNameTd.innerHTML = `<a href="/file/download?path=${path}&fileName=${originalFileName}&type=pp&uuid=${uuid}">${fileName}</a>`;
                 newRow.appendChild(fileNameTd);
                 fileTable0.appendChild(newRow);
 
-                viewList(originalFileName, fileName, fileType, path, 1, "c");
+                viewList(originalFileName, fileName, fileType, path, 1, "pp");
             });
         }
     });
 }
 
 // 계약서 수정 첨부파일 목록 불러오기
-function initProPlanFile(conNo){
+function initContractFile(conNo){
     const fileTable0=document.getElementById('fileTable0');
     const code=conNo;
     $.ajax({

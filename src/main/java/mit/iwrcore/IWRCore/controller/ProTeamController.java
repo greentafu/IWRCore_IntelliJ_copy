@@ -48,12 +48,12 @@ public class ProTeamController {
     public void list_pro() {}
     @GetMapping("/input_pro")
     public void input_pro(@RequestParam("manuCode") Long manuCode, Model model) {
-        model.addAttribute("product", productService.getProductById(manuCode));
+        model.addAttribute("product", productService.getProduct(manuCode));
         model.addAttribute("line_list", lineService.getLines());
     }
     @GetMapping("/modify_plan")
     public void modify_plan(@RequestParam("proplanNo") Long proplanNo, Model model) {
-        ProplanDTO proplanDTO=proplanService.findById(proplanNo);
+        ProplanDTO proplanDTO=proplanService.getProPlan(proplanNo);
 
         model.addAttribute("proplan", proplanDTO);
         model.addAttribute("product", proplanDTO.getProductDTO());
@@ -62,7 +62,7 @@ public class ProTeamController {
     }
     @GetMapping("/details_plan")
     public void details_plan(@RequestParam("proplanNo") Long proplanNo, Model model) {
-        ProplanDTO proplanDTO=proplanService.findById(proplanNo);
+        ProplanDTO proplanDTO=proplanService.getProPlan(proplanNo);
         Long manuCode=proplanDTO.getProductDTO().getManuCode();
 
         model.addAttribute("proplan", proplanDTO);
@@ -128,7 +128,7 @@ public class ProTeamController {
     public ResponseEntity<Map<String, Object>> getMaterialStructure(@RequestParam("manuCode") Long manuCode) {
         try {
             // 제품 정보 조회
-            ProductDTO product = productService.getProductById(manuCode);
+            ProductDTO product = productService.getProduct(manuCode);
             if (product == null) {
                 return ResponseEntity.notFound().build(); // 제품이 없는 경우
             }
@@ -210,8 +210,8 @@ public class ProTeamController {
                 // Material 변환 및 설정 - materCode만 사용
                 if (requestDTO.getMaterialDTO() != null && requestDTO.getMaterialDTO().getMaterCode() != null) {
                     // MaterialDTO를 Material로 변환
-                    MaterialDTO materialDTO = materialService.findM(requestDTO.getMaterialDTO().getMaterCode());
-                    Material material = materialService.materdtoToEntity(materialDTO); // DTO를 엔티티로 변환
+                    MaterialDTO materialDTO = materialService.getMaterial(requestDTO.getMaterialDTO().getMaterCode());
+                    Material material = materialService.dtoToEntity(materialDTO); // DTO를 엔티티로 변환
                     if (material != null) {
                         request.setMaterial(material);
                     } else {
@@ -224,7 +224,7 @@ public class ProTeamController {
                 // ProPlan 변환 및 설정 - proplanNo만 사용
                 if (requestDTO.getProplanDTO() != null && requestDTO.getProplanDTO().getProplanNo() != null) {
                     // ProplanDTO를 ProPlan으로 변환
-                    ProplanDTO proplanDTO = proplanService.findById(requestDTO.getProplanDTO().getProplanNo());
+                    ProplanDTO proplanDTO = proplanService.getProPlan(requestDTO.getProplanDTO().getProplanNo());
                     ProPlan proPlan = proplanService.dtoToEntity(proplanDTO); // DTO를 엔티티로 변환
                     if (proPlan != null) {
                         request.setProPlan(proPlan);

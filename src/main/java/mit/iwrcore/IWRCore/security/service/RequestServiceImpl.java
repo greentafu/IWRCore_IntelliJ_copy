@@ -35,7 +35,7 @@ public class RequestServiceImpl implements RequestService{
                 .reqCheck(dto.getReqCheck())
                 .line(dto.getLine())
                 .proPlan(dto.getProplanDTO() != null ? proPlanService.dtoToEntity(dto.getProplanDTO()) : null) // ProplanDTO를 ProPlan으로 변환
-                .material(dto.getMaterialDTO() != null ? materialService.materdtoToEntity(dto.getMaterialDTO()) : null) // MaterialDTO를 Material로 변환
+                .material(dto.getMaterialDTO() != null ? materialService.dtoToEntity(dto.getMaterialDTO()) : null) // MaterialDTO를 Material로 변환
                 .writer(dto.getMemberDTO() != null ? memberService.memberdtoToEntity(dto.getMemberDTO()) : null) // MemberDTO를 Member로 변환
                 .build();
     }
@@ -50,7 +50,7 @@ public class RequestServiceImpl implements RequestService{
                 .reqCheck(entity.getReqCheck())
                 .line(entity.getLine())
                 .proplanDTO(entity.getProPlan() != null ? proPlanService.entityToDTO(entity.getProPlan()) : null) // ProPlan을 ProplanDTO로 변환
-                .materialDTO(entity.getMaterial() != null ? materialService.materTodto(entity.getMaterial()) : null) // Material을 MaterialDTO로 변환
+                .materialDTO(entity.getMaterial() != null ? materialService.entityToDto(entity.getMaterial()) : null) // Material을 MaterialDTO로 변환
                 .memberDTO(entity.getWriter() != null ? memberService.memberTodto(entity.getWriter()) : null) // Member를 MemberDTO로 변환
                 .build();
     }

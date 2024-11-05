@@ -146,7 +146,7 @@ public class ReturnsServiceImpl implements ReturnsService {
         LocalDateTime regDate=(LocalDateTime) objects[2];
         Balju balju=(Balju) objects[3];
         ReturnsDTO returnsDTO=convertToDTO(returns);
-        BaljuDTO baljuDTO=baljuService.convertToDTO(balju);
+        BaljuDTO baljuDTO=baljuService.entityToDTO(balju);
         return new ReturnBaljuDTO(returnsDTO, shipNum, regDate, baljuDTO);
     }
 

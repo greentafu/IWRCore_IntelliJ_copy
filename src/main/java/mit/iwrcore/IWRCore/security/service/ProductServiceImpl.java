@@ -1,5 +1,7 @@
 package mit.iwrcore.IWRCore.security.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.FileProduct;
 import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.repository.MaterialRepository;
@@ -19,91 +21,30 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+    private final ProductRepository productRepository;
+    private final ProCodeService proCodeService;
+    private final MemberService memberService;
 
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private ProSCodeRepository proSRepository;
-    @Autowired
-    private MaterialRepository materialRepository;
-
-    @Autowired
-    private ProCodeService proCodeService;
-    @Autowired
-    private MemberService memberService;
-
-    @Override
-    public Long newProductCount(){
-        Long count=productRepository.newProductCount();
-        return (count!=null)?count:0L;
-    }
-
-    @Override
-    public ProductDTO getProductById(Long productID) {
-        return productEntityToDto(productRepository.findProduct(productID));
-    }
-
-    @Override
-    public PageResultDTO<ProductDTO, Product> getAllProducts(PageRequestDTO requestDTO) {
-        Page<Product> entityPage = productRepository.findProductByCustomQuery(requestDTO);
-
-        // Product 엔티티를 ProductDTO로 변환하는 함수
-        Function<Product, ProductDTO> fn = (entity -> {
-            ProductDTO dto = productEntityToDto(entity);
-            List<ProplanDTO> proPlans = convertProPlans(entity);
-            dto.setProPlans(proPlans);
-            return dto;
-        });
-
-        return new PageResultDTO<>(entityPage, fn);
-    }
-
-    @Override
-    public PageResultDTO<ProductDTO, Product> getNonPlanProducts(PageRequestDTO requestDTO){
-        Page<Product> entityPage=productRepository.findProductByCustomQuery4(requestDTO);
-        Function<Product, ProductDTO> fn=(entity->productEntityToDto(entity));
-        return new PageResultDTO<>(entityPage, fn);
-    }
-    // 임시저장 했으나 최종확인은 하지 않은 제품 리스트
-    @Override
-    public PageResultDTO<ProductDTO, Product> getNonCheckProducts(PageRequestDTO requestDTO){
-        Page<Product> entityPage=productRepository.findProductByCustomQuery2(requestDTO);
-        Function<Product, ProductDTO> fn=(entity->productEntityToDto(entity));
-        return new PageResultDTO<>(entityPage, fn);
-    }
-    // 최종확인한 제품 리스트
-    @Override
-    public PageResultDTO<ProductDTO, Product> getCheckProducts(PageRequestDTO requestDTO) {
-        Page<Product> entityPage=productRepository.findProductByCustomQuery3(requestDTO);
-        Function<Product, ProductDTO> fn=(entity->productEntityToDto(entity));
-        return new PageResultDTO<>(entityPage, fn);
-    }
-
+    // 저장, 삭제
     @Override
     public ProductDTO saveProduct(ProductDTO productDTO, List<FileProduct> fileList) {
-        Product product = productDtoToEntity(productDTO);
+        Product product = dtoToEntity(productDTO);
         product.setFiles(fileList);
         Product savedProduct=productRepository.save(product);
-        return productEntityToDto(savedProduct);
+        return entityToDto(savedProduct);
     }
-
     @Override
     public void deleteProduct(Long productID) {
-        if (productRepository.existsById(productID)) {  // ID로 존재 확인
-            productRepository.deleteById(productID);
-        } else {
-            throw new RuntimeException("Product not found");  // 예외 처리
-        }
+        productRepository.deleteById(productID);
     }
 
-    // DTO를 엔티티로 변환
+    // 변환
     @Override
-    public Product productDtoToEntity(ProductDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-        return Product.builder()
+    public Product dtoToEntity(ProductDTO dto) {
+        Product product=Product.builder()
                 .manuCode(dto.getManuCode())
                 .name(dto.getName())
                 .color(dto.getColor())
@@ -114,18 +55,11 @@ public class ProductServiceImpl implements ProductService {
                 .mater_check(dto.getMater_check())
                 .proS(proCodeService.proSdtoToEntity(dto.getProSDTO()))
                 .member(memberService.memberdtoToEntity(dto.getMemberDTO()))
-
                 .build();
+        return product;
     }
-
-    // 엔티티를 DTO로 변환
     @Override
-    public ProductDTO productEntityToDto(Product entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        // Product 엔티티를 ProductDTO로 변환
+    public ProductDTO entityToDto(Product entity) {
         ProductDTO productDTO = ProductDTO.builder()
                 .manuCode(entity.getManuCode())
                 .name(entity.getName())
@@ -139,25 +73,56 @@ public class ProductServiceImpl implements ProductService {
                 .proSDTO(proCodeService.proSTodto(entity.getProS()))
                 .memberDTO(memberService.memberTodto(entity.getMember()))
                 .build();
-
-        // proPlans 필드 추가: Product 엔티티의 proPlans를 DTO로 변환하여 설정
-//        if (entity.getProPlans() != null) {
-//            List<ProplanDTO> proPlans = entity.getProPlans().stream()
-//                    .map(proPlan -> ProplanDTO.builder()
-//                            .proplanNo(proPlan.getProplanNo())
-//                            .pronum(proPlan.getPronum())
-//                            .filename(proPlan.getFilename())
-//                            .startDate(proPlan.getStartDate())
-//                            .endDate(proPlan.getEndDate())
-//                            .line(proPlan.getLine())
-//                            .details(proPlan.getDetails())
-//                            .build())
-//                    .collect(Collectors.toList());
-//            productDTO.setProPlans(proPlans);
-//        }
-
         return productDTO;
     }
+
+    // 조회
+    @Override
+    public ProductDTO getProduct(Long productID) {
+        return entityToDto(productRepository.findProduct(productID));
+    }
+    @Override
+    public Long newProductCount(){
+        Long count=productRepository.newProductCount();
+        return (count!=null)?count:0L;
+    }
+
+
+    // 생산부서> 모든 제품 목록
+    @Override
+    public PageResultDTO<ProductDTO, Product> getAllProducts(PageRequestDTO requestDTO) {
+        Page<Product> entityPage = productRepository.findProductByCustomQuery(requestDTO);
+        Function<Product, ProductDTO> fn=(entity->entityToDto(entity));
+        return new PageResultDTO<>(entityPage, fn);
+    }
+    // 생산부서> 생산계획이 없는 제품 목록
+    @Override
+    public PageResultDTO<ProductDTO, Product> getNonPlanProducts(PageRequestDTO requestDTO){
+        Page<Product> entityPage=productRepository.findProductByCustomQuery4(requestDTO);
+        Function<Product, ProductDTO> fn=(entity->entityToDto(entity));
+        return new PageResultDTO<>(entityPage, fn);
+    }
+    // 개발부서> 임시저장 했으나 최종확인은 하지 않은 제품 리스트
+    @Override
+    public PageResultDTO<ProductDTO, Product> getNonCheckProducts(PageRequestDTO requestDTO){
+        Page<Product> entityPage=productRepository.findProductByCustomQuery2(requestDTO);
+        Function<Product, ProductDTO> fn=(entity->entityToDto(entity));
+        return new PageResultDTO<>(entityPage, fn);
+    }
+    // 제품관리> 최종확인까지 완료한 제품 리스트
+    @Override
+    public PageResultDTO<ProductDTO, Product> getCheckProducts(PageRequestDTO requestDTO) {
+        Page<Product> entityPage=productRepository.findProductByCustomQuery3(requestDTO);
+        Function<Product, ProductDTO> fn=(entity->entityToDto(entity));
+        return new PageResultDTO<>(entityPage, fn);
+    }
+
+
+
+
+
+
+
 
     @Override
     public List<ProplanDTO> convertProPlans(Product entity) {
@@ -179,24 +144,25 @@ public class ProductServiceImpl implements ProductService {
     }
     @Override
     public List<ProductDTO> searchProducts(String query) {
-        List<Product> products;
-        if (query == null || query.trim().isEmpty()) {
-            products = productRepository.findAll(); // 모든 제품 가져오기
-        } else {
-            products = productRepository.searchProducts(query); // 검색 결과 가져오기
-        }
-
-        // Product 리스트를 ProductDTO 리스트로 변환
-        return products.stream()
-                .map(productEntity -> {
-                    ProductDTO productDTO = productEntityToDto(productEntity);
-                    // ProPlans 추가
-                    List<ProplanDTO> proPlans = convertProPlans(productEntity);
-                    productDTO.setProPlans(proPlans);
-                    return productDTO;
-                })
-                .collect(Collectors.toList());
+//        List<Product> products;
+//        if (query == null || query.trim().isEmpty()) {
+//            products = productRepository.findAll(); // 모든 제품 가져오기
+//        } else {
+//            products = productRepository.searchProducts(query); // 검색 결과 가져오기
+//        }
+//
+//        // Product 리스트를 ProductDTO 리스트로 변환
+//        return products.stream()
+//                .map(productEntity -> {
+//                    ProductDTO productDTO = entityToDto(productEntity);
+//                    // ProPlans 추가
+//                    List<ProplanDTO> proPlans = convertProPlans(productEntity);
+//                    productDTO.setProPlans(proPlans);
+//                    return productDTO;
+//                })
+//                .collect(Collectors.toList());
+        return null;
     }
-    }
+}
 
 
