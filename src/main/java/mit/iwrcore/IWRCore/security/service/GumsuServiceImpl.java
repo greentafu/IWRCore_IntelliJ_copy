@@ -1,22 +1,20 @@
 package mit.iwrcore.IWRCore.security.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.GumsuRepository;
+import mit.iwrcore.IWRCore.security.dto.BaljuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.GumsuDTO;
-import mit.iwrcore.IWRCore.security.dto.JodalChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuBaljuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuGumsuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuJodalChasuDTO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,78 +22,68 @@ public class GumsuServiceImpl implements GumsuService{
     private final GumsuRepository gumsuRepository;
     private final BaljuService baljuService;
     private final MemberService memberService;
-    private final JodalChasuService jodalChasuService;
+    private final BaljuChasuService baljuChasuService;
 
+    // 저장, 삭제
     @Override
-    public Gumsu convertToEntity(GumsuDTO dto) {
+    public GumsuDTO saveGumsu(GumsuDTO gumsuDTO) {
+        Gumsu savedGumsu = gumsuRepository.save(dtoToEntity(gumsuDTO));
+        return entityToDTO(savedGumsu);
+    }
+    @Override
+    public void deleteGumsu(Long id) {
+        gumsuRepository.deleteById(id);
+    }
+    @Override
+    public GumsuDTO modifyGumsu(GumsuDTO gumsuDTO){
+        Gumsu gumsu=gumsuRepository.findById(gumsuDTO.getGumsuNo()).orElseThrow(() -> new EntityNotFoundException("Gumsu not found"));
+        gumsu.setMake(gumsuDTO.getMake());
+        Gumsu savedGumsu=gumsuRepository.save(gumsu);
+        return entityToDTO(savedGumsu);
+    }
+
+    // 변환
+    @Override
+    public Gumsu dtoToEntity(GumsuDTO dto) {
+        if(dto==null) return null;
         return Gumsu.builder()
                 .gumsuNo(dto.getGumsuNo())
                 .make(dto.getMake())
                 .who(dto.getWho())
-                .writer(memberService.memberdtoToEntity(dto.getMemberDTO())) // MemberDTO를 Member로 변환
-                .balju(baljuService.dtoToEntity(dto.getBaljuDTO()))   // BaljuDTO를 Balju로 변환
+                .writer(memberService.memberdtoToEntity(dto.getMemberDTO()))
+                .balju(baljuService.dtoToEntity(dto.getBaljuDTO()))
+                .build();
+    }
+    @Override
+    public GumsuDTO entityToDTO(Gumsu entity) {
+        if(entity==null) return null;
+        return GumsuDTO.builder()
+                .gumsuNo(entity.getGumsuNo())
+                .make(entity.getMake())
+                .who(entity.getWho())
+                .baljuDTO(baljuService.entityToDTO(entity.getBalju()))
+                .memberDTO(memberService.memberTodto(entity.getWriter()))
                 .build();
     }
 
+    // 조회
     @Override
-    public GumsuDTO convertToDTO(Gumsu entity) {
-        if(entity!=null){
-            return GumsuDTO.builder()
-                    .gumsuNo(entity.getGumsuNo())
-                    .make(entity.getMake())
-                    .who(entity.getWho())
-                    .baljuDTO(baljuService.entityToDTO(entity.getBalju())) // Balju를 BaljuDTO로 변환
-                    .memberDTO(memberService.memberTodto(entity.getWriter())) // Member를 MemberDTO로 변환
-                    .build();
-        }
-        else return null;
+    public GumsuDTO getGumsu(Long id) {
+        Gumsu gumsu=gumsuRepository.findById(id).get();
+        return entityToDTO(gumsu);
     }
-
-    @Override
-    public GumsuDTO createGumsu(GumsuDTO gumsuDTO) {
-        Gumsu gumsu = convertToEntity(gumsuDTO);
-        Gumsu savedGumsu = gumsuRepository.save(gumsu);
-        return convertToDTO(savedGumsu);
-    }
-
-    @Override
-    public GumsuDTO getGumsuById(Long id) {
-        List<Object[]> list= gumsuRepository.getGumsuFromBalju(id);
-        Gumsu gumsu=(Gumsu) list.get(0)[0];
-        return convertToDTO(gumsu);
-    }
-
     @Override
     public GumsuDTO getGumsuByBalju(Long baljuNo){
-        return convertToDTO(gumsuRepository.findGumsuByBalju(baljuNo));
+        Gumsu gumsu=gumsuRepository.getGumsuByBaljuNo(baljuNo);
+        return entityToDTO(gumsu);
     }
-
     @Override
-    public GumsuDTO updateGumsu(Long id, GumsuDTO gumsuDTO) {
-        if (!gumsuRepository.existsById(id)) {
-            throw new RuntimeException("ID가 " + id + "인 GumsuDTO를 찾을 수 없습니다.");
-        }
-        Gumsu gumsu = convertToEntity(gumsuDTO);
-        gumsu.setGumsuNo(id); // 수정할 때 ID를 설정합니다.
-        Gumsu updatedGumsu = gumsuRepository.save(gumsu);
-        return convertToDTO(updatedGumsu);
+    public Long getQuantityMake(Long baljuNo){
+        return gumsuRepository.quantityMake(baljuNo);
     }
 
-    @Override
-    public void deleteGumsu(Long id) {
-        if (!gumsuRepository.existsById(id)) {
-            throw new RuntimeException("ID가 " + id + "인 GumsuDTO를 찾을 수 없습니다.");
-        }
-        gumsuRepository.deleteById(id);
-    }
 
-    @Override
-    public List<GumsuDTO> getAllGumsus() {
-        return gumsuRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
+    // 검수차수> 검수해야할 목록
     @Override
     public PageResultDTO<BaljuGumsuDTO, Object[]> couldGumsu(PageRequestDTO requestDTO) {
         Page<Object[]> entityPage= gumsuRepository.findGumsuByCustomQuery(requestDTO);
@@ -105,36 +93,21 @@ public class GumsuServiceImpl implements GumsuService{
         Balju balju=(Balju) objects[0];
         Gumsu gumsu=(Gumsu) objects[1];
         BaljuDTO baljuDTO=(balju!=null)? baljuService.entityToDTO(balju):null;
-        GumsuDTO gumsuDTO=(gumsu!=null)? convertToDTO(gumsu):null;
+        GumsuDTO gumsuDTO=(gumsu!=null)? entityToDTO(gumsu):null;
         return new BaljuGumsuDTO(baljuDTO, gumsuDTO);
     }
-
+    // 검수차수> 회사별 검수차수 설정 가능 발주 목록
     @Override
-    public Long getQuantityMake(Long baljuNo){
-        return gumsuRepository.quantityMake(baljuNo);
-    }
-
-    @Override
-    public List<Partner> getNonGumsuPartner(){return gumsuRepository.getNonGumsuPartner();}
-
-    @Override
-    public List<BaljuJodalChasuDTO> getNoneGumsuBalju(Long pno){
+    public List<BaljuBaljuChasuDTO> getNoneGumsuBalju(Long pno){
         List<Object[]> list= gumsuRepository.getNoneGumsu(pno);
-        List<BaljuJodalChasuDTO> dtoList=list.stream().map(this::baljuJodalChasuToDTO).toList();
+        List<BaljuBaljuChasuDTO> dtoList=list.stream().map(this::baljuBaljuChasuToDTO).toList();
         return dtoList;
     }
-    private BaljuJodalChasuDTO baljuJodalChasuToDTO(Object[] objects){
+    private BaljuBaljuChasuDTO baljuBaljuChasuToDTO(Object[] objects){
         Balju balju=(Balju) objects[0];
-        JodalChasu jodalChasu=(JodalChasu) objects[1];
+        BaljuChasu baljuChasu=(BaljuChasu) objects[1];
         BaljuDTO baljuDTO=(balju!=null)?baljuService.entityToDTO(balju):null;
-        JodalChasuDTO jodalChasuDTO=(jodalChasu!=null)?jodalChasuService.convertToDTO(jodalChasu):null;
-        return new BaljuJodalChasuDTO(baljuDTO, jodalChasuDTO);
+        BaljuChasuDTO baljuChasuDTO=(baljuChasu!=null)?baljuChasuService.entityToDto(baljuChasu):null;
+        return new BaljuBaljuChasuDTO(baljuDTO, baljuChasuDTO);
     }
-    @Override
-    public List<BaljuJodalChasuDTO> modifyGumsu(Long baljuNo){
-        List<Object[]> list= gumsuRepository.modifyGumsu(baljuNo);
-        List<BaljuJodalChasuDTO> dtoList=list.stream().map(this::baljuJodalChasuToDTO).toList();
-        return dtoList;
-    }
-
 }

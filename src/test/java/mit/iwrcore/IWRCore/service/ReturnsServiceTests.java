@@ -31,40 +31,5 @@ public class ReturnsServiceTests {
     @Autowired
     private ReturnsRepository returnsRepository;
 
-    @Test
-    @Transactional
-    @Commit
-    public void insert(){
-        ReturnsDTO dto =ReturnsDTO.builder()
-                .reDetail("반품 내용은 비밀")
-                .whyRe("이유도 비밀")
-                .bGo("이건 비비고")
-                .filename("파일")
-                .email("asdq@asd.com")
-//                .shipmentDTO(shipmentService.getShipmentById(1L))
-                .memberDTO(memberService.findMemberDto(1L,null))
-                .build();
-        returnsService.createReturns(dto);
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test123(){
-        PageRequestDTO requestDTO=PageRequestDTO.builder().page(1).size(2).build();
-        System.out.println(returnsService.getReturnPage(requestDTO, 2L));
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test111(){
-//        List<Object[]> list=returnsRepository.detailReturns(1L);
-//        list.forEach(x-> Arrays.stream(x).forEach(System.out::println));
-        System.out.println(returnsService.getDetailReturn(1L));
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test12312(){
-        System.out.println(returnsService.getReturnsList(1L));
-    }
+
 }

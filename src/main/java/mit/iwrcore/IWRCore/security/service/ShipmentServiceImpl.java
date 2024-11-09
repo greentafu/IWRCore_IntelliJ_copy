@@ -19,59 +19,79 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
 public class ShipmentServiceImpl implements ShipmentService {
-
     private final ShipmentRepository shipmentRepository;
     private final InvoiceService invoiceService;
     private final BaljuService baljuService;
     private final MemberService memberService;
-    private final InvoiceRepository invoiceRepository;
     private final ReturnsRepository returnsRepository;
     private final GumsuService gumsuService;
     private final PartnerService partnerService;
-    private final RequestRepository requestRepository;
+
+    // 저장, 삭제
     @Override
     @Transactional
-    public void updateShipmentWithReturns(Long shipmentId, Long returnsId) {
-        Shipment shipment = shipmentRepository.findById(shipmentId)
-                .orElseThrow(() -> new RuntimeException("Shipment not found"));
-        Returns returns = returnsRepository.findById(returnsId)
-                .orElseThrow(() -> new RuntimeException("Returns not found"));
-
-        // 출고와 반품 연결 설정
-        shipment.setReturns(returns);
-        returns.setShipment(shipment);
-
-        shipmentRepository.save(shipment);
-        returnsRepository.save(returns);
-    }
-
-    @Override
-    @Transactional
-    public ShipmentDTO createShipmentWithoutInvoice() {
-        Shipment shipment = new Shipment();
-        // 기본 설정 작업 필요
+    public ShipmentDTO saveShipment(ShipmentDTO shipmentDTO) {
+        Shipment shipment = dtoToEntity(shipmentDTO);
         Shipment savedShipment = shipmentRepository.save(shipment);
-        return convertToDTO(savedShipment);
+        return entityToDTO(savedShipment);
     }
-
     @Override
     @Transactional
-    public ShipmentDTO linkShipmentToInvoice(Long shipmentId, Long invoiceId) {
-        Shipment shipment = shipmentRepository.findById(shipmentId)
-                .orElseThrow(() -> new RuntimeException("Shipment not found"));
-        Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new RuntimeException("Invoice not found"));
-        shipment.setInvoice(invoice);
-        Shipment updatedShipment = shipmentRepository.save(shipment);
-        return convertToDTO(updatedShipment);
+    public void deleteShipment(Long id) {
+        shipmentRepository.deleteById(id);
+    }
+    @Override
+    @Transactional
+    public ShipmentDTO modifyShipment(Long id, ShipmentDTO shipmentDTO) {
+        Shipment existingShipment = shipmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("ID가 " + id + "인 ShipmentDTO를 찾을 수 없습니다."));
+
+        if (shipmentDTO.getShipNum() != null) existingShipment.setShipNum(shipmentDTO.getShipNum());
+        if (shipmentDTO.getReceipt() != null) existingShipment.setReceipt(shipmentDTO.getReceipt());
+
+        if (shipmentDTO.getInvoiceDTO() != null) existingShipment.setInvoice(invoiceService.convertToEntity(shipmentDTO.getInvoiceDTO()));
+        else existingShipment.setInvoice(null);
+
+        if (shipmentDTO.getBaljuDTO() != null) existingShipment.setBalju(baljuService.dtoToEntity(shipmentDTO.getBaljuDTO()));
+        else existingShipment.setBalju(null);
+
+        if (shipmentDTO.getMemberDTO() != null) existingShipment.setWriter(memberService.memberdtoToEntity(shipmentDTO.getMemberDTO()));
+
+        if (shipmentDTO.getReturnsDTO() != null) {
+            Returns returns = returnsRepository.findById(shipmentDTO.getReturnsDTO().getReNO())
+                    .orElseThrow(() -> new RuntimeException("Returns not found"));
+            existingShipment.setReturns(returns);
+        } else existingShipment.setReturns(null);
+
+        Shipment updatedShipment = shipmentRepository.save(existingShipment);
+        return entityToDTO(updatedShipment);
+    }
+    @Override
+    @Transactional
+    public void updateShipmentInvoicebGo(Long shipNo){
+        shipmentRepository.updateShipmentInvoiceText(shipNo);
+    }
+    @Override
+    public void updateShipmentDate(LocalDateTime dateTime, Long shipNo){
+        shipmentRepository.updateShipmentDate(dateTime, shipNo);
+    }
+    @Override
+    public void updateMemberCheck(Member member, Long shipNo){
+        shipmentRepository.updateShipmentMemberCheck(member, shipNo);
+    }
+    @Override
+    public void updateSHipmentInvoice(Invoice invoice, String text, Long shipNo){
+        shipmentRepository.updateShipmentInvoice(invoice, text, shipNo);
     }
 
+    // 변환
     @Override
-    public Shipment convertToEntity(ShipmentDTO dto) {
+    public Shipment dtoToEntity(ShipmentDTO dto) {
         return Shipment.builder()
                 .shipNO(dto.getShipNO())
                 .shipNum(dto.getShipNum())
@@ -84,10 +104,9 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .balju(dto.getBaljuDTO() != null ? baljuService.dtoToEntity(dto.getBaljuDTO()) : null)
                 .build();
     }
-
     @Transactional
     @Override
-    public ShipmentDTO convertToDTO(Shipment entity) {
+    public ShipmentDTO entityToDTO(Shipment entity) {
         return ShipmentDTO.builder()
                 .shipNO(entity.getShipNO())
                 .shipNum(entity.getShipNum())
@@ -102,85 +121,35 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .build();
     }
 
-
+    // 조회
     @Override
-    @Transactional
-    public ShipmentDTO createShipment(ShipmentDTO shipmentDTO) {
-        Shipment shipment = convertToEntity(shipmentDTO);
-        Shipment savedShipment = shipmentRepository.save(shipment);
-        return convertToDTO(savedShipment);
-    }
-
-    @Override
-    public ShipmentDTO getShipmentById(Long id) {
-        return shipmentRepository.findById(id)
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new RuntimeException("Shipment not found"));
-    }
-
-    @Override
-    @Transactional
-    public ShipmentDTO updateShipment(Long id, ShipmentDTO shipmentDTO) {
-        Shipment existingShipment = shipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("ID가 " + id + "인 ShipmentDTO를 찾을 수 없습니다."));
-
-        if (shipmentDTO.getShipNum() != null) {
-            existingShipment.setShipNum(shipmentDTO.getShipNum());
-        }
-        if (shipmentDTO.getReceipt() != null) {
-            existingShipment.setReceipt(shipmentDTO.getReceipt());
-        }
-        if (shipmentDTO.getInvoiceDTO() != null) {
-            existingShipment.setInvoice(invoiceService.convertToEntity(shipmentDTO.getInvoiceDTO()));
-        } else {
-            existingShipment.setInvoice(null);
-        }
-        if (shipmentDTO.getBaljuDTO() != null) {
-            existingShipment.setBalju(baljuService.dtoToEntity(shipmentDTO.getBaljuDTO()));
-        } else {
-            existingShipment.setBalju(null);
-        }
-        if (shipmentDTO.getMemberDTO() != null) {
-            existingShipment.setWriter(memberService.memberdtoToEntity(shipmentDTO.getMemberDTO()));
-        }
-        if (shipmentDTO.getReturnsDTO() != null) {
-            Returns returns = returnsRepository.findById(shipmentDTO.getReturnsDTO().getReNO())
-                    .orElseThrow(() -> new RuntimeException("Returns not found"));
-            existingShipment.setReturns(returns);
-        } else {
-            existingShipment.setReturns(null);
-        }
-
-        Shipment updatedShipment = shipmentRepository.save(existingShipment);
-        return convertToDTO(updatedShipment);
+    public ShipmentDTO getShipment(Long id) {
+        Shipment shipment=shipmentRepository.findById(id).get();
+        return entityToDTO(shipment);
     }
     @Override
-    @Transactional
-    public void updateShipmentInvoicebGo(Long shipNo){
-        shipmentRepository.updateShipmentInvoiceText(shipNo);
+    public Shipment getShipmentEntity(Long shipNo){
+        return shipmentRepository.findShipment(shipNo);
+    }
+    @Override
+    public List<ShipmentDTO> getShipmentByBalju(Long baljuNo){
+        List<Shipment> entityList=shipmentRepository.getShipmentByBalju(baljuNo);
+        return entityList.stream().map(this::entityToDTO).toList();
     }
 
-    @Override
-    @Transactional
-    public void deleteShipment(Long id) {
-        if (!shipmentRepository.existsById(id)) {
-            throw new RuntimeException("ID가 " + id + "인 ShipmentDTO를 찾을 수 없습니다.");
-        }
-        shipmentRepository.deleteById(id);
-    }
 
-    @Override
-    public List<ShipmentDTO> getAllShipments() {
-        return shipmentRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
+
+
+
+
+
+
+
 
     @Override
     public List<ShipmentDTO> getInvoiceContent(Long tranNO){
-        return shipmentRepository.getInvoiceContent(tranNO).stream().map(this::convertToDTO).toList();
+        return shipmentRepository.getInvoiceContent(tranNO).stream().map(this::entityToDTO).toList();
     }
-
     @Override
     public ShipmentReturnDTO findShipment(Long shipNo){
         Shipment shipment=shipmentRepository.findShipment(shipNo);
@@ -189,39 +158,16 @@ public class ShipmentServiceImpl implements ShipmentService {
             return new ShipmentReturnDTO(shipNo, shipment.getShipNum(), materialName);
         }else return null;
     }
-
-    @Override
-    public void updateShipmentDate(LocalDateTime dateTime, Long shipNo){
-        shipmentRepository.updateShipmentDate(dateTime, shipNo);
-    }
-    @Override
-    public void updateMemberCheck(Member member, Long shipNo){
-        shipmentRepository.updateShipmentMemberCheck(member, shipNo);
-    }
-    @Override
-    public void updateSHipmentInvoice(Invoice invoice, String text, Long shipNo){
-        shipmentRepository.updateShipmentInvoice(invoice, text, shipNo);
-    }
-
-    @Override
-    public List<ShipmentDTO> getShipmentByBalju(Long baljuNo){
-        List<Shipment> entityList=shipmentRepository.getShipmentByBalju(baljuNo);
-        List<ShipmentDTO> dtoList=entityList.stream().map(this::convertToDTO).toList();
-        return dtoList;
-    }
     @Override
     public List<ShipmentDTO> canInvoiceShipment(Long pno){
-        List<Object[]> entityList=shipmentRepository.couldInvoice(pno);
-        List<ShipmentDTO> dtoList=entityList.stream().map(this::extractShipmentDTO).toList();
-        return dtoList;
+        List<Shipment> entityList=shipmentRepository.couldInvoice(pno);
+        return entityList.stream().map(x->entityToDTO(x)).toList();
     }
     private ShipmentDTO extractShipmentDTO(Object[] objects){
         Shipment shipment=(Shipment) objects[0];
-        ShipmentDTO shipmentDTO=(shipment!=null)?convertToDTO(shipment):null;
+        ShipmentDTO shipmentDTO=(shipment!=null)?entityToDTO(shipment):null;
         return shipmentDTO;
     }
-
-
     @Override
     public List<PartnerDTO> canInvoicePartner(){
         List<Partner> entityList=shipmentRepository.couldInvoicePartner();
@@ -231,17 +177,20 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
 
 
-    @Override
-    public Shipment findShipmentEntity(Long shipNo){
-        return shipmentRepository.findShipment(shipNo);
-    }
 
 
+
+
+
+
+
+    // 메인페이지> 배송갯수
     @Override
-    public PageResultDTO<ShipmentGumsuDTO, Object[]> pageShipment(PageRequestDTO requestDTO){
-        Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery(requestDTO);
-        return new PageResultDTO<>(entityPage, this::shipmentGumsuToDTO);
+    public Long mainShipNum(){
+        Long aa= shipmentRepository.mainShipment();
+        return (aa!=null)?aa:0L;
     }
+    // 메인페이지> 수령가능 목록
     @Override
     public PageResultDTO<ShipmentGumsuDTO, Object[]> mainShipment(PageRequestDTO requestDTO){
         Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery2(requestDTO);
@@ -252,14 +201,19 @@ public class ShipmentServiceImpl implements ShipmentService {
         Gumsu gumsu=(Gumsu) objects[1];
         Long totalShipment=(Long) objects[2];
         Long reNo=(Long) objects[3];
-        ShipmentDTO shipmentDTO=(shipment!=null)? convertToDTO(shipment):null;
-        GumsuDTO gumsuDTO=(gumsu!=null)? gumsuService.convertToDTO(gumsu):null;
+        ShipmentDTO shipmentDTO=(shipment!=null)? entityToDTO(shipment):null;
+        GumsuDTO gumsuDTO=(gumsu!=null)? gumsuService.entityToDTO(gumsu):null;
         totalShipment=(totalShipment!=null)?totalShipment:0L;
         reNo=(reNo!=null)?reNo:0L;
         return new ShipmentGumsuDTO(shipmentDTO, gumsuDTO, totalShipment, reNo);
     }
-
-
+    // 입고/반품> 배송 목록
+    @Override
+    public PageResultDTO<ShipmentGumsuDTO, Object[]> pageShipment(PageRequestDTO requestDTO){
+        Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery(requestDTO);
+        return new PageResultDTO<>(entityPage, this::shipmentGumsuToDTO);
+    }
+    // 거래명세서> 거래명세서 발급 필요 목록
     @Override
     public PageResultDTO<ShipmentDTO, Object[]> noneInvoiceShipment(PageRequestDTO requestDTO){
         Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery3(requestDTO);
@@ -267,10 +221,9 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
     private ShipmentDTO shipmentContractToDTO(Object[] objects){
         Shipment shipment=(Shipment) objects[0];
-        ShipmentDTO shipmentDTO=(shipment!=null)? convertToDTO(shipment):null;
-        return shipmentDTO;
+        return (shipment!=null)? entityToDTO(shipment):null;
     }
-
+    // 거래명세서> 거래명세서 발급 완료 목록
     @Override
     public PageResultDTO<InvoicePartnerDTO, Object[]> pageFinInvoice(PageRequestDTO2 requestDTO2){
         Page<Object[]> entityPage=shipmentRepository.findShipmentByCustomQuery4(requestDTO2);
@@ -283,7 +236,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         PartnerDTO partnerDTO=(partner!=null)? partnerService.partnerTodto(partner):null;
         return new InvoicePartnerDTO(invoiceDTO, partnerDTO);
     }
-
+    // 협력회사> 거래명세서 목록
     @Override
     public PageResultDTO<InvoicePartnerDTO, Object[]> partnerInvoicePage(PageRequestDTO requestDTO){
         Pageable pageable=requestDTO.getPageable(Sort.by("tranNO").descending());
@@ -291,15 +244,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         return new PageResultDTO<>(entityPage, this::invoicePartnerToDTO);
     }
 
-    @Override
-    public Long allShipmnetNum(Long joNo){
-        return shipmentRepository.allShipNum(joNo);
-    }
-    @Override
-    public Long mainShipNum(){
-        Long aa= shipmentRepository.mainShipment();
-        return (aa!=null)?aa:0L;
-    }
 
 
 
@@ -308,7 +252,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         List<Shipment> shipments = shipmentRepository.findByReceiveCheckWithDetails(receiveCheck);
 
         List<ShipmentDTO> shipmentDTOs = shipments.stream()
-                .map(this::convertToDTO)
+                .map(this::entityToDTO)
                 .collect(Collectors.toList());
 
         log.info("Converted Shipment Entities to DTOs: {}", shipmentDTOs);

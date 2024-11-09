@@ -11,8 +11,8 @@ import java.util.List;
 
 public interface EmergencyRepository extends JpaRepository<Emergency , Long> {
     @EntityGraph(attributePaths = {"balju"})
-    @Query("select e, e.balju.contract from Emergency e where e.balju.contract.partner.pno=:pno")
-    Page<Object[]> findEmergency(Pageable pageable, Long pno);
+    @Query("select e from Emergency e where e.balju.contract.partner.pno=:pno")
+    Page<Emergency> findEmergency(Pageable pageable, Long pno);
 
     @Query("select e from Emergency e where e.balju.baljuNo=:baljuNo")
     List<Emergency> getEmengencyListByBalju(Long baljuNo);

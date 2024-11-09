@@ -77,7 +77,7 @@ public class MaterialServiceImpl implements MaterialService {
 
     // 자재관리> 모든 자재 목록
     @Override
-    public PageResultDTO<MaterialDTO, Material> findMaterialAll(PageRequestDTO requestDTO) {
+    public PageResultDTO<MaterialDTO, Material> getMaterialAll(PageRequestDTO requestDTO) {
         Page<Material> entityPage = materialRepository.findMaterialByCustomQuery(requestDTO);
         Function<Material, MaterialDTO> fn = (entity -> entityToDto(entity));
         return new PageResultDTO<>(entityPage, fn);

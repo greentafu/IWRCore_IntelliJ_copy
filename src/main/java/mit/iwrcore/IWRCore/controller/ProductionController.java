@@ -35,10 +35,10 @@ public class ProductionController {
     public void manufacture(@RequestParam Long manuCode, Model model) {
         model.addAttribute("product", productService.getProduct(manuCode));
         model.addAttribute("pFiles", fileService.getProductFileList(manuCode));
-        model.addAttribute("structures", structureService.findByProduct_ManuCode(manuCode));
+        model.addAttribute("structures", structureService.getStructureByProduct(manuCode));
     }
     @GetMapping("/structures")
     public List<StructureDTO> getStructures(@RequestParam Long manuCode) {
-        return structureService.findByProduct_ManuCode(manuCode);
+        return structureService.getStructureByProduct(manuCode);
     }
 }

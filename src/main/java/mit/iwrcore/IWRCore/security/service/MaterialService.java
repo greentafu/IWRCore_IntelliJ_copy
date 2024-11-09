@@ -23,7 +23,7 @@ public interface MaterialService {
 
 
     // 자재관리> 모든 자재 목록
-    PageResultDTO<MaterialDTO, Material> findMaterialAll(PageRequestDTO requestDTO);//모든 리스트
+    PageResultDTO<MaterialDTO, Material> getMaterialAll(PageRequestDTO requestDTO);//모든 리스트
     // 제품등록> 제품에 선택되지 않은 자재 목록
     PageResultDTO<MaterialDTO, Material> productMaterialList(PageRequestDTO requestDTO);//모든 리스트
 }

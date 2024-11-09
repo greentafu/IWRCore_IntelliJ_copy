@@ -43,7 +43,7 @@ public class InvoiceController {
         // 회사 정보 전달(고정)
         model.addAttribute("company", partnerService.findPartnerDto(1L, null, null));
         if(shipNO!=null){
-            Shipment shipment=shipmentService.findShipmentEntity(shipNO);
+            Shipment shipment=shipmentService.getShipmentEntity(shipNO);
             Long pno=(shipNO!=null)?shipment.getBalju().getContract().getPartner().getPno():null;
             model.addAttribute("selectedPartner", pno);
             model.addAttribute("selectedShipNo", shipNO);

@@ -1,39 +1,32 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import mit.iwrcore.IWRCore.entity.Gumsu;
 import mit.iwrcore.IWRCore.entity.GumsuChasu;
 import mit.iwrcore.IWRCore.security.dto.GumsuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.GumsuChasuContractDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.QuantityDateDTO;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 public interface GumsuChasuService {
-    // DTO를 엔티티로 변환
-    GumsuChasu convertToEntity(GumsuChasuDTO dto);
-
-    // 엔티티를 DTO로 변환
-    GumsuChasuDTO convertToDTO(GumsuChasu entity);
-
-    // 기타 CRUD 메서드
-    void createGumsuChasu(GumsuChasuDTO gumsuChasuDTO, Gumsu gumsu);
-
-    GumsuChasuDTO getGumsuChasuById(Long id);
-
-    GumsuChasuDTO updateGumsuChasu(Long id, GumsuChasuDTO gumsuChasuDTO);
-
+    // 저장, 삭제
+    void saveGumsuChasu(GumsuChasuDTO gumsuChasuDTO);
     void deleteGumsuChasu(Long id);
+    GumsuChasuDTO modifyGumsuChasu(GumsuChasuDTO gumsuChasuDTO);
 
-    PageResultDTO<GumsuChasuDTO, GumsuChasu> getAllGumsuChasus(PageRequestDTO requestDTO);
+    // 변환
+    GumsuChasu dtoToEntity(GumsuChasuDTO dto);
+    GumsuChasuDTO entityToDTO(GumsuChasu entity);
 
-    List<QuantityDateDTO> partnerMainGumsu(Long baljuNo);
+    // 조회
+    GumsuChasuDTO getGumsuChasu(Long id);
 
+
+    // 검수차수> 진행도
     PageResultDTO<GumsuChasuContractDTO, Object[]> getAllGumsuChasuContract(PageRequestDTO requestDTO);
-
-    List<GumsuChasuDTO> getGumsuChasuFromBalju(Long baljuNo);
+    // 검수차수> 검수차수 저장에 사용
+    List<GumsuChasuDTO> getGumsuChasuByGumsu(Long gumsuNo);
+    // 협력회사> 메인페이지 검수정보
+    List<QuantityDateDTO> partnerMainGumsu(Long baljuNo);
 }

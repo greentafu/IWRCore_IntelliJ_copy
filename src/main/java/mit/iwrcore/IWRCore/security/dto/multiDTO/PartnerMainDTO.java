@@ -11,6 +11,7 @@ import java.util.List;
 public class PartnerMainDTO {
     private BaljuDTO baljuDTO;
     private List<QuantityDateDTO> jodalList;
+    private List<QuantityDateDTO> baljuList;
     private List<QuantityDateDTO> gumsuList;
     private Long emergency;
     private Long returns;

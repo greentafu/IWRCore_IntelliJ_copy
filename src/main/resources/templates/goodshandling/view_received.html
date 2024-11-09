@@ -11,7 +11,7 @@
 <th:block th:replace="~{layout/mainlayout::all(~{this::#head} ,~{this::#content})}">
 
   <span id="head">
-    <title>수령정보 상세보기</title>
+    <title>배송정보 상세보기</title>
     <!--Style-->
 
     <!--/Style-->
@@ -19,40 +19,47 @@
 
   <span id="content">
     <div class="container-xxl flex-grow-1 container-p-y">
-      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">입고/출하 관리 /</span> 수령 정보 상세 보기</h4>
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">입고/출하 관리 /</span> 배송정보 상세 보기</h4>
       <div class="row">
         <div class="accordion mt-3" id="accordionExample">
-          <div class="card accordion-item active">
-            <div id="accordionOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-              <div class="accordion-body" style="position: relative; padding-bottom: 80px; margin: 0;">
-                <h4 class="mb-4">출하 확인서</h4>
-                <p><strong>전화번호:</strong> ([[${shipment.baljuDTO.contractDTO.partnerDTO.name}]]) [[${shipment.baljuDTO.contractDTO.partnerDTO.telNumber}]] &nbsp;&nbsp;<strong>주문 번호:</strong> ([[${shipment.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}]]) [[${shipment.baljuDTO.baljuNo}]]</p>
-                <p class="mb-4"><strong>출하 일자:</strong> [[${#temporals.format(shipment.regDate, 'yyyy-MM-dd')}]] &nbsp;&nbsp;<strong>출하 수량:</strong> [[${shipment.shipNum}]]</p>
-                <textarea class="form-control mb-4" rows="25" style="width: 100%;" name="text" readonly>[[${shipment.text}]]</textarea>
-                <div class="d-flex justify-content-between w-100">
-                  <div class="menu-item" style="position: absolute; bottom: 20px; left: 20px;">
-                    <a th:href="@{/goodshandling/list_received}">
-                      <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
+          <div class="card">
+            <div class="card-body">
+              <h4 class="mb-4">출하 확인서</h4>
+              <p><strong>전화번호:</strong> ([[${shipment.baljuDTO.contractDTO.partnerDTO.name}]]) [[${shipment.baljuDTO.contractDTO.partnerDTO.telNumber}]] &nbsp;&nbsp;<strong>주문 번호:</strong> ([[${shipment.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}]]) [[${shipment.baljuDTO.baljuNo}]]</p>
+              <p class="mb-4"><strong>출하 일자:</strong> [[${#temporals.format(shipment.regDate, 'yyyy-MM-dd')}]] &nbsp;&nbsp;<strong>출하 수량:</strong> [[${shipment.shipNum}]]</p>
+              <textarea class="form-control mb-4" rows="25" style="width: 100%;" name="text" readonly>[[${shipment.text}]]</textarea>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between w-100">
+                <div class="menu-item" style="position: absolute; bottom: 20px; left: 20px;">
+                  <a th:href="@{/goodshandling/list_received}">
+                    <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
+                  </a>
+                </div>
+                <div class="menu-item" style="position: absolute; bottom: 20px; right: 20px;">
+                  <th:block th:if="${shipment.receipt}==null">
+                    <button type="button" class="btn btn-outline-primary" style="width: 100%;"
+                            data-bs-toggle="modal" data-bs-target="#modalCenter2"
+                            th:shipNum="${shipment.shipNum}" th:shipNo="${shipment.shipNO}" onclick="receivebutton(this)">
+                      수령
+                    </button>
+                  </th:block>
+                  <th:block th:if="${shipment.receipt!=null && shipment.returnsDTO==null && shipment.receiveCheck==0}">
+                    <a th:href="@{/goodshandling/return_received(shipNo=${shipment.shipNO})}">
+                      <button type="button" class="btn btn-secondary">반품</button>
                     </a>
-                  </div>
-                  <div class="menu-item" style="position: absolute; bottom: 20px; right: 20px;">
-                    <th:block th:if="${shipment.receipt}!=null">
-                      <a th:href="@{/goodshandling/return_received(shipNo=${shipment.shipNO})}">
-                        <button type="button" class="btn btn-secondary">반품</button>
-                      </a>
-                      <button
-                              type="button"
-                              class="btn btn-primary"
-                              data-bs-toggle="modal"
-                              data-bs-target="#modalCenter"
-                              th:shipNum="${shipment.shipNum}"
-                              th:shipNo="${shipment.shipNO}"
-                              onclick="receiveConfirm(this)"
-                      >
-                        입고
-                      </button>
-                    </th:block>
-                  </div>
+                    <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalCenter"
+                            th:shipNum="${shipment.shipNum}"
+                            th:shipNo="${shipment.shipNO}"
+                            onclick="receiveConfirm(this)"
+                    >
+                      입고
+                    </button>
+                  </th:block>
                 </div>
               </div>
             </div>
@@ -62,6 +69,7 @@
     </div>
 
     <!--Modal-->
+    <!--Modal1-->
     <div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -74,20 +82,41 @@
             </div>
           </div>
           <div class="modal-footer">
-            <form th:action="@{/goodshandling/receiveConfirm}" method="post">
-              <input style="display:none;" name="shipNO" id="receiveConfirmNo">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                취소
-              </button>
-              <button type="submit" class="btn btn-primary">입고확정</button>
-            </form>
+            <input style="display:none;" id="receiveConfirmNo">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              취소
+            </button>
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="saveCheckShipment(2)">입고확정</button>
           </div>
         </div>
       </div>
     </div>
+    <!--Modal-->
+    <!--Modal2-->
+    <div class="modal fade" id="modalCenter2" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">수령확인</h5>
+          </div>
+          <div class="modal-body">
+            <div class="col mb-3 text-center" id="receiveText"></div>
+          </div>
+          <div class="modal-footer">
+            <input style="display:none;" id="receiveNo">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              취소
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="saveReceiveShipment(2)">수령확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/Modal2-->
     <!--/Modal-->
 
     <!--Script-->
+    <script src="../assets/js/new-return-request.js"></script>
     <script>
       function receiveConfirm(button){
       var shipNum=button.getAttribute('shipNum');

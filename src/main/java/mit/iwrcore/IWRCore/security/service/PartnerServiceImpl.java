@@ -78,6 +78,21 @@ public class PartnerServiceImpl implements PartnerService{
 
         return pageResultDTO;
     }
+    // 검수차수> 소속회사 외 검수차수 설정 가능한 협력회사 모두 보기
+    @Override
+    public PageResultDTO<PartnerDTO, Partner> getGumsuPartner(PageRequestDTO requestDTO) {
+        Page<Partner> partnerList=partnerRepository.getGumsuPartner(requestDTO);
+
+        Function<Partner, PartnerDTO> fn=(entity->partnerTodto(entity));
+        PageResultDTO pageResultDTO=new PageResultDTO<>(partnerList, fn);
+
+        pageResultDTO.setPartL(requestDTO.getPartL());
+        pageResultDTO.setPartM(requestDTO.getPartM());
+        pageResultDTO.setPartS(requestDTO.getPartS());
+        pageResultDTO.setPartnerSearch(requestDTO.getPartnerSearch());
+
+        return pageResultDTO;
+    }
 
 
 

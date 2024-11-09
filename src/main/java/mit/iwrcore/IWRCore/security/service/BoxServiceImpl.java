@@ -5,9 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.Box;
 import mit.iwrcore.IWRCore.repository.BoxRepository;
 import mit.iwrcore.IWRCore.security.dto.BoxDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import java.util.List;
 import java.util.stream.Collectors;

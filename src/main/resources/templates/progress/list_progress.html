@@ -152,24 +152,18 @@
                     <th rowspan="2">회사</th>
                     <th rowspan="2">제품</th>
                     <th rowspan="2">자재</th>
-                    <th rowspan="2">수량</th>
-                    <th rowspan="2">검수일</th>
                     <th colspan="2">협력회사</th>
-                    <th rowspan="2">남은기일</th>
-                    <th rowspan="2">
-                      <select class="form-select form-select-sm" style="width: fit-content;">
-                        <option>전체 진척도</option>
-                        <option>여유</option>
-                        <option>보통</option>
-                        <option>미달</option>
-                      </select>
-                    </th>
+                    <th colspan="4">검수</th>
                     <th rowspan="2">수정</th>
                     <th rowspan="2">추가 요청</th>
                   </tr>
                   <tr>
                     <th>제작수량</th>
                     <th>보유수량</th>
+                    <th>검수수량</th>
+                    <th>검수일정</th>
+                    <th>남은기일</th>
+                    <th>진척도</th>
                   </tr>
                 </thead>
                 <tbody id="firstTbody"></tbody>
@@ -285,7 +279,9 @@
           success:function(data){
             if(data.totalPage<page) finPage=true;
 
+            let idx=0;
             data.dtoList.forEach(x=>{
+              const gumsuNo=x.gumsuChasuDTO.gumsuDTO.gumsuNo;
               const gcnum=x.gumsuChasuDTO.gcnum;
               const partnerName=x.contractDTO.partnerDTO.name;
               const productName=x.contractDTO.jodalPlanDTO.proplanDTO.productDTO.name;
@@ -294,16 +290,26 @@
               const gumsuDate=x.gumsuChasuDTO.gumsuDate.split('T')[0];
               const make=x.gumsuChasuDTO.gumsuDTO.make;
               const allShipNum=x.allShipNum;
-              const percent=x.percent;
+              const percent=x.percent.toFixed(2);
               const remainingDate=x.remainingDate;
 
               const newRow = document.createElement("tr");
+              if(idx%3===0){
+                [partnerName, productName, materialName, make, make-allShipNum].forEach(text => {
+                  const item = document.createElement("td");
+                  item.rowSpan = 3;
+                  item.textContent = text;
+                  newRow.appendChild(item);
+                });
+              }
 
-              [partnerName, productName, materialName, gumsuNum, gumsuDate, make, make-allShipNum, remainingDate].forEach(text => {
+
+              [gumsuNum, gumsuDate, remainingDate].forEach(text => {
                 const item = document.createElement("td");
                 item.textContent = text;
                 newRow.appendChild(item);
               });
+
 
               const progressTd = document.createElement("td");
               if(percent>=70) { progressTd.innerHTML=`<p class="green-text">${percent}%</p>`; }
@@ -311,23 +317,27 @@
               if(percent<30) { progressTd.innerHTML=`<p class="red-text">${percent}%</p>`; }
               newRow.appendChild(progressTd);
 
-              const btn1Td = document.createElement("td");
-              btn1Td.innerHTML=`
-                <a href="/progress/modify_progress?gcnum=${gcnum}">
-                  <button class="btn btn-primary">수정</button>
-                </a>
-              `;
-              newRow.appendChild(btn1Td);
-
-              const btn2Td = document.createElement("td");
-              btn2Td.innerHTML=`
-                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalCenter" >
-                  요청
-                </button>
-              `;
-              newRow.appendChild(btn2Td);
-
+              if(idx%3===0){
+                const btn1Td = document.createElement("td");
+                btn1Td.rowSpan = 3;
+                btn1Td.innerHTML=`
+                  <a href="/progress/modify_progress?gumsuNo=${gumsuNo}">
+                    <button class="btn btn-primary">수정</button>
+                  </a>
+                `;
+                newRow.appendChild(btn1Td);
+                const btn2Td = document.createElement("td");
+                btn2Td.rowSpan = 3;
+                btn2Td.innerHTML=`
+                  <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalCenter" >
+                    요청
+                  </button>
+                `;
+                newRow.appendChild(btn2Td);
+              }
               firstTbody.appendChild(newRow);
+
+              idx++;
             });
           }
         });

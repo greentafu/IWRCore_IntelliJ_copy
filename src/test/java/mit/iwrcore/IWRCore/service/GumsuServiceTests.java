@@ -1,6 +1,7 @@
 package mit.iwrcore.IWRCore.service;
 
 import jakarta.transaction.Transactional;
+import mit.iwrcore.IWRCore.entity.Gumsu;
 import mit.iwrcore.IWRCore.repository.GumsuRepository;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.GumsuDTO;
@@ -25,30 +26,5 @@ public class GumsuServiceTests {
     @Autowired
     private GumsuRepository gumsuRepository;
 
-    @Test
-    @Transactional
-    @Commit
-    public void insert(){
-        BaljuDTO baljuDTO= baljuService.getBaljuById(1L);
-        GumsuDTO dto = GumsuDTO.builder()
-                .make(0L)
-                .who("이우식")
-                .memberDTO(memberService.findMemberDto(1L,null))
-                .baljuDTO(baljuDTO)
-                .build();
-        gumsuService.createGumsu(dto);
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test1(){
-        Pageable pageable= PageRequest.of(0,2);
-        gumsuRepository.couldGumsu(pageable).forEach(System.out::println);
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test12(){
-        System.out.println(gumsuService.getGumsuById(1L));
-    }
+
 }

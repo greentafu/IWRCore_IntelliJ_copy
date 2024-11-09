@@ -25,54 +25,37 @@
           <div class="card mb-4">
             <div class="card-body">
               <h5>반품 상세 내용 보기</h5>
+              <input type="number" style="display:none;" id="reNo" th:value="${returnsDTO.reNO}">
               <div class="mb-3">
                 <label class="form-label">자재명</label>
-                <input
-                        class="form-control"
-                        type="text"
-                        th:value="${returns.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}"
-                        readonly
-                />
+                <input class="form-control" type="text"
+                        th:value="${returnsDTO.shipmentDTO.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}" readonly/>
               </div>
               <div class="mb-3">
                 <label class="form-label">수량</label>
-                <input
-                        class="form-control"
-                        type="text"
-                        th:value="${returns.shipNum}"
-                        readonly
-                />
+                <input class="form-control" type="text" th:value="${returnsDTO.shipmentDTO.shipNum}" readonly/>
               </div>
               <div class="mb-3">
                 <label class="form-label">반품 내용</label>
-                <input
-                        class="form-control"
-                        type="text"
-                        th:value="${returns.returnsDTO.whyRe}"
-                        readonly
-                />
+                <input class="form-control" type="text" th:value="${returnsDTO.whyRe}" readonly/>
               </div>
               <div class="mb-3">
                 <label class="form-label">이유</label>
-                <textarea class="form-control" rows="4" readonly>[[${returns.returnsDTO.reDetail}]]</textarea>
+                <textarea class="form-control" rows="4" readonly>[[${returnsDTO.reDetail}]]</textarea>
               </div>
-
               <div class="mb-4">
                 <label class="form-label">비고</label>
-                <textarea class="form-control" rows="10" readonly>[[${returns.returnsDTO.bGo}]]</textarea>
+                <textarea class="form-control" rows="10" readonly>[[${returnsDTO.bGo}]]</textarea>
               </div>
               <div class="d-flex justify-content-between w-100">
                 <a th:href="@{/partner/list_return}">
                   <button type="button" class="btn btn-outline-secondary">목록가기</button>
                 </a>
                 <div>
-                  <th:block th:if="${returns.returnsDTO.returnCheck==0}">
-                    <form th:action="@{/partner/returnCheck}" method="post">
-                      <input type="number" style="display:none;" name="reNo" th:value="${returns.returnsDTO.reNO}">
-                      <button type="submit" class="btn btn-primary">확인</button>
-                    </form>
+                  <th:block th:if="${returnsDTO.returnCheck==0}">
+                    <button type="button" class="btn btn-primary" onclick="returnCheck()">확인</button>
                   </th:block>
-                  <th:block th:if="${returns.returnsDTO.returnCheck==1}">
+                  <th:block th:if="${returnsDTO.returnCheck==1}">
                     <button type="button" class="btn btn-secondary">확인완료</button>
                   </th:block>
                 </div>
@@ -87,7 +70,7 @@
 
     <!--/Modal-->
     <!--Script-->
-
+    <script src="../assets/js/partner-page.js"></script>
     <!--Script-->
   </span>
 

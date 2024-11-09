@@ -22,25 +22,26 @@ import java.time.LocalDateTime;
 @RequestMapping("/goodshandling")
 @RequiredArgsConstructor
 public class GoodsHandlingController {
-
-    private static final Logger log = LoggerFactory.getLogger(GoodsHandlingController.class);
     private final RequestService requestService;
     private final ShipmentService shipmentService;
     private final MemberService memberService;
     private final ReturnsService returnsService;
 
     @GetMapping("/list_received")
-    public void list_received(PageRequestDTO requestDTO, Model model){
-        model.addAttribute("list", shipmentService.pageShipment(requestDTO));
-    }
-    @GetMapping("/view_received")
-    public void view_received(@RequestParam Long shipNO, Model model){
-        model.addAttribute("shipment", shipmentService.convertToDTO(shipmentService.findShipmentEntity(shipNO)));
-    }
+    public void list_received(){}
     @GetMapping("/return_received")
     public void return_received(@RequestParam Long shipNo, Model model){
         model.addAttribute("shipment", shipmentService.findShipment(shipNo));
     }
+
+
+
+
+    @GetMapping("/view_received")
+    public void view_received(@RequestParam Long shipNO, Model model){
+        model.addAttribute("shipment", shipmentService.entityToDTO(shipmentService.getShipmentEntity(shipNO)));
+    }
+
     @GetMapping("/list_request")
     public void list_request(PageRequestDTO requestDTO, Model model){
         model.addAttribute("list", requestService.requestPage(requestDTO));
@@ -49,37 +50,37 @@ public class GoodsHandlingController {
     public void view_request(){
 
     }
-    @PostMapping("/receiveCheck")
-    public String receiveCheck(@ModelAttribute ShipmentDTO shipmentDTO){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
-        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
-        Member member=memberService.memberdtoToEntity(memberDTO);
-        Long shipNo=shipmentDTO.getShipNO();
-        LocalDateTime now=LocalDateTime.now();
-        shipmentService.updateShipmentDate(now, shipNo);
-        return "redirect:/goodshandling/list_received";
-    }
-    @PostMapping("/receiveConfirm")
-    public String receiveConfirm(@ModelAttribute ShipmentDTO shipmentDTO){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
-        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
-        Member member=memberService.memberdtoToEntity(memberDTO);
-        Long shipNo=shipmentDTO.getShipNO();
-        shipmentService.updateMemberCheck(member, shipNo);
-        return "redirect:/goodshandling/list_received";
-    }
-    @PostMapping("/savereturn")
-    public String savereturn(@ModelAttribute ReturnsDTO returnsDTO, @RequestParam("shipNo") Long shipNo){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
-        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
-
-        returnsService.addReturns(returnsDTO, memberDTO, shipNo);
-
-        return "redirect:/goodshandling/list_received";
-    }
+//    @PostMapping("/receiveCheck")
+//    public String receiveCheck(@ModelAttribute ShipmentDTO shipmentDTO){
+//        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+//        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
+//        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
+//        Member member=memberService.memberdtoToEntity(memberDTO);
+//        Long shipNo=shipmentDTO.getShipNO();
+//        LocalDateTime now=LocalDateTime.now();
+//        shipmentService.updateShipmentDate(now, shipNo);
+//        return "redirect:/goodshandling/list_received";
+//    }
+//    @PostMapping("/receiveConfirm")
+//    public String receiveConfirm(@ModelAttribute ShipmentDTO shipmentDTO){
+//        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+//        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
+//        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
+//        Member member=memberService.memberdtoToEntity(memberDTO);
+//        Long shipNo=shipmentDTO.getShipNO();
+//        shipmentService.updateMemberCheck(member, shipNo);
+//        return "redirect:/goodshandling/list_received";
+//    }
+//    @PostMapping("/savereturn")
+//    public String savereturn(@ModelAttribute ReturnsDTO returnsDTO, @RequestParam("shipNo") Long shipNo){
+//        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+//        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
+//        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
+//
+//        returnsService.addReturns(returnsDTO, memberDTO, shipNo);
+//
+//        return "redirect:/goodshandling/list_received";
+//    }
     @PostMapping("/request_check")
     public void request_check(){
 

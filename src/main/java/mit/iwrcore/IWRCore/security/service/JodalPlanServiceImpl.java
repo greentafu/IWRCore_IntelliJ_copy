@@ -38,7 +38,7 @@ public class JodalPlanServiceImpl implements JodalPlanService {
     @Override
     public void saveJodalPlanFromProplan(ProplanDTO proplanDTO, MemberDTO memberDTO) {
         Long product_id = proplanDTO.getProductDTO().getManuCode();
-        List<StructureDTO> structureDTOS = structureService.findByProduct_ManuCode(product_id);
+        List<StructureDTO> structureDTOS = structureService.getStructureByProduct(product_id);
         structureDTOS.forEach(x -> {
             JodalPlanDTO jodalPlanDTO = JodalPlanDTO.builder()
                     .memberDTO(memberDTO)
@@ -78,8 +78,7 @@ public class JodalPlanServiceImpl implements JodalPlanService {
     public JodalPlanDTO getJodalPlan(Long id) {
         JodalPlanDTO jodalPlanDTO=null;
         if(id!=null) {
-//            JodalPlan jodalPlan=jodalPlanRepository.findById(id).get();
-            JodalPlan jodalPlan=(JodalPlan) jodalPlanRepository.getJodalPlan(id).get(0)[0];
+            JodalPlan jodalPlan=jodalPlanRepository.findById(id).get();
             jodalPlanDTO=entityToDTO(jodalPlan);
         }
         return jodalPlanDTO;
@@ -90,7 +89,7 @@ public class JodalPlanServiceImpl implements JodalPlanService {
         return (count!=null)?count:0L;
     }
     @Override
-    public List<JodalPlanDTO> findJodalPlanByProPlan(Long proplanNo){
+    public List<JodalPlanDTO> getJodalPlanByProPlan(Long proplanNo){
         List<JodalPlan> entityList=jodalPlanRepository.findByProPlanProplanNo(proplanNo);
         List<JodalPlanDTO> dtoList=entityList.stream().map(this::entityToDTO).toList();
         return dtoList;
@@ -98,8 +97,7 @@ public class JodalPlanServiceImpl implements JodalPlanService {
     @Override
     public List<JodalPlanJodalChsuDTO> noneContract(){
         List<Object[]> entityList=jodalPlanRepository.noneContractJodalPlanList();
-        List<JodalPlanJodalChsuDTO> dtoList=entityList.stream().map(this::exJodalPlanJodalChsuDTO).toList();
-        return dtoList;
+        return entityList.stream().map(this::exJodalPlanJodalChsuDTO).toList();
     }
 
 

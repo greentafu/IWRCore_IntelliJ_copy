@@ -1,27 +1,16 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.Member;
 import mit.iwrcore.IWRCore.entity.MemberRole;
-import mit.iwrcore.IWRCore.entity.Product;
-import mit.iwrcore.IWRCore.entity.QMember;
 import mit.iwrcore.IWRCore.repository.MemberRepository;
 import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
-import mit.iwrcore.IWRCore.security.dto.ProductDTO;
-import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 @Service

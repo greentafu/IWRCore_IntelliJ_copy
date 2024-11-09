@@ -6,10 +6,8 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.JodalPlanJodalChsuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturctureDTO;
 
 import java.util.List;
-import java.util.Objects;
 
 public interface JodalPlanService {
     // 저장, 삭제
@@ -24,7 +22,7 @@ public interface JodalPlanService {
     // 조회
     JodalPlanDTO getJodalPlan(Long id);
     Long newNoneJodalChasuCount();
-    List<JodalPlanDTO> findJodalPlanByProPlan(Long proplanNo);
+    List<JodalPlanDTO> getJodalPlanByProPlan(Long proplanNo);
     List<JodalPlanJodalChsuDTO> noneContract();
 
 

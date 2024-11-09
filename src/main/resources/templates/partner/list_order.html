@@ -27,14 +27,12 @@
               <thead>
                 <tr>
                   <th>발주일</th>
-                  <th>서류명</th>
                   <th>다운로드</th>
                 </tr>
               </thead>
               <tbody class="table-border-bottom-0">
                 <tr th:each="list:${balju_list.dtoList}">
                   <td>[[${#temporals.format(list.regDate, 'yyyy-MM-dd')}]]</td>
-                  <td>[[${list.filename}]]</td>
                   <td>
                     <button type="button" class="btn btn-sm btn-outline-primary">
                       <span class="bx bx-arrow-to-bottom"></span>

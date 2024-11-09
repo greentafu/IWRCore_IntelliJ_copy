@@ -20,87 +20,28 @@
   <span id="content">
     <div class="container-xxl flex-grow-1 container-p-y">
       <div class="card mb-4">
+        <input type="number" id="baljuNo" style="display:none;" th:value="${baljuDTO.baljuNo}">
         <div class="d-flex justify-content-between w-100">
-          <h5 class="card-header">
-            <button type="button" class="btn btn-outline-primary btn-lg">
-              [[${list.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}]]
-            </button>
-          </h5>
+          <div th:id="'materialSpace'+${baljuDTO.baljuNo}"></div>
           <div class="demo-inline-spacing">
-
-            <th:block th:if="${list.returns}!=null and ${list.returns}!=1">
-              <button type="button" class="btn btn-sm btn-primary" th:onclick="|location.href='@{/partner/view_return(reNO=${list.returns})}'|">
-                <span class="tf-icons bx bx-redo"></span>&nbsp; 반품처리
-              </button>
-            </th:block>
-            <th:block th:if="${list.returns}==null or ${list.returns}==1">
-              <button type="button" class="btn btn-sm btn-outline-primary">
-                <span class="tf-icons bx bx-redo"></span>&nbsp; 반품처리
-              </button>
-            </th:block>
-
-            <th:block th:if="${list.emergency}!=null and ${list.emergency}!=1">
-              <button type="button" class="btn btn-sm btn-primary" th:onclick="|location.href='@{/partner/list_urgent}'|">
-                <span class="tf-icons bx bx-task"></span>&nbsp; 긴급납품
-              </button>
-            </th:block>
-            <th:block th:if="${list.emergency}==null or ${list.emergency}==1">
-              <button type="button" class="btn btn-sm btn-outline-primary">
-                <span class="tf-icons bx bx-task"></span>&nbsp; 긴급납품
-              </button>
-            </th:block>
-
+            <div class="row" th:id="'btnSpace'+${baljuDTO.baljuNo}"></div>
           </div>
         </div>
         <hr class="m-0" />
         <div class="card-body">
           <span class="text-light fw-semibold">납기일</span>
-          <div class="d-flex justify-content-between w-100">
+          <div class="d-flex justify-content-between w-100" th:id="'dateLine'+${baljuDTO.baljuNo}">
             <span></span>
-            <b th:each="chasu:${list.jodalList}">
-              [[${#temporals.format(chasu.dueDate, 'yyyy-MM-dd')}]]
-            </b>
           </div>
           <div class="demo-vertical-spacing mb-4">
-            <div class="row g-0">
-              <div class="progress" th:each="chasu:${list.jodalList}">
-                <div
-                        class="progress-bar bg-info"
-                        role="progressbar"
-                        th:style="'width: '+${chasu.percent}+'%'"
-                        aria-valuenow="20"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                >
-                  [[${chasu.percent}]]%
-                  <span class="count" style="display: none;">[[${#lists.size(list.jodalList)}]]</span>
-                </div>
-              </div>
-            </div>
+            <div class="row g-0" th:id="'dateProgress'+${baljuDTO.baljuNo}"></div>
           </div>
           <span class="text-light fw-semibold">납기량</span>
-          <div class="d-flex justify-content-between w-100">
+          <div class="d-flex justify-content-between w-100" th:id="'numberLine'+${baljuDTO.baljuNo}">
             <span></span>
-            <b th:each="chasu:${list.jodalList}">
-              [[${chasu.quantity}]]
-            </b>
           </div>
           <div class="demo-vertical-spacing mb-4">
-            <div class="row g-0">
-              <div class="progress" th:each="chasu:${list.jodalList}">
-                <div
-                        class="progress-bar"
-                        role="progressbar"
-                        th:style="'width: '+${chasu.count}+'%'"
-                        aria-valuenow="25"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                >
-                  [[${chasu.count}]]%
-                  <span class="count" style="display: none;">[[${#lists.size(list.jodalList)}]]</span>
-                </div>
-              </div>
-            </div>
+            <div class="row g-0" th:id="'numberProgress'+${baljuDTO.baljuNo}"></div>
           </div>
         </div>
         <hr class="m-0">
@@ -113,31 +54,18 @@
                 <th>총 출고수량</th>
                 <th>총 반품수량</th>
               </tr>
-              <tr>
-                <td>[[${list.jodalList[0].totalOrder}]]</td>
-                <td>[[${list.gumsuList[0].totalOrder-list.totalShipment}]]</td>
-                <td>[[${list.totalShipment}]]</td>
-                <td>[[${list.totalReturn}]]</td>
-              </tr>
+              <tr th:id="'productTable'+${baljuDTO.baljuNo}"></tr>
             </table>
           </div>
         </div>
         <hr class="m-0">
         <div class="card-body">
-          <span class="text-light small fw-semibold">생산량</span>
-          <div class="demo-vertical-spacing">
-            <form class="input-group" th:action="@{/partner/addQuantity}" method="post">
-              <input type="number" style="display:none;" name="baljuNo" th:value="${list.baljuDTO.baljuNo}">
-              <input
-                      type="text"
-                      class="form-control"
-                      placeholder="생산량 입력"
-                      aria-label="Recipient's username"
-                      aria-describedby="button-addon2"
-                      name="quantity"
-              />
-              <button type="submit" class="btn btn-outline-primary">등록</button>
-            </form>
+          <span class="text-light fw-semibold mb-4">생산량</span>
+          <div class="row">
+            <div class="col-md-11">
+              <input type="number" class="form-control" placeholder="생산량 입력" aria-label="Recipient's username" aria-describedby="button-addon2" id="makeQuantity"/>
+            </div>
+            <button type="button" class="btn btn-outline-primary col-md-1" onclick="addQuantity()">등록</button>
           </div>
         </div>
         <hr class="m-0" />
@@ -164,64 +92,44 @@
           <div class="modal-header">
             <h5 class="modal-title" id="modalCenterTitle">출고 완료 처리</h5>
           </div>
-          <form th:action="@{/partner/release}" method="post">
-            <div class="modal-body">
-              <label class="form-label">품목명</label>
-              <input style="display:none;" name="baljuNo" th:value="${list.baljuDTO.baljuNo}">
-              <input
-                      type="text"
-                      class="form-control"
-                      th:value="${list.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}"
-                      readonly
-              />
-              <div class="row g-2">
-                <div class="col mb-0">
-                  <label for="emailWithTitle" class="form-label">날짜</label>
-                  <input
-                          type="text"
-                          id="emailWithTitle"
-                          class="form-control"
-                          th:value="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd')}"
-                          readonly
-                  />
-                </div>
-                <div class="col mb-0">
-                  <label for="dobWithTitle" class="form-label">보유수량</label>
-                  <input
-                          type="text"
-                          class="form-control"
-                          th:value="${list.gumsuList[0].totalOrder-list.totalShipment}"
-                          readonly
-                  />
-                </div>
+          <div class="modal-body">
+            <label class="form-label">품목명</label>
+            <input type="text" class="form-control" th:value="${baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}" readonly/>
+            <div class="row g-2">
+              <div class="col mb-0">
+                <label class="form-label">날짜</label>
+                <input type="text" class="form-control"th:value="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd')}" readonly/>
               </div>
-              <label for="dobWithTitle" class="form-label">출고량</label>
-              <input
-                      type="text"
-                      id="dobWithTitle"
-                      class="form-control"
-                      placeholder="출고량 입력"
-                      name="shipNum"
-              />
-              <label class="form-label">비고</label>
-              <textarea class="form-control mb-4" rows="15" style="width: 100%;" name="text"></textarea>
+              <div class="col mb-0">
+                <label class="form-label">보유수량</label>
+                <input type="text" class="form-control" th:id="getNum" readonly/>
+              </div>
             </div>
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">
-                출고 완료
-              </button>
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                취소
-              </button>
-            </div>
-          </form>
+            <label class="form-label">출고량</label>
+            <input type="number" id="shipNum" class="form-control" placeholder="출고량 입력"/>
+            <label class="form-label">비고</label>
+            <textarea class="form-control mb-4" rows="15" style="width: 100%;" id="shipText"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="release()">
+              출고 완료
+            </button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              취소
+            </button>
+          </div>
         </div>
       </div>
     </div>
     <!--/Modal-->
 
     <!--Script-->
-
+    <script src="../assets/js/partner-page.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        initPartnerProduct();
+      });
+    </script>
     <!--Script-->
   </span>
 

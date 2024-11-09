@@ -10,8 +10,14 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class SaveGumsuDTO {
-    String baljuNo;
-    String person;
-    String partnerNo;
-    List<TdData> tdData;
+    private Long gumsuNo;
+    private Long baljuNo;
+    private String person;
+    private Long partnerNo;
+    private Long oneNum;
+    private String oneDate;
+    private Long twoNum;
+    private String twoDate;
+    private Long threeNum;
+    private String threeDate;
 }

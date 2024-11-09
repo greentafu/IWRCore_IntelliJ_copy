@@ -52,56 +52,26 @@
                   <td rowspan="3">[[${list.contractDTO.jodalPlanDTO.materialDTO.materCode}]]</td>
                   <td rowspan="3">[[${list.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
                   <td>1차</td>
-                  <td>
-                    <input type="number" style="border: 0; width: 100%;"
-                           th:value="${list.baljuChasuDTOs[0].balNum}"
-                           th:id="'oneNum'+${list.contractDTO.conNo}"
-                           th:styleappend="${list.remainder<0?'color:red':'color:black'}">
-                  <td>
-                  <input type="date" style="border: 0; width: 100%;"
-                         th:value="${#temporals.format(list.baljuChasuDTOs[0].balDate, 'yyyy-MM-dd')}"
-                         th:id="'oneDate'+${list.contractDTO.conNo}">
-                </td>
+                  <td>[[${list.baljuChasuDTOs[0].balNum}]]</td>
+                  <td>[[${#temporals.format(list.baljuChasuDTOs[0].balDate, 'yyyy-MM-dd')}]]</td>
                 </tr>
                 <tr>
                   <td>2차</td>
-                  <td>
-                    <input type="number" style="border: 0; width: 100%;"
-                           th:value="${list.baljuChasuDTOs[1].balNum}"
-                           th:id="'twoNum'+${list.contractDTO.conNo}"
-                           th:styleappend="${list.remainder<0?'color:red':'color:black'}">
-                  </td>
-                  <td>
-                    <input type="date" style="border: 0; width: 100%;"
-                           th:value="${#temporals.format(list.baljuChasuDTOs[1].balDate, 'yyyy-MM-dd')}"
-                           th:id="'twoDate'+${list.contractDTO.conNo}">
-                  </td>
+                  <td>[[${list.baljuChasuDTOs[1].balNum}]]</td>
+                  <td>[[${#temporals.format(list.baljuChasuDTOs[1].balDate, 'yyyy-MM-dd')}]]</td>
                 </tr>
                 <tr>
                   <td>3차</td>
-                  <td>
-                    <input type="number" style="border: 0; width: 100%;"
-                           th:value="${list.baljuChasuDTOs[2].balNum}"
-                           th:id="'threeNum'+${list.contractDTO.conNo}"
-                           th:styleappend="${list.remainder<0?'color:red':'color:black'}">
-                  </td>
-                  <td>
-                    <input type="date" style="border: 0; width: 100%;"
-                           th:value="${#temporals.format(list.baljuChasuDTOs[2].balDate, 'yyyy-MM-dd')}"
-                           th:id="'threeDate'+${list.contractDTO.conNo}">
-                  </td>
+                  <td>[[${list.baljuChasuDTOs[2].balNum}]]</td>
+                  <td>[[${#temporals.format(list.baljuChasuDTOs[2].balDate, 'yyyy-MM-dd')}]]</td>
                 </tr>
                 <tr>
                   <td>배송장소</td>
-                  <td colspan="4">
-                    <input type="text" style="border: 0; width: 100%;" th:id="'location'+${list.contractDTO.conNo}" th:value="${list.baljuDTO.baljuWhere}">
-                  </td>
+                  <td colspan="4">[[${list.baljuDTO.baljuWhere}]]</td>
                 </tr>
                 <tr>
                   <td>배송 요청 사항</td>
-                  <td colspan="4">
-                    <textarea style="width: 100%; border: 0;" rows="4" th:id="'text'+${list.contractDTO.conNo}">[[${list.baljuDTO.baljuPlz}]]</textarea>
-                  </td>
+                  <td colspan="4">[[${list.baljuDTO.baljuPlz}]]</td>
                 </tr>
               </table>
             </div>

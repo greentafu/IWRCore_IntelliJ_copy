@@ -36,7 +36,7 @@
             <label class="form-label">협력업체명</label>
             <div class="row">
               <div class="col-md-6">
-                <input class="form-control" type="text" id="partnerName"/>
+                <input class="form-control" type="text" id="partnerName" th:value="${name}"/>
               </div>
               <div class="col-md-6">
                 <button
@@ -44,11 +44,12 @@
                         class="btn btn-outline-primary"
                         data-bs-toggle="modal"
                         data-bs-target="#modalScrollable"
-                >공급자 선택
+                >
+                  공급자 선택
                 </button>
               </div>
             </div>
-            <input class="form-control" type="number" id="partnerNo" style="display:none;"/>
+            <input class="form-control" type="number" id="partnerNo" style="display:none;" th:value="${pno}"/>
           </div>
           <hr class="m-0">
           <div class="card-body">
@@ -138,7 +139,7 @@
                     <input type="text" class="form-control" id="partnerSearch" style="height: 32px; font-size: 12px;" value="">
                   </div>
                   <div class="col-md-4">
-                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn()">검색</button>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn('balju')">검색</button>
                   </div>
                 </div>
               </div>
@@ -208,7 +209,7 @@
 
     <!--Script-->
     <script src="../assets/js/new-contract-order-invoice.js"></script>
-    <script src="../assets/js/new-jodalplan.js"></script>
+    <script src="../assets/js/new-jodalchasu-gumsuchasu.js"></script>
     <script src="../assets/js/etc-crud.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -238,6 +239,11 @@
         loadItems('balju');
         locationList();
 
+        const pno=document.getElementById('partnerNo').value;
+        if(pno!==0){
+          getNonBaljuContract(pno);
+        }
+
         const container = document.getElementById('setTable');
         container.addEventListener('input', function(event) {
             if (event.target.matches('input[id*="Num"]')) {
@@ -246,6 +252,9 @@
         });
 
       });
+
+      const pno=document.getElementById('partnerNo').value;
+      if(pno) getNonBaljuContract(pno);
 
       let timeout;
       document.getElementById('searchLocation').addEventListener("input", function(){

@@ -1,6 +1,5 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import mit.iwrcore.IWRCore.entity.FileMaterial;
 import mit.iwrcore.IWRCore.entity.FileProduct;
 import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;

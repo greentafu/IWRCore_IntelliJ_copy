@@ -1,13 +1,15 @@
 package mit.iwrcore.IWRCore.repository;
 
 import mit.iwrcore.IWRCore.entity.JodalChasu;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.QuantityDateDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface JodalChasuRepository extends JpaRepository<JodalChasu, Long> {
+    @Query("select jc from JodalChasu jc where jc.jodalPlan.joNo=:joNo")
+    List<JodalChasu> findJCfromJP(Long joNo);
+
     @Query("select j from JodalChasu j where j.jodalPlan.joNo=:jpnum")
     List<JodalChasu> getJodalChausFromPlan(Long jpnum);
 
@@ -20,8 +22,4 @@ public interface JodalChasuRepository extends JpaRepository<JodalChasu, Long> {
             "where j.proPlan.proplanNo=:proplanNo " +
             "group by j, jc")
     List<Object[]> modifyJodalChasu(Long proplanNo);
-
-    @Query("select jc from JodalChasu jc where jc.jodalPlan.joNo=:joNo")
-    List<JodalChasu> findJCfromJP(Long joNo);
-
 }

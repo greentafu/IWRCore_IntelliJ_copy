@@ -28,21 +28,26 @@ public class OrderController {
     @GetMapping("/list_order")
     public void list_order(){}
     @GetMapping("/new_order")
-    public void new_order(){}
-    @GetMapping("/new_order2")
     public void new_order2(@RequestParam(required = false) Long conNo, Model model){
-        ContractDTO contractDTO=contractService.getContractById(conNo);
-        model.addAttribute("partner", contractDTO.getPartnerDTO());
+        Long pno=0L;
+        String name="";
+        if(conNo!=null){
+            PartnerDTO partnerDTO=contractService.getContract(conNo).getPartnerDTO();
+            pno=partnerDTO.getPno();
+            name=partnerDTO.getName();
+        }
+        model.addAttribute("pno", pno);
+        model.addAttribute("name", name);
     }
     @GetMapping("/modify_order")
     public void modify_order2(Long baljuNo, Model model){
-        PartnerDTO partnerDTO=baljuService.getBaljuById(baljuNo).getContractDTO().getPartnerDTO();
+        PartnerDTO partnerDTO=baljuService.getBalju(baljuNo).getContractDTO().getPartnerDTO();
         model.addAttribute("partner", partnerDTO);
         model.addAttribute("baljuList", baljuChasuService.modifyBalju(partnerDTO.getPno()));
     }
     @GetMapping("/order")
     public void download_order(Long baljuNo, Model model){
-        PartnerDTO partnerDTO=baljuService.getBaljuById(baljuNo).getContractDTO().getPartnerDTO();
+        PartnerDTO partnerDTO=baljuService.getBalju(baljuNo).getContractDTO().getPartnerDTO();
         model.addAttribute("partner", partnerDTO);
         model.addAttribute("baljuList", baljuChasuService.modifyBalju(partnerDTO.getPno()));
     }

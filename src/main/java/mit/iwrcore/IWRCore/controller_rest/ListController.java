@@ -58,7 +58,7 @@ public class ListController {
                 .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
                 .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch).box(selectedBox).build();
 
-        return materialService.findMaterialAll(requestDTO);
+        return materialService.getMaterialAll(requestDTO);
     }
 
     @GetMapping("/productDevList")
@@ -275,6 +275,7 @@ public class ListController {
         return gumsuService.couldGumsu(requestDTO);
     }
 
+    // 검수차수> 진행도
     @GetMapping("/gumsuChasuList")
     public PageResultDTO<GumsuChasuContractDTO, Object[]> gumsuChasuList(@RequestParam(required = false) int page,
                                                                          @RequestParam(required = false) Long selectPartL, @RequestParam(required = false) Long selectPartM,

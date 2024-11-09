@@ -1,60 +1,39 @@
 package mit.iwrcore.IWRCore.security.service;
 
-
 import mit.iwrcore.IWRCore.entity.Balju;
-import mit.iwrcore.IWRCore.entity.BaljuChasu;
-import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.NewOrderDTO;
 
 import java.util.List;
 
 public interface BaljuService {
-    // 추가, 삭제
-    BaljuDTO saveBalju(BaljuDTO baljuDTO, List<BaljuChasu> baljuChasuList);
+    // 저장, 삭제
+    BaljuDTO saveBalju(BaljuDTO baljuDTO);
     void deleteBalju(Long id);
+    BaljuDTO modifyBalju(BaljuDTO baljuDTO);
+
     // 변환
     Balju dtoToEntity(BaljuDTO dto);
     BaljuDTO entityToDTO(Balju entity);
+
     // 조회
-    BaljuDTO getBaljuById(Long id);
+    BaljuDTO getBalju(Long id);
 
 
-
-
-
-
-    // 기존 BaljuDTO 수정
-    BaljuDTO updateBalju(Long id, BaljuDTO baljuDTO);
-
-
-
-
-    // 모든 BaljuDTO 조회
-    List<BaljuDTO> getAllBaljus();
-
-    // 발주완료 리스트
-    PageResultDTO<BaljuDTO, Balju> finishedBalju(PageRequestDTO2 requestDTO);
-    // 발주완료 리스트 새로
-    PageResultDTO<ContractBaljuDTO, Object[]> finBaljuPage(PageRequestDTO2 requestDTO);
-    // 계약서 리스트+발주여부
+    // 계약서> 계약 완료 목록
     PageResultDTO<ContractBaljuDTO, Object[]> finishedContract(PageRequestDTO2 requestDTO);
-    // 계약서 리스트+발주해야할 것만
+    // 발주서> 발주 해야하는 계약 목록
     PageResultDTO<ContractBaljuDTO, Object[]> couldBalju(PageRequestDTO requestDTO);
-
-    // 협력회사용 발주서 목록
-    PageResultDTO<BaljuDTO, Object[]> partnerBaljuList(PageRequestDTO requestDTO);
-    // 협력회사 발주서 목록
+    // 발주서> 발주완료한 목록
+    PageResultDTO<ContractBaljuDTO, Object[]> finBaljuPage(PageRequestDTO2 requestDTO);
+    // 발주서> 협력회사별 발주 가능한 목록
     List<BaljuDTO> partListBalju(Long pno);
-
-    // 발주한 하는 목록(협력회사로 묶음)
-    List<NewOrderDTO> modifyBalju(Long pno);
-
-    // 발주한 제품 목록
+    // 협력회사> 협력회사용 발주서 목록
+    PageResultDTO<BaljuDTO, Balju> partnerBaljuList(PageRequestDTO requestDTO);
+    // 메인화면> 발주 중인 제품 목록
     List<ProductDTO> baljuProduct();
 }

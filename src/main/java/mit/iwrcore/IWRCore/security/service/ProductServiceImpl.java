@@ -4,21 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.FileProduct;
 import mit.iwrcore.IWRCore.entity.Product;
-import mit.iwrcore.IWRCore.repository.MaterialRepository;
-import mit.iwrcore.IWRCore.repository.Category.Pro.ProSCodeRepository;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
 import mit.iwrcore.IWRCore.repository.ProductRepository;
 import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2

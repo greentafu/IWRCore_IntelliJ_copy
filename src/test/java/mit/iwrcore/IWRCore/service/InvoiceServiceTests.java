@@ -20,19 +20,5 @@ public class InvoiceServiceTests {
         @Autowired
         private InvoiceService invoiceService;
 
-    @Test
-    @Transactional
-    @Commit
-    public void insert(){
-        InvoiceDTO dto = InvoiceDTO.builder()
-                .plz("영수")
-                .dateCreated(LocalDateTime.now())
-                .memberDTO(memberService.findMemberDto(1L,null))
-                .cash(100000L)
-                .text("asd")
-                .build();
-
-        System.out.println(invoiceService.createInvoice(dto));
-    }
 
 }

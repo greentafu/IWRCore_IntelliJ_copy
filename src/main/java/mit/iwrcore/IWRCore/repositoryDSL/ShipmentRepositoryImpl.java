@@ -2,18 +2,14 @@ package mit.iwrcore.IWRCore.repositoryDSL;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.NumberTemplate;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;

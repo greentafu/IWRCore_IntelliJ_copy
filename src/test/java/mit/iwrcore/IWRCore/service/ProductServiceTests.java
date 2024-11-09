@@ -40,30 +40,6 @@ public class ProductServiceTests {
     private ProCodeService proCodeService;
     @Autowired
     private MemberService memberService;
-    // 데이터 삽입
-    @Test
-    @Transactional
-    @Commit
-    public void insert(){
-        ProductDTO dto=ProductDTO.builder()
-                .name("A자전거").color("빨강").text("").uuid("")
-                .supervisor("감독자1").mater_imsi(0L).mater_check(0L)
-                .memberDTO(memberService.findMemberDto(1L, null))
-                .proSDTO(proCodeService.findProS(1L))
-                .build();
-        productRepository.save(productServiceImpl.productDtoToEntity(dto));
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test23(){
-        Pageable pageable=PageRequest.of(0,2);
-    }
 
-    @Test
-    public void test(){
-        PageRequestDTO requestDTO=PageRequestDTO.builder().page(1).size(2).build();
-        System.out.println(productRepository.findProductByCustomQuery(requestDTO));
-    }
 
 }

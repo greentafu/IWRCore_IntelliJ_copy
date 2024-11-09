@@ -153,7 +153,6 @@
                       </select>
                     </th>
                     <th rowspan="2">업체명</th>
-                    <th rowspan="2">다운로드</th>
                     <th rowspan="2">
                       <select class="form-select form-select-sm" style="width: fit-content;" id="receiveReturn">
                         <option value="">전체 상태</option>
@@ -193,13 +192,11 @@
             </div>
           </div>
           <div class="modal-footer">
-            <form th:action="@{/goodshandling/receiveConfirm}" method="post">
-              <input style="display:none;" name="shipNO" id="receiveConfirmNo">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                취소
-              </button>
-              <button type="submit" class="btn btn-primary">입고확정</button>
-            </form>
+            <input style="display:none;" id="receiveConfirmNo">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              취소
+            </button>
+            <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" onclick="saveCheckShipment(1)">입고확정</button>
           </div>
         </div>
       </div>
@@ -216,18 +213,17 @@
             <div class="col mb-3 text-center" id="receiveText"></div>
           </div>
           <div class="modal-footer">
-            <form th:action="@{/goodshandling/receiveCheck}" method="post">
-              <input style="display:none;" name="shipNO" id="receiveNo">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                취소
-              </button>
-              <button type="submit" class="btn btn-primary">수령확인</button>
-            </form>
+            <input style="display:none;" id="receiveNo">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              취소
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="saveReceiveShipment(1)">수령확인</button>
           </div>
         </div>
       </div>
     </div>
     <!--/Modal2-->
+    <!--Modal3-->
     <div id="myModal" class="modal">
       <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
@@ -236,9 +232,11 @@
         <button onclick="emailContact()" class="btn btn-secondary">담당자 이메일 보내기</button>
       </div>
     </div>
+    <!--/Modal3-->
     <!--/Modal-->
 
     <!--Script-->
+    <script src="../assets/js/new-return-request.js"></script>
     <script>
       let page = 1;
       let finPage=false;
@@ -360,11 +358,6 @@
               });
 
               const recieveBtnTd = document.createElement("td");
-              if(receipt==null) { recieveBtnTd.innerHTML=`
-                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCenter2" shipNum="${shipNum}" shipNo="${shipNO}" onclick="receivebutton(this)">
-                  수령
-                </button>
-              `; }
               if(receipt!=null) {
                 if(receiveCheck==1) { recieveBtnTd.innerHTML=`<span style="color: green;">${shipNum} (입고)</span>`; }
                 if(reNo!=0) { recieveBtnTd.innerHTML=`<span style="color: red;">${shipNum} (반품)</span>`; }
@@ -381,15 +374,12 @@
               partnerNameTd.textContent = partnerName;
               newRow.appendChild(partnerNameTd);
 
-              const btn0Td = document.createElement("td");
-              btn0Td.innerHTML=`
-                <button type="button" class="btn btn-outline-primary">
-                  <span class="bx bx-download"></span>
-                </button>
-              `;
-              newRow.appendChild(btn0Td);
-
               const receiveReturnTd = document.createElement("td");
+              if(receipt==null) { receiveReturnTd.innerHTML=`
+                <button type="button" class="btn btn-outline-primary" style="width: 150px;" data-bs-toggle="modal" data-bs-target="#modalCenter2" shipNum="${shipNum}" shipNo="${shipNO}" onclick="receivebutton(this)">
+                  수령
+                </button>
+              `; }
               if(receipt!=null && reNo==0 && receiveCheck==0) { receiveReturnTd.innerHTML=`
                 <a href="/goodshandling/return_received?shipNo=${shipNO}">
                   <button class="btn btn-primary">반품</button>
@@ -399,18 +389,8 @@
                 </button>
               `;
               }
-              if(receiveCheck==1) { receiveReturnTd.innerHTML=`
-                <a href="javascript:void(0);" class="menu-link" onclick="alert('이미 완료된 작업 입니다.');">
-                  <button  class="btn btn-secondary">입고완료</button>
-                </a>
-              `;
-              }
-              if(reNo!=0) { receiveReturnTd.innerHTML=`
-                <a href="javascript:void(0);" class="menu-link" onclick="alert('이미 완료된 작업 입니다.');">
-                  <button  class="btn btn-secondary">반품완료</button>
-                </a>
-              `;
-              }
+              if(receiveCheck==1) receiveReturnTd.innerHTML=`<button class="btn btn-secondary" style="width: 150px;">입고완료</button>`;
+              if(reNo!=0) receiveReturnTd.innerHTML=`<button class="btn btn-secondary" style="width: 150px;">반품완료</button>`;
               newRow.appendChild(receiveReturnTd);
 
               const btn2Td = document.createElement("td");
@@ -440,23 +420,6 @@
 
         loadItems();
       });
-    </script>
-
-    <script>
-      function receivebutton(button){
-        var shipNum=button.getAttribute('shipNum');
-        var shipNo=button.getAttribute('shipNo');
-        document.getElementById('receiveText').innerHTML="협력회사에서 보낸 수량은 "+shipNum+"개 입니다.<br/>수령확정시 '수령확인'버튼을 누르세요.";
-        document.getElementById('receiveNo').value=shipNo;
-      }
-
-      function receiveConfirm(button){
-      var shipNum=button.getAttribute('shipNum');
-        var shipNo=button.getAttribute('shipNo');
-        document.getElementById('receiveConfirmText').innerHTML="협력회사에서 보낸 수량 "+shipNum+"개를 입고확정하시겠습니까?<br/>입고확정시 '입고확정'버튼을 누르세요.";
-        document.getElementById('receiveConfirmNo').value=shipNo;
-      }
-
     </script>
     <script>
       function showConfirmation() {

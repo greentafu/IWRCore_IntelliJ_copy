@@ -1,44 +1,32 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import mit.iwrcore.IWRCore.entity.Gumsu;
-import mit.iwrcore.IWRCore.entity.Partner;
 import mit.iwrcore.IWRCore.security.dto.GumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuBaljuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuGumsuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuJodalChasuDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface GumsuService {
-
-    // DTO를 엔티티로 변환
-    Gumsu convertToEntity(GumsuDTO dto);
-
-    // 엔티티를 DTO로 변환
-    GumsuDTO convertToDTO(Gumsu entity);
-
-    // 기타 CRUD 메서드
-    GumsuDTO createGumsu(GumsuDTO gumsuDTO);
-
-    GumsuDTO getGumsuById(Long id);
-
-    GumsuDTO getGumsuByBalju(Long baljuNo);
-
-    GumsuDTO updateGumsu(Long id, GumsuDTO gumsuDTO);
-
+    // 저장, 삭제
+    GumsuDTO saveGumsu(GumsuDTO gumsuDTO);
     void deleteGumsu(Long id);
+    GumsuDTO modifyGumsu(GumsuDTO gumsuDTO);
 
-    List<GumsuDTO> getAllGumsus();
+    // 변환
+    Gumsu dtoToEntity(GumsuDTO dto);
+    GumsuDTO entityToDTO(Gumsu entity);
 
-    PageResultDTO<BaljuGumsuDTO, Object[]> couldGumsu(PageRequestDTO requestDTO);
-
+    // 조회
+    GumsuDTO getGumsu(Long id);
+    GumsuDTO getGumsuByBalju(Long baljuNo);
     Long getQuantityMake(Long baljuNo);
 
-    List<Partner> getNonGumsuPartner();
 
-    List<BaljuJodalChasuDTO> getNoneGumsuBalju(Long pno);
-
-    List<BaljuJodalChasuDTO> modifyGumsu(Long baljuNo);
+    // 검수차수> 검수해야할 목록
+    PageResultDTO<BaljuGumsuDTO, Object[]> couldGumsu(PageRequestDTO requestDTO);
+    // 검수차수> 회사별 검수차수 설정 가능 발주 목록
+    List<BaljuBaljuChasuDTO> getNoneGumsuBalju(Long pno);
 }

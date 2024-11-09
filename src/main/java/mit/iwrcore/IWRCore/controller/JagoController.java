@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class JagoController {
 
-    private final MaterService materService;
-    private final ProCodeService proCodeService;
     private final ContractService contractService;
     private final BoxService boxService;
 

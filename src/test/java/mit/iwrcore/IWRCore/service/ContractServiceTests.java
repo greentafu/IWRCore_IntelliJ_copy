@@ -34,10 +34,6 @@ public class ContractServiceTests {
     @Autowired
     private PartnerService partnerService;
 
-    @Test
-    @Transactional
-    @Commit
-    public void testCreateContract() {
-    }
+
 
 }

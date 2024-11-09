@@ -1,18 +1,12 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
-import mit.iwrcore.IWRCore.entity.GumsuChasu;
-import mit.iwrcore.IWRCore.entity.Line;
 import mit.iwrcore.IWRCore.entity.Location;
-import mit.iwrcore.IWRCore.repository.LineRepository;
 import mit.iwrcore.IWRCore.repository.LocationRepository;
-import mit.iwrcore.IWRCore.security.dto.GumsuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.LocationDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

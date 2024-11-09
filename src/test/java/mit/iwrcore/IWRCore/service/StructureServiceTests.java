@@ -40,9 +40,6 @@ public class StructureServiceTests {
     @Autowired
     private MaterialServiceImpl materialServiceImpl;
 
-    private static Material material;
-    private static Product product;
-    private static Structure structure;
 
 
 }

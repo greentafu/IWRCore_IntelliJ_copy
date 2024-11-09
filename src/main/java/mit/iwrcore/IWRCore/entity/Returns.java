@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.List;
+
 @Entity
 @Builder
 @AllArgsConstructor
@@ -20,7 +22,6 @@ public class Returns extends BaseEntity {
     @NotNull
     private String whyRe;               // 반품 이유
     private String bGo;                 // 비고
-    private String filename;            // 파일
     private String email;               // 담당자 이메일
     @NotNull
     private Long returnCheck;
@@ -34,4 +35,7 @@ public class Returns extends BaseEntity {
     @JoinColumn(name = "writer_id")    // 외래 키 컬럼 이름
     @NotNull
     private Member writer;              // 작성자
+
+    @OneToMany(mappedBy = "returns", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileReturns> files;
 }

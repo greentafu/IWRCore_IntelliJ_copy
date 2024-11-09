@@ -13,7 +13,12 @@
   <span id="head">
     <title>진척검수일 등록</title>
     <!--Style-->
-
+    <style>
+      #content1 {
+        height: 250px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
     <!--/Style-->
   </span>
 
@@ -22,6 +27,7 @@
       <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">진척검수 관리 /</span> 진척검수 등록</h4>
       <div class="card">
         <div class="card-body">
+          <h5>담당자 정보</h5>
           <label class="form-label" style="width: fit-content;">담당자</label>
           <div class="col-md-6">
             <input type="text" class="form-control" id="person">
@@ -29,11 +35,12 @@
         </div>
         <hr class="m-0">
         <div class="card-body">
+          <h5>공급자 정보</h5>
           <label class="form-label" style="width: fit-content;">협력회사</label>
           <div class="row">
             <div class="col-md-6">
-              <input type="number" style="display:none;" id="partnerNo" th:value="${selectedPno}">
-              <input type="text" class="form-control" id="partnerName" th:value="${selectedName}">
+              <input class="form-control" type="number" id="partnerNo" style="display:none;" th:value="${pno}"/>
+              <input class="form-control" type="text" id="partnerName" th:value="${name}"/>
             </div>
             <div class="col-md-4">
               <button
@@ -47,11 +54,15 @@
             </div>
           </div>
         </div>
+        <hr class="m-0">
         <div class="card-body">
           <div class="mb-4">
             <div class="row">
               <div class="col-md-2">
-                <button type="button" class="btn btn-outline-primary mb-1" onclick="selectAllBalju()">모두 선택</button>
+                <input type="number" style="display:none;" value="0" id="checkAllBtn">
+                <button type="button" class="btn btn-outline-primary" onclick="selectAll()">
+                  모두선택
+                </button>
               </div>
               <div class="col-md-4">
                 <button type="button" class="btn btn-primary mb-1" onclick="amountPer(30)">30% 수량</button>
@@ -60,24 +71,25 @@
               </div>
               <div class="col-md-6">
                 <div class="row">
+                  <input id="baseDate" type="date" style="display:none;">&nbsp;
                   <span style="width: fit-content;" class="col-md-1">입고예정일 기준</span>
-                  <input id="days-input" type="number" class="form-control col-md-2" style="width: 100px;">&nbsp;
+                  <input id="days-input" type="number" class="form-control col-md-2" style="width: 100px;" value="3">&nbsp;
                   <span style="width: fit-content;" class="col-md-1">일 전</span>
-                  <button id="bulk-date-button" type="button" class="btn btn-outline-primary col-md-2"
-                          style="width: fit-content;" onclick="autoFillDate()">
+                  <button type="button" class="btn btn-outline-primary col-md-2" style="width: fit-content;" onclick="autoBtn(5)">
                     진척검수일 일괄 등록
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          <div class="table-responsive text-nowrap" id="alltable"></div>
+          <input type="number" id="gumsuNo" style="display:none;">
+          <div id="setTable"></div>
         </div>
         <div class="card-header d-flex align-items-center justify-content-between">
           <a th:href="@{/progress/requiring_progress}">
             <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
           </a>
-          <button type="button" class="btn btn-primary" onclick="saveGumsu()">등록</button>
+          <button type="button" class="btn btn-primary" onclick="saveGumsu(1)">등록</button>
         </div>
       </div>
     </div>
@@ -87,52 +99,39 @@
       <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
           <div class="modal-body">
-            <h5 class="modal-title mb-4" id="modalScrollableTitle">공급자 검색</h5>
+            <h5 class="modal-title mb-4">공급자 검색</h5>
             <div class="row mb-10 mb-2">
               <label class="form-label col-md-2" style="width: fit-content;">협력회사</label>
               <div class="col-md-10">
+                <div class="row mb-2">
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartL" onchange="updatePartCode('L')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartM" onchange="updatePartCode('M')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectPartS" onchange="updatePartCode('S')"></select>
+                  </div>
+                </div>
                 <div class="row">
-                  <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="partnerSearch" style="height: 32px; font-size: 12px;" value="">
                   </div>
                   <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
-                  </div>
-                  <div class="col-md-4">
-                    <select class="form-select form-select-sm">
-                      <option>전체보기</option>
-                    </select>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="partnerSearchBtn('gumsu')">검색</button>
                   </div>
                 </div>
               </div>
             </div>
-            <div>
-              <form class="d-flex" onsubmit="return false">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                <button class="btn btn-outline-primary" type="submit">Search</button>
-              </form>
-            </div>
           </div>
           <hr class="m-0">
           <div class="modal-body" style="height: 350px;">
-            <table class="table table-hover">
-              <tr th:each="partnerList:${nonGumsu_list}">
-                <td>[[${partnerList.name}]]</td>
-                <td>[[${partnerListregistrationNumber}]]</td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary"
-                          th:value="${partnerList.pno}"
-                          th:name="${partnerList.name}"
-                          onclick="selectPartner(this)">
-                    선택
-                  </button>
-                </td>
-              </tr>
-            </table>
+            <div id="content1">
+              <table class="table table-hover">
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
@@ -145,309 +144,28 @@
     <!--/Modal-->
 
     <!--Script-->
+    <script src="../assets/js/new-contract-order-invoice.js"></script>
+    <script src="../assets/js/new-jodalchasu-gumsuchasu.js"></script>
     <script>
-      $(document).ready(function(){
-        const partnerNo=document.getElementById('partnerNo').value;
-        const partnerName=document.getElementById('partnerName').value;
-        if(partnerNo!=''){
-          selectPartner({ value: partnerNo, name: partnerName });
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+            if(finPage==false){
+                const scrollTop = content1.scrollTop;
+                const scrollHeight = content1.scrollHeight;
+                const clientHeight = content1.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    loadItems('gumsu');
+                }
+            }
+        });
+        loadItems('gumsu');
+
+        const pno=document.getElementById('partnerNo').value;
+        if(pno!==0){
+          getNonGumsuChasuBalju(pno);
         }
       });
-
-      function selectPartner(button){
-
-        console.log('gggggg',button);
-
-        var pno=button.value;
-        document.getElementById('partnerName').value= button.name;
-        document.getElementById('partnerNo').value=pno;
-        var alltable=document.getElementById('alltable');
-        alltable.innerHTML='';
-
-        $.ajax({
-          url:'/select/noneGumsu',
-          method:'GET',
-          data:{pno:pno},
-          success:function(data){
-            var alltable = document.getElementById('alltable');
-
-            data.forEach(function(tableData){
-              var newBody=document.createElement('table');
-              newBody.classList.add('table', 'table-bordered', 'mb-4');
-
-              var newTable=document.createElement('tbody');
-
-              var newRowHead=document.createElement('tr');
-              ['선택', '자재', '발주수량', '입고예정일', '진척검수 수량', '진척검수 날짜'].forEach(function(text) {
-                var td = document.createElement('td');
-                td.innerText = text;
-                newRowHead.appendChild(td);
-              });
-              newTable.appendChild(newRowHead);
-
-              var tempNum=0;
-
-              var baljuNo=tableData.baljuDTO.baljuNo;
-              var materialName=tableData.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name;
-              var jodalChasuDTOs=tableData.jodalChasuDTOs;
-
-              jodalChasuDTOs.forEach(x=>{
-                var newRow = document.createElement('tr');
-
-                if(tempNum==0){
-                  var inputTd = document.createElement('td');
-                  inputTd.rowSpan = 3;
-                  var input = document.createElement('input');
-                  input.type = 'checkbox';
-                  input.id = 'checkbox'+baljuNo;
-                  input.class='form-check-input';
-                  inputTd.appendChild(input);
-                  newRow.appendChild(inputTd);
-
-                  var nameTd = document.createElement('td');
-                  nameTd.rowSpan = 3;
-                  nameTd.innerText = materialName;
-                  newRow.appendChild(nameTd);
-
-                  tempNum=1;
-                }
-
-                var numTd = document.createElement('td');
-                numTd.innerText = x.joNum;
-                numTd.id = 'jodalNum'+x.jcnum;
-                newRow.appendChild(numTd);
-
-                var dateTd = document.createElement('td');
-                dateTd.innerText = x.joDate.split('T')[0];
-                dateTd.id = 'jodalDate'+x.jcnum;
-                newRow.appendChild(dateTd);
-
-                var gumNumTd = document.createElement('td');
-                var gumNumInput = document.createElement('input');
-                gumNumInput.type = 'number';
-                gumNumInput.id = 'gumNum'+x.jcnum;
-                gumNumInput.style.border = '0px';
-                gumNumTd.appendChild(gumNumInput);
-                newRow.appendChild(gumNumTd);
-
-                var gumDateTd = document.createElement('td');
-                var gumDateInput = document.createElement('input');
-                gumDateInput.type = 'date';
-                gumDateInput.id = 'gumDate'+x.jcnum;
-                gumDateInput.style.border = '0px';
-                gumDateTd.appendChild(gumDateInput);
-                newRow.appendChild(gumDateTd);
-
-                newTable.appendChild(newRow);
-
-              });
-
-              newBody.appendChild(newTable);
-              alltable.appendChild(newBody);
-
-            });
-
-          }
-        });
-
-      }
-
-      let checkValue = 0;
-      function selectAllBalju(){
-        const checkBox=document.querySelectorAll('input[type="checkbox"]');
-        checkBox.forEach(x=>{
-          if(checkValue==0) {x.checked=true;}
-          if(checkValue==1) {x.checked=false;}
-        });
-        checkValue=(checkValue===0)?1:0;
-      }
-
-      function amountPer(percent){
-        const allTables = document.querySelectorAll('#alltable table');
-        allTables.forEach(table=>{
-          const checkbox=table.querySelector('input[type="checkbox"]');
-          if(checkbox&&checkbox.checked){
-            var baseId="checkbox";
-            var baljuNo=checkbox.id.substring(baseId.length);
-
-            const all=table.querySelectorAll('[id^="jodalNum"]');
-
-            all.forEach(x=>{
-              var baseId2="jodalNum";
-              var jodalNo=x.id.substring(baseId2.length);
-
-              var amount=parseInt(x.innerText, 10);
-              var amountpercent=Math.floor(amount*percent/100);
-
-              document.getElementById('gumNum'+jodalNo).value=amountpercent;
-
-            });
-          }
-        });
-      }
-
-      function autoFillDate(){
-        const allTables = document.querySelectorAll('#alltable table');
-          allTables.forEach(table=>{
-            const checkbox=table.querySelector('input[type="checkbox"]');
-            if(checkbox&&checkbox.checked){
-              var baseId="checkbox";
-              var baljuNo=checkbox.id.substring(baseId.length);
-
-             const all=table.querySelectorAll('[id^="jodalDate"]');
-
-              all.forEach(x=>{
-                var baseId2="jodalDate";
-                var jodalNo=x.id.substring(baseId2.length);
-
-                var joDateStr = x.innerText.trim();
-                var minusDate = parseInt(document.getElementById('days-input').value, 10);
-
-                var joDate = new Date(joDateStr);
-                if (isNaN(joDate.getTime())) {
-                    console.error('Invalid date format for jodalDate:', joDateStr);
-                    return;
-                }
-
-                joDate.setDate(joDate.getDate() - minusDate);
-
-                var year = joDate.getFullYear();
-                var month = joDate.getMonth() + 1;
-                var day = joDate.getDate();
-                var formattedDate = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
-
-                document.getElementById('gumDate' + jodalNo).value = formattedDate;
-             });
-          }
-        });
-      }
-
-
-      function saveGumsu(){
-        var person=document.getElementById('person').value;
-        var partnerNo=document.getElementById('partnerNo').value;
-
-        const allTables = document.querySelectorAll('#alltable table');
-
-        const allData=[];
-
-        allTables.forEach(table=>{
-          const tableData={};
-
-          const checkbox=table.querySelector('input[type="checkbox"]');
-          if(checkbox&&checkbox.checked){
-            const tdData=[];
-            var baseId="checkbox";
-            var baljuNo=checkbox.id.substring(baseId.length);
-
-            const all=table.querySelectorAll('[id^="gumNum"]');
-            all.forEach(x=>{
-              var baseId2="gumNum";
-              var saveGumNum=x.value;
-              const tempNum=x.id.substring(baseId2.length);
-              var saveGumDate=document.getElementById('gumDate'+tempNum).value;
-
-              tdData.push({ gumNum: saveGumNum, gumDate: saveGumDate });
-
-            });
-
-            tableData.baljuNo = baljuNo;
-            tableData.person=person;
-            tableData.partnerNo=partnerNo;
-            tableData.tdData = tdData;
-
-
-            allData.push(tableData);
-
-          }
-
-        });
-
-        console.log(allData);
-
-        $.ajax({
-          url:'/progress/save_gumsu',
-          method:'POST',
-          contentType: 'application/json',
-          data: JSON.stringify(allData),
-          success:function(data){
-            window.location.href = '/progress/requiring_progress';
-          }
-        });
-
-      }
-
-
-
-
-    </script>
-
-
-
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const tableRows = document.querySelectorAll('.table-row');
-        const startYear = 24;
-        const endYear = 99;
-
-        // 연도 옵션 추가 함수
-        function populateYearOptions(select) {
-          for (let year = startYear; year <= endYear; year++) {
-            const option = document.createElement('option');
-            const fullYear = 2000 + year;
-            option.value = fullYear;
-            option.textContent = fullYear;
-            select.appendChild(option);
-          }
-        }
-        // 월 옵션 추가 함수
-        function populateMonthOptions(select) {
-          for (let month = 1; month <= 12; month++) {
-            const option = document.createElement('option');
-            const monthValue = month < 10 ? '0' + month : month.toString();
-            option.value = monthValue;
-            option.textContent = monthValue;
-            select.appendChild(option);
-          }
-        }
-        // 일 옵션 추가 함수
-        function populateDayOptions(selectYear, selectMonth, selectDay) {
-          selectYear.addEventListener('change', function() {
-            populateDays(selectYear, selectMonth, selectDay);
-          });
-          selectMonth.addEventListener('change', function() {
-            populateDays(selectYear, selectMonth, selectDay);
-          });
-          populateDays(selectYear, selectMonth, selectDay);
-        }
-        function populateDays(selectYear, selectMonth, selectDay) {
-          const selectedYear = parseInt(selectYear.value);
-          const selectedMonth = parseInt(selectMonth.value);
-          const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
-
-          selectDay.innerHTML = ''; // 기존 옵션 초기화
-
-          for (let day = 1; day <= daysInMonth; day++) {
-            const option = document.createElement('option');
-            const dayValue = day < 10 ? '0' + day : day.toString();
-            option.value = dayValue;
-            option.textContent = dayValue;
-            selectDay.appendChild(option);
-          }
-        }
-        // 각 테이블 행의 연도, 월, 일 옵션 추가
-        tableRows.forEach(function(row, index) {
-          const yearSelect = row.querySelector('.year-select');
-          const monthSelect = row.querySelector('.month-select');
-          const daySelect = row.querySelector('.day-select');
-
-          populateYearOptions(yearSelect);
-          populateMonthOptions(monthSelect);
-          populateDayOptions(yearSelect, monthSelect, daySelect);
-        });
-      });
-
     </script>
     <!--Script-->
   </span>

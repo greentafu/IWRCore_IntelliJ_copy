@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface StructureRepository extends JpaRepository<Structure,Long> {
-    @Query("select s, p from Structure s " +
-            "join Product p on (s.product.manuCode=p.manuCode) " +
-            "where s.product.manuCode=:manuCode")
-    List<Object[]> findByProduct_ManuCode(Long manuCode);
+    @Query("select s from Structure s where s.product.manuCode=:manuCode")
+    List<Structure> findByProduct_ManuCode(Long manuCode);
 }

@@ -66,7 +66,7 @@ public class ProTeamController {
         Long manuCode=proplanDTO.getProductDTO().getManuCode();
 
         model.addAttribute("proplan", proplanDTO);
-        model.addAttribute("lines", planService.findByProductId(manuCode));
+        model.addAttribute("lines", planService.getLineByProduct(manuCode));
         model.addAttribute("useLine", String.join(", ", proplanDTO.getLine()));
     }
 
@@ -134,7 +134,7 @@ public class ProTeamController {
             }
 
             // 구조 정보 조회
-            List<StructureDTO> structures = structureService.findByProduct_ManuCode(manuCode);
+            List<StructureDTO> structures = structureService.getStructureByProduct(manuCode);
             if (structures.isEmpty()) {
                 return ResponseEntity.noContent().build(); // 구조 정보가 없는 경우
             }

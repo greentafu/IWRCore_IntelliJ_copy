@@ -36,11 +36,11 @@ public class ContractController {
     }
     @GetMapping("/modify_contract")
     public void modify_contract(Long conNo, Model model){
-        model.addAttribute("contract", contractService.getContractById(conNo));
+        model.addAttribute("contract", contractService.getContract(conNo));
     }
     @GetMapping("/contract")
     public void download_contract(@RequestParam(required = false) Long conNo, Model model){
-        model.addAttribute("con", contractService.getContractById(conNo));
+        model.addAttribute("con", contractService.getContract(conNo));
     }
 }
 

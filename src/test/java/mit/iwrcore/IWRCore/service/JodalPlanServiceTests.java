@@ -37,11 +37,5 @@ public class JodalPlanServiceTests {
     @Autowired
     private JodalPlanRepository jodalPlanRepository;
 
-    @Test
-    @Transactional
-    @Commit
-    void insertJplan(){
-        System.out.println(jodalPlanService.selectedJodalPlan(60L));
-    }
 
 }

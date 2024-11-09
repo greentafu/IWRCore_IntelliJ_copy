@@ -6,7 +6,6 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.RequestDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface RequestService {
     Request convertToEntity(RequestDTO dto);

@@ -5,8 +5,6 @@ import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 
-import java.util.List;
-
 public interface MemberService {
 
     // 직원 찾기

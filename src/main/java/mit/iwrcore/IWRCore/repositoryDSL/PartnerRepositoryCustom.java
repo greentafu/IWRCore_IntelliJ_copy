@@ -11,4 +11,6 @@ public interface PartnerRepositoryCustom {
     Page<Partner> getAllPartner(PageRequestDTO requestDTO);
     // 발주서> 소속회사 외 발주가능한 협력회사 모두 보기
     Page<Partner> getBaljuPartner(PageRequestDTO requestDTO);
+    // 검수차수> 소속회사 외 검수차수 설정 가능한 협력회사 모두 보기
+    Page<Partner> getGumsuPartner(PageRequestDTO requestDTO);
 }

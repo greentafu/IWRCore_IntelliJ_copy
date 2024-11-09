@@ -31,10 +31,5 @@ public class MaterialServiceTests {
     @Autowired
     private MaterialServiceImpl materialServiceImpl;
 
-    @Test
-    @Transactional
-    @Commit
-    public void insertMaterial() {
-        System.out.println(fileService.getMaterialFileList(1L));
-    }
+
 }

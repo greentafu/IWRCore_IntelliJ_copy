@@ -1,10 +1,8 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
-import mit.iwrcore.IWRCore.entity.Balju;
-import mit.iwrcore.IWRCore.entity.Emergency;;
-import mit.iwrcore.IWRCore.entity.ProPlan;
-import mit.iwrcore.IWRCore.entity.Request;
+import mit.iwrcore.IWRCore.entity.*;
+;
 import mit.iwrcore.IWRCore.repository.EmergencyRepository;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
@@ -116,15 +114,11 @@ public class EmergencyServiceImpl implements EmergencyService{
     }
 
     @Override
-    public PageResultDTO<EmergencyDTO, Object[]> getAllEmergencies(PageRequestDTO requestDTO) {
+    public PageResultDTO<EmergencyDTO, Emergency> getAllEmergencies(PageRequestDTO requestDTO) {
         Pageable pageable = requestDTO.getPageable(Sort.by("emerNo").descending());
-        Page<Object[]> entityPage = emergencyRepository.findEmergency(pageable, requestDTO.getPno());
-        return new PageResultDTO<>(entityPage, this::extractEmergencyDTO);
-    }
-
-    private EmergencyDTO extractEmergencyDTO(Object[] objects) {
-        Emergency emergency = (Emergency) objects[0];
-        return (emergency != null) ? convertToDTO(emergency) : null;
+        Page<Emergency> entityPage = emergencyRepository.findEmergency(pageable, requestDTO.getPno());
+        Function<Emergency, EmergencyDTO> fn = (entity -> convertToDTO(entity));
+        return new PageResultDTO<>(entityPage, fn);
     }
 
     @Override

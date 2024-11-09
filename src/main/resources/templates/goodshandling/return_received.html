@@ -22,74 +22,71 @@
       <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">입고/출하 관리 /</span> 자재 반품</h4>
       <div class="row">
         <div class="fullscreen-background">
-          <form th:action="@{/goodshandling/savereturn}" method="post">
-            <input style="display:none;" name="shipNo" th:value="${shipment.shipNo}">
-            <div class="card mb-4">
-              <div class="card-body">
-                <div>
-                  <label class="form-label">이메일</label>
-                  <input
-                          type="email"
-                          class="form-control"
-                          aria-describedby="defaultFormControlHelp"
-                          name="email"
-                  />
-                </div>
-                <label class="form-label">첨부자료</label>
-                <div class="input-group">
-                  <input
-                          type="file"
-                          class="form-control"
-                          id="inputGroupFile04"
-                          aria-describedby="inputGroupFileAddon04"
-                          aria-label="Upload"
-                          name="filename"
-                  />
-                  <button class="btn btn-outline-primary" type="button" id="inputGroupFileAddon04" disabled>업로드</button>
-                </div>
+          <input style="display:none;" id="shipNo" th:value="${shipment.shipNo}">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5>추가 정보</h5>
+              <div>
+                <label class="form-label">회신 이메일</label>
+                <input type="email" class="form-control" aria-describedby="defaultFormControlHelp" id="email"/>
               </div>
-              <hr class="m-0">
-              <div class="card-body">
-                <div class="mb-3">
-                  <label for="exampleFormControlReadOnlyInput1" class="form-label">자재명</label>
-                  <input
-                          class="form-control"
-                          type="text"
-                          id="exampleFormControlReadOnlyInput1"
-                          th:value="${shipment.materialName}"
-                          readonly
-                  />
-                </div>
-                <div>
-                  <label class="form-label">반품 수량</label>
-                  <input type="number" class="form-control mb-4" th:value="${shipment.shipNum}" readonly>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">반품 내용</label>
-                  <select class="form-select" aria-label="Default select example" name="whyRe">
-                    <option>항목 선택</option>
-                    <option value="규격">규격</option>
-                    <option value="수량">수량</option>
-                    <option value="무게">무게</option>
-                    <option value="색상">색상</option>
-                    <option value="재질">재질</option>
-                    <option value="기타">기타</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">이유</label>
-                  <textarea class="form-control" rows="5" name="reDetail"></textarea>
-                </div>
-                <div class="mb-4">
-                  <label class="form-label">비고</label>
-                  <textarea class="form-control" rows="10" name="bGo"></textarea>
-                </div>
-                <div class="text-end">
-                  <button type="submit" class="btn btn-outline-primary">반품</button>
-                </div>
+              <label class="form-label">첨부 파일</label>
+              <div class="input-group mb-2">
+                <input
+                        type="file"
+                        class="form-control"
+                        aria-label="Upload"
+                        id="uploadFiles1"
+                        multiple
+                />
+                <button class="btn btn-outline-primary" type="button" id="uploadBtn1">업로드</button>
+                <button id="uploadBtn2" style="display:none;"></button>
+              </div>
+              <div class="card shadow-none mb-3" style="min-height: 100px; border: 2px solid #e0e0e0;" id="fileList1">
+                <table style="margin-left: 20px; margin-top: 5px;">
+                  <tbody id="fileTable0"></tbody>
+                  <tbody id="fileTable1"></tbody>
+                </table>
               </div>
             </div>
-          </form>
+            <hr class="m-0">
+            <div class="card-body">
+              <h5>반품 정보</h5>
+              <div class="mb-3">
+                <label class="form-label">자재명</label>
+                <input class="form-control" type="text" th:value="${shipment.materialName}" readonly/>
+              </div>
+              <div>
+                <label class="form-label">반품 수량</label>
+                <input type="number" class="form-control mb-4" th:value="${shipment.shipNum}" readonly>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">반품 내용</label>
+                <select class="form-select" id="returnType">
+                  <option value="규격">규격</option>
+                  <option value="수량">수량</option>
+                  <option value="무게">무게</option>
+                  <option value="색상">색상</option>
+                  <option value="재질">재질</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">이유</label>
+                <textarea class="form-control" rows="5" id="returnReason"></textarea>
+              </div>
+              <div class="mb-4">
+                <label class="form-label">비고</label>
+                <textarea class="form-control" rows="10" id="returnText"></textarea>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <a th:href="@{/goodshandling/list_received}">
+                  <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
+                </a>
+                <button type="button" class="btn btn-primary" onclick="saveReturnShipment()">반품</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -98,6 +95,8 @@
     <!--/Modal-->
 
     <!--Script-->
+    <script src="../assets/js/file.js"></script>
+    <script src="../assets/js/new-return-request.js"></script>
     <!--Script-->
   </span>
 

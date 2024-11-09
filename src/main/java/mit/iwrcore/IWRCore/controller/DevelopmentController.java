@@ -29,6 +29,6 @@ public class DevelopmentController {
     public void detail_dev(@RequestParam Long manuCode, Model model){
         model.addAttribute("product", productService.getProduct(manuCode));
         model.addAttribute("pFiles", fileService.getProductFileList(manuCode));
-        model.addAttribute("structures", structureService.findByProduct_ManuCode(manuCode));
+        model.addAttribute("structures", structureService.getStructureByProduct(manuCode));
     }
 }

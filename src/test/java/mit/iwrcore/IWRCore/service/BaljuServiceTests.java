@@ -38,18 +38,6 @@ public class BaljuServiceTests {
     @Autowired
     private ContractService contractService;
 
-    @Test
-    @Transactional
-    @Commit
-    public void test1(){
-        Pageable pageable= PageRequest.of(0, 2);
-        System.out.println(baljuRepository.couldBalju(pageable));
-    }
-    @Test
-    @Transactional
-    @Commit
-    public void test12(){
-        System.out.println(baljuService.baljuProduct());
-    }
+
 
 }

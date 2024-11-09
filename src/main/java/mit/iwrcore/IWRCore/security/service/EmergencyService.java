@@ -24,7 +24,7 @@ public interface EmergencyService {
 
     void deleteEmergency(Long id);
 
-    PageResultDTO<EmergencyDTO, Object[]> getAllEmergencies(PageRequestDTO requestDTO);
+    PageResultDTO<EmergencyDTO, Emergency> getAllEmergencies(PageRequestDTO requestDTO);
 
     List<EmergencyDTO> getEmergencyByBalju(Long baljuNo);
 }

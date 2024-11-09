@@ -1,8 +1,6 @@
 package mit.iwrcore.IWRCore.repository;
 
-import mit.iwrcore.IWRCore.entity.Member;
 import mit.iwrcore.IWRCore.entity.Returns;
-import mit.iwrcore.IWRCore.entity.Shipment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -24,12 +22,6 @@ public interface ReturnsRepository extends JpaRepository<Returns,Long> {
     @Modifying
     @Transactional
     @EntityGraph(attributePaths = {"shipment", "writer"})
-    @Query("update Returns r set r.shipment=:shipment where r.reNO=:reNO")
-    void updateReturnsShipment(Shipment shipment, Long reNO);
-
-    @Modifying
-    @Transactional
-    @EntityGraph(attributePaths = {"shipment", "writer"})
     @Query("update Returns r set r.returnCheck=1 where r.reNO=:reNO")
     void updateReturnsCheck(Long reNO);
 
@@ -42,14 +34,4 @@ public interface ReturnsRepository extends JpaRepository<Returns,Long> {
             "left join ProPlan pp on (pp.proplanNo=b.contract.jodalPlan.proPlan.proplanNo) " +
             "where r.shipment.balju.contract.partner.pno=:pno")
     Page<Object[]> pageReturns(Pageable pageable, Long pno);
-
-    @Transactional
-    @EntityGraph(attributePaths = {"shipment", "writer"})
-    @Query("select r, s.shipNum, s.regDate, b, r.shipment.balju.contract, p, pp from Returns r " +
-            "left join Shipment s on (r.shipment.shipNO=s.shipNO) " +
-            "left join Balju b on (r.shipment.balju.baljuNo=b.baljuNo) " +
-            "left join Product p on (p.manuCode=b.contract.jodalPlan.proPlan.product.manuCode) " +
-            "left join ProPlan pp on (pp.proplanNo=b.contract.jodalPlan.proPlan.proplanNo) " +
-            "where r.reNO=:reNO")
-    List<Object[]> detailReturns(Long reNO);
 }

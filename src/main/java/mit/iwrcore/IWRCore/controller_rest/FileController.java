@@ -2,10 +2,7 @@ package mit.iwrcore.IWRCore.controller_rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileContractDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileMaterialDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProPlanDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileProductDTO;
+import mit.iwrcore.IWRCore.security.dto.FileDTO.*;
 import mit.iwrcore.IWRCore.security.service.FileService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -44,6 +41,10 @@ public class FileController {
     public List<FileContractDTO> getContractFile(@RequestParam(required = false) Long code){
         return fileService.getContractFileList(code);
     }
+    @GetMapping("/returnsFile")
+    public List<FileReturnsDTO> getReturnsFile(@RequestParam(required = false) Long code){
+        return fileService.getReturnsFileList(code);
+    }
 
     @GetMapping("/thumbnail")
     @ResponseBody
@@ -53,6 +54,7 @@ public class FileController {
         else if(type.equals("p")) folder="product";
         else if(type.equals("pp")) folder="proplan";
         else if(type.equals("c")) folder="contract";
+        else if(type.equals("r")) folder="returns";
 
         File file=new File("C:\\iwlcore\\"+folder+"\\"+path+"\\"+fileName);
 
@@ -74,6 +76,7 @@ public class FileController {
         else if (type.equals("p")) folder = "product";
         else if(type.equals("pp")) folder="proplan";
         else if(type.equals("c")) folder="contract";
+        else if(type.equals("r")) folder="returns";
 
         File file = new File("C:\\iwlcore\\" + folder + "\\" + path + "\\" + fileName);
 
@@ -99,6 +102,7 @@ public class FileController {
         else if(type.equals("p")) folder="product";
         else if(type.equals("pp")) folder="proplan";
         else if(type.equals("c")) folder="contract";
+        else if(type.equals("r")) folder="returns";
 
         Resource resource=new FileSystemResource("C:\\iwlcore\\"+folder+"\\"+path+"\\"+fileName);
 

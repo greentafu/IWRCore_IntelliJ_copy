@@ -3,7 +3,6 @@ package mit.iwrcore.IWRCore.security.dto.multiDTO;
 import lombok.Builder;
 import lombok.Data;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
-import mit.iwrcore.IWRCore.security.dto.GumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.JodalChasuDTO;
 
 @Builder

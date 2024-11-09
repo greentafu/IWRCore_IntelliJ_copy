@@ -3,19 +3,12 @@ package mit.iwrcore.IWRCore.security.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.Material;
-import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.entity.Structure;
-import mit.iwrcore.IWRCore.repository.MaterialRepository;
-import mit.iwrcore.IWRCore.repository.ProductRepository;
 import mit.iwrcore.IWRCore.repository.StructureRepository;
 import mit.iwrcore.IWRCore.security.dto.StructureDTO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -66,12 +59,8 @@ public class StructureServiceImpl implements StructureService {
         return entityToDto(structure);
     };
     @Override
-    public List<StructureDTO> findByProduct_ManuCode(Long manuCode) {
-        List<Object[]> list=structureRepository.findByProduct_ManuCode(manuCode);
-        return list.stream().map(this::exStruct).toList();
-    }
-    private StructureDTO exStruct(Object[] objects){
-        Structure structure=(Structure) objects[0];
-        return (structure!=null)?entityToDto(structure):null;
+    public List<StructureDTO> getStructureByProduct(Long manuCode) {
+        List<Structure> list=structureRepository.findByProduct_ManuCode(manuCode);
+        return list.stream().map(x->entityToDto(x)).toList();
     }
 }

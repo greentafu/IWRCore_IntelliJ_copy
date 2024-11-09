@@ -98,6 +98,7 @@ function materialSearchBtn2(type){
 function loadItems(type){
     if(type==="contract") getAllPartner();
     if(type==="balju") getBaljuPartner();
+    if(type==="gumsu") getGumsuPartner();
 }
 
 function loadItems2(type){
@@ -119,7 +120,7 @@ function getOnePartner(pno, type){
             document.getElementById('selectPartM').value='';
             document.getElementById('selectPartS').value='';
             document.getElementById('partnerSearch').value='';
-            partnerSearchBtn(type);
+            partnerSearchBtn(word);
 
             $('#modalScrollable').modal('hide');
         }
@@ -499,9 +500,7 @@ function getNonBaljuContract(pno){
                     const remainder=rem-conNum;
 
                     const newTable = document.createElement("table");
-                    newTable.classList.add("table");
-                    newTable.classList.add("table-bordered");
-                    newTable.classList.add("mb-4");
+                    newTable.classList.add('table', 'table-bordered', 'mb-4');
                     newTable.id = 'autoTable'+conNo;
 
                     const newTbody = document.createElement("tbody");

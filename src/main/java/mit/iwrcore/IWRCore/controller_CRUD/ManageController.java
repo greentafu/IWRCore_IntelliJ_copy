@@ -1,4 +1,4 @@
-package mit.iwrcore.IWRCore.controller_rest;
+package mit.iwrcore.IWRCore.controller_CRUD;
 
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.security.service.MemberService;

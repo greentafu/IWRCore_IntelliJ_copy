@@ -288,23 +288,20 @@
             <div class="col mb-3 text-center" id="receiveText"></div>
           </div>
           <div class="modal-footer">
-            <form th:action="@{/goodshandling/receiveCheck}" method="post">
-              <input style="display:none;" name="shipNO" id="receiveNo">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                취소
-              </button>
-              <button type="submit" class="btn btn-primary">수령확인</button>
-            </form>
+            <input style="display:none;" id="receiveNo">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              취소
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="saveReceiveShipment(3)">수령확인</button>
           </div>
         </div>
       </div>
     </div>
     <!--/Modal2-->
-
-
     <!--/Modal-->
 
     <!--Script-->
+    <script src="../assets/js/new-return-request.js"></script>
     <script>
       let page = 1;
       let finPage=false;

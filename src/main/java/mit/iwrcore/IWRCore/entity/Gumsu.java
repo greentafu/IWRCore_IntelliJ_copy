@@ -33,6 +33,6 @@ public class Gumsu extends BaseEntity {
     @NotNull
     private Balju balju;               // 연관된 Order 엔티티
 
-    @OneToMany(mappedBy = "gumsu")
+    @OneToMany(mappedBy = "gumsu", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<GumsuChasu> gumsuChasus; // GumsuChasu 엔티티와의 1대다 관계
 }

@@ -1,21 +1,13 @@
 package mit.iwrcore.IWRCore.security.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.Line;
 import mit.iwrcore.IWRCore.entity.Plan;
-import mit.iwrcore.IWRCore.entity.Product;
-import mit.iwrcore.IWRCore.repository.LineRepository;
 import mit.iwrcore.IWRCore.repository.PlanRepository;
-import mit.iwrcore.IWRCore.repository.ProductRepository;
 import mit.iwrcore.IWRCore.security.dto.PlanDTO;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,58 +15,50 @@ import java.util.stream.Collectors;
 public class PlanServiceImpl implements PlanService{
     private final PlanRepository planRepository;
     private final ProductServiceImpl productServiceImpl;
-
     private final LineService lineService;
 
+    // 저장, 삭제
     @Override
     public void saveLine(PlanDTO dto) {
         Plan plan = dtoToEntity(dto);
         planRepository.save(plan);
     }
     @Override
-    public void deleteById(Long id) {
+    public void deleteLine(Long id) {
         planRepository.deleteById(id);
     }
-    @Override
-    public PlanDTO findLineByLine(Long manuCode, String line){
-        Plan plan=planRepository.findLineByLine(manuCode, line);
-        PlanDTO planDTO=entityToDTO(plan);
-        return planDTO;
-    }
 
-    @Override
-    public List<PlanDTO> findByProductId(Long productId) {
-        List<Plan> plans = planRepository.findByProduct_ManuCode(productId);
-        List<PlanDTO> dtoList=plans.stream().map(this::entityToDTO).toList();
-        return dtoList;
-    }
-    private PlanDTO exPlan(Object[] objects){
-        Plan plan=(Plan) objects[0];
-        PlanDTO planDTO=(plan!=null)? entityToDTO(plan):null;
-        return planDTO;
-    }
-
-
+    // 변환
     @Override
     public Plan dtoToEntity(PlanDTO dto) {
         if(dto==null) return null;
-        Plan entity=Plan.builder()
+        return Plan.builder()
                 .plancode(dto.getPlancode())
                 .line(lineService.stringToLine(dto.getLine()))
                 .product(productServiceImpl.dtoToEntity(dto.getProductDTO()))
                 .quantity(dto.getQuantity())
                 .build();
-        return entity;
     }
     @Override
     public PlanDTO entityToDTO(Plan entity) {
         if(entity==null) return null;
-        PlanDTO dto=PlanDTO.builder()
+        return PlanDTO.builder()
                 .plancode(entity.getPlancode())
                 .line(lineService.lineToString(entity.getLine()))
                 .productDTO(productServiceImpl.entityToDto(entity.getProduct()))
                 .quantity(entity.getQuantity())
                 .build();
-        return dto;
+    }
+
+    // 조회
+    @Override
+    public PlanDTO getLineByLine(Long manuCode, String line){
+        Plan plan=planRepository.findLineByLine(manuCode, line);
+        return entityToDTO(plan);
+    }
+    @Override
+    public List<PlanDTO> getLineByProduct(Long productId) {
+        List<Plan> plans = planRepository.findPlanByProduct(productId);
+        return plans.stream().map(this::entityToDTO).toList();
     }
 }

@@ -1,5 +1,6 @@
 package mit.iwrcore.IWRCore.security.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.GumsuChasuRepository;
@@ -8,104 +9,71 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.GumsuChasuContractDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.QuantityDateDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 public class GumsuChasuServiceImpl implements GumsuChasuService{
-    private static final Logger log = LoggerFactory.getLogger(GumsuChasuServiceImpl.class);
     private final GumsuChasuRepository gumsuChasuRepository;
     private final MemberService memberService;
     private final GumsuService gumsuService;
     private final ContractService contractService;
     private final JodalChasuService jodalChasuService;
 
+    // 저장, 삭제
     @Override
-    public GumsuChasu convertToEntity(GumsuChasuDTO dto) {
+    public void saveGumsuChasu(GumsuChasuDTO gumsuChasuDTO) {
+        GumsuChasu gumsuChasu = dtoToEntity(gumsuChasuDTO);
+        gumsuChasuRepository.save(gumsuChasu);
+    }
+    @Override
+    public void deleteGumsuChasu(Long id) {
+        gumsuChasuRepository.deleteById(id);
+    }
+    @Override
+    public GumsuChasuDTO modifyGumsuChasu(GumsuChasuDTO gumsuChasuDTO){
+        GumsuChasu gumsuChasu=gumsuChasuRepository.findById(gumsuChasuDTO.getGcnum()).orElseThrow(() -> new EntityNotFoundException("GumsuChasu not found"));
+        gumsuChasu.setGumsuNum(gumsuChasuDTO.getGumsuNum());
+        gumsuChasu.setGumsuDate(gumsuChasuDTO.getGumsuDate());
+        GumsuChasu savedGumsuChasu=gumsuChasuRepository.save(gumsuChasu);
+        return entityToDTO(savedGumsuChasu);
+    }
+
+    // 변환
+    @Override
+    public GumsuChasu dtoToEntity(GumsuChasuDTO dto) {
         return GumsuChasu.builder()
                 .gcnum(dto.getGcnum())
                 .gumsuNum(dto.getGumsuNum())
                 .gumsuDate(dto.getGumsuDate())
-                .writer(memberService.memberdtoToEntity(dto.getMemberDTO())) // MemberDTO를 Member로 변환
-                .gumsu(gumsuService.convertToEntity(dto.getGumsuDTO()))   // GumsuDTO를 Gumsu로 변환
+                .writer(memberService.memberdtoToEntity(dto.getMemberDTO()))
+                .gumsu(gumsuService.dtoToEntity(dto.getGumsuDTO()))
                 .build();
     }
-
     @Override
-    public GumsuChasuDTO convertToDTO(GumsuChasu entity) {
+    public GumsuChasuDTO entityToDTO(GumsuChasu entity) {
         return GumsuChasuDTO.builder()
                 .gcnum(entity.getGcnum())
                 .gumsuNum(entity.getGumsuNum())
                 .gumsuDate(entity.getGumsuDate())
-                .memberDTO(memberService.memberTodto(entity.getWriter())) // Member를 MemberDTO로 변환
-                .gumsuDTO(gumsuService.convertToDTO(entity.getGumsu()))   // Gumsu를 GumsuDTO로 변환
+                .memberDTO(memberService.memberTodto(entity.getWriter()))
+                .gumsuDTO(gumsuService.entityToDTO(entity.getGumsu()))
                 .build();
     }
 
+    // 조회
     @Override
-    public void createGumsuChasu(GumsuChasuDTO gumsuChasuDTO, Gumsu gumsu) {
-        GumsuChasu gumsuChasu = convertToEntity(gumsuChasuDTO);
-        gumsuChasu.setGumsu(gumsu);
-        gumsuChasuRepository.save(gumsuChasu);
+    public GumsuChasuDTO getGumsuChasu(Long id) {
+        return entityToDTO(gumsuChasuRepository.findById(id).get());
     }
 
-    @Override
-    public GumsuChasuDTO getGumsuChasuById(Long id) {
-        return convertToDTO(gumsuChasuRepository.findById(id).get());
-    }
 
-    @Override
-    public GumsuChasuDTO updateGumsuChasu(Long id, GumsuChasuDTO gumsuChasuDTO) {
-        if (!gumsuChasuRepository.existsById(id)) {
-            throw new RuntimeException("ID가 " + id + "인 GumsuChasuDTO를 찾을 수 없습니다.");
-        }
-        GumsuChasu gumsuChasu = convertToEntity(gumsuChasuDTO);
-        gumsuChasu.setGumsuNum(id); // 수정할 때 ID를 설정합니다.
-        GumsuChasu updatedGumsuChasu = gumsuChasuRepository.save(gumsuChasu);
-        return convertToDTO(updatedGumsuChasu);
-    }
-
-    @Override
-    public void deleteGumsuChasu(Long id) {
-        if (!gumsuChasuRepository.existsById(id)) {
-            throw new RuntimeException("ID가 " + id + "인 GumsuChasuDTO를 찾을 수 없습니다.");
-        }
-        gumsuChasuRepository.deleteById(id);
-    }
-
-    @Override
-    public PageResultDTO<GumsuChasuDTO, GumsuChasu> getAllGumsuChasus(PageRequestDTO requestDTO) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("gcnum").descending());
-        Page<GumsuChasu> entityPage=gumsuChasuRepository.findAll(pageable);
-        Function<GumsuChasu, GumsuChasuDTO> fn=(entity->convertToDTO(entity));
-        return new PageResultDTO<>(entityPage, fn);
-    }
-
-    @Override
-    public List<QuantityDateDTO> partnerMainGumsu(Long baljuNo){
-        List<GumsuChasu> entityList=gumsuChasuRepository.getGumsuChasuByBaljuNo(baljuNo);
-        List<QuantityDateDTO> list=new ArrayList<>();
-        for(GumsuChasu gumsuChasu:entityList){
-            QuantityDateDTO quantityDateDTO=QuantityDateDTO.builder()
-                    .quantity(gumsuChasu.getGumsuNum())
-                    .dueDate(gumsuChasu.getGumsuDate())
-                    .build();
-            list.add(quantityDateDTO);
-        }
-        if(list.size()>0) list.get(0).setTotalOrder(entityList.get(0).getGumsu().getMake());
-        return list;
-    }
-
+    // 검수차수> 진행도
     @Override
     public PageResultDTO<GumsuChasuContractDTO, Object[]> getAllGumsuChasuContract(PageRequestDTO requestDTO){
         Page<Object[]> entityPage=gumsuChasuRepository.findGumsuChasuByCustomQuery(requestDTO);
@@ -115,8 +83,8 @@ public class GumsuChasuServiceImpl implements GumsuChasuService{
         GumsuChasu gumsuChasu=(GumsuChasu) objects[0];
         Contract contract=(Contract) objects[1];
         Long allShipNum=(Long) objects[2];
-        GumsuChasuDTO gumsuChasuDTO=(gumsuChasu!=null)?convertToDTO(gumsuChasu):null;
-        ContractDTO contractDTO=(contract!=null)?contractService.convertToDTO(contract):null;
+        GumsuChasuDTO gumsuChasuDTO=(gumsuChasu!=null)?entityToDTO(gumsuChasu):null;
+        ContractDTO contractDTO=(contract!=null)?contractService.entityToDTO(contract):null;
         Long allNum=(allShipNum!=null)?allShipNum:0L;
 
         Long remainingDate=0L;
@@ -130,7 +98,7 @@ public class GumsuChasuServiceImpl implements GumsuChasuService{
             remainingDate= Duration.between(today, gumsuDate).toDays();
         }
 
-        List<JodalChasuDTO> jodalChasuDTOs=jodalChasuService.findJCfromJP(contractDTO.getJodalPlanDTO().getJoNo())
+        List<JodalChasuDTO> jodalChasuDTOs=jodalChasuService.getJodalChasuByJodalPlan(contractDTO.getJodalPlanDTO().getJoNo())
                 .stream()
                 .sorted(Comparator.comparing(JodalChasuDTO::getJcnum))
                 .toList();
@@ -152,9 +120,25 @@ public class GumsuChasuServiceImpl implements GumsuChasuService{
 
         return new GumsuChasuContractDTO(gumsuChasuDTO, contractDTO, allNum, remainingDate, percent);
     }
-
+    // 검수차수> 검수차수 저장에 사용
     @Override
-    public List<GumsuChasuDTO> getGumsuChasuFromBalju(Long baljuNo){
-        return gumsuChasuRepository.getGumsuChasuByBaljuNo(baljuNo).stream().map(this::convertToDTO).toList();
+    public List<GumsuChasuDTO> getGumsuChasuByGumsu(Long gumsuNo){
+        List<GumsuChasu> entityList=gumsuChasuRepository.getGumsuChasuListByGumsu(gumsuNo);
+        return entityList.stream().map(this::entityToDTO).toList();
+    }
+    // 협력회사> 메인페이지 검수정보
+    @Override
+    public List<QuantityDateDTO> partnerMainGumsu(Long baljuNo){
+        List<GumsuChasu> entityList=gumsuChasuRepository.getGumsuChasuByBaljuNo(baljuNo);
+        List<QuantityDateDTO> list=new ArrayList<>();
+        for(GumsuChasu gumsuChasu:entityList){
+            QuantityDateDTO quantityDateDTO=QuantityDateDTO.builder()
+                    .quantity(gumsuChasu.getGumsuNum())
+                    .dueDate(gumsuChasu.getGumsuDate())
+                    .build();
+            list.add(quantityDateDTO);
+        }
+        if(list.size()>0) list.get(0).setTotalOrder(entityList.get(0).getGumsu().getMake());
+        return list;
     }
 }

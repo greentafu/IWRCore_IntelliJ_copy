@@ -22,16 +22,26 @@ import java.util.*;
 @RequiredArgsConstructor
 @Log4j2
 public class PartnerController {
-
     private final EmergencyService emergencyService;
     private final ContractService contractService;
     private final BaljuService baljuService;
-    private final GumsuChasuService gumsuChasuService;
-    private final JodalChasuService jodalChasuService;
     private final ReturnsService returnsService;
-    private final GumsuService gumsuService;
     private final ShipmentService shipmentService;
 
+    @GetMapping("/main")
+    public void main(Model model){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
+        model.addAttribute("baljuDTOs", baljuService.partListBalju(authPartnerDTO.getPno()));
+    }
+    @GetMapping("/view_product")
+    public void view_product(@RequestParam Long baljuNo, Model model){
+        model.addAttribute("baljuDTO", baljuService.getBalju(baljuNo));
+    }
+    @GetMapping("/view_return")
+    public void view_return(@RequestParam Long reNO, Model model){
+        model.addAttribute("returnsDTO", returnsService.getReturns(reNO));
+    }
     @GetMapping("/list_contract")
     public void list_contract(PageRequestDTO requestDTO, Model model){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
@@ -65,113 +75,5 @@ public class PartnerController {
         AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
         requestDTO.setPno(authPartnerDTO.getPno());
         model.addAttribute("urget_list", emergencyService.getAllEmergencies(requestDTO));
-    }
-    @GetMapping("/view_product")
-    public void view_product(@RequestParam Long baljuNo, Model model){
-        BaljuDTO baljuDTO=baljuService.getBaljuById(baljuNo);
-
-        List<QuantityDateDTO> jodalList=jodalChasuService.partnerMainJodal(
-                baljuDTO.getContractDTO().getJodalPlanDTO().getJoNo(),
-                baljuDTO.getRegDate(),
-                gumsuService.getQuantityMake(baljuDTO.getBaljuNo()));
-        List<QuantityDateDTO> gumsuList=gumsuChasuService.partnerMainGumsu(baljuDTO.getBaljuNo());
-
-        List<EmergencyDTO> emergencyDTOs=emergencyService.getEmergencyByBalju(baljuDTO.getBaljuNo());
-        List<ReturnsDTO> returnsDTOs=returnsService.getReturnsList(baljuDTO.getBaljuNo());
-        List<ShipmentDTO> shipmentDTOs=shipmentService.getShipmentByBalju(baljuNo);
-
-        PartnerMainDTO partnerMainDTO=PartnerMainDTO.builder()
-                .baljuDTO(baljuDTO)
-                .jodalList(jodalList)
-                .gumsuList(gumsuList)
-                .build();
-
-        Long totalReturn=0L;
-        Long totalShipment=0L;
-
-        if(emergencyDTOs!=null){
-            for(EmergencyDTO emergencyDTO:emergencyDTOs){
-                if(emergencyDTO.getEmcheck()==0) partnerMainDTO.setEmergency(emergencyDTO.getEmerNo());
-            }
-        }
-        if(returnsDTOs!=null) {
-            for(ReturnsDTO returnsDTO:returnsDTOs){
-                if(returnsDTO.getReturnCheck()==0) partnerMainDTO.setReturns(returnsDTO.getReNO());
-                totalReturn+=returnsDTO.getShipmentDTO().getShipNum();
-            }
-        }
-        if(shipmentDTOs!=null){
-            for(ShipmentDTO shipmentDTO:shipmentDTOs){
-                totalShipment+=shipmentDTO.getShipNum();
-            }
-        }
-        partnerMainDTO.setTotalReturn(totalReturn);
-        partnerMainDTO.setTotalShipment(totalShipment);
-
-        model.addAttribute("list", partnerMainDTO);
-    }
-    @GetMapping("/view_return")
-    public void view_return(@RequestParam Long reNO, Model model){
-        model.addAttribute("returns", returnsService.getDetailReturn(reNO));
-    }
-    @GetMapping("/main")
-    public void main(Model model){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
-
-        List<PartnerMainDTO> mainList=new ArrayList<>();
-
-        List<BaljuDTO> baljuDTOList=baljuService.partListBalju(authPartnerDTO.getPno());
-        for(BaljuDTO baljuDTO:baljuDTOList){
-            List<QuantityDateDTO> jodalList=jodalChasuService.partnerMainJodal(
-                    baljuDTO.getContractDTO().getJodalPlanDTO().getJoNo(),
-                    baljuDTO.getRegDate(),
-                    gumsuService.getQuantityMake(baljuDTO.getBaljuNo()));
-            List<QuantityDateDTO> gumsuList=gumsuChasuService.partnerMainGumsu(baljuDTO.getBaljuNo());
-
-            List<EmergencyDTO> emergencyDTOs=emergencyService.getEmergencyByBalju(baljuDTO.getBaljuNo());
-            List<ReturnsDTO> returnsDTOs=returnsService.getReturnsList(baljuDTO.getBaljuNo());
-            List<ShipmentDTO> shipmentDTOs=shipmentService.getShipmentByBalju(baljuDTO.getBaljuNo());
-
-            PartnerMainDTO partnerMainDTO=PartnerMainDTO.builder()
-                    .baljuDTO(baljuDTO)
-                    .jodalList(jodalList)
-                    .gumsuList((gumsuList.size()!=0)?gumsuList:null)
-                    .build();
-            if(emergencyDTOs!=null) emergencyDTOs.forEach(x->{
-                if(x.getEmcheck()==0) partnerMainDTO.setEmergency(x.getEmerNo());
-            });
-            if(returnsDTOs!=null) returnsDTOs.forEach(x->{
-                if(x.getReturnCheck()==0) partnerMainDTO.setReturns(x.getReNO());
-            });
-
-            mainList.add(partnerMainDTO);
-        }
-
-        model.addAttribute("main_list", mainList);
-    }
-    @PostMapping("/release")
-    public String release(@ModelAttribute ShipmentDTO shipmentDTO, @RequestParam Long baljuNo, RedirectAttributes attr){
-        ShipmentDTO saveShipment=shipmentDTO;
-        shipmentDTO.setReceiveCheck(0L);
-        shipmentDTO.setBaljuDTO(baljuService.getBaljuById(baljuNo));
-        shipmentService.createShipment(saveShipment);
-        attr.addAttribute("baljuNo", baljuNo);
-        return "redirect:/partner/view_product";
-    }
-    @PostMapping("/addQuantity")
-    public String addQuantity(@RequestParam Long baljuNo, @RequestParam Long quantity, RedirectAttributes attr){
-        if(quantity>0){
-            GumsuDTO gumsuDTO=gumsuService.getGumsuById(baljuNo);
-            gumsuDTO.setMake(gumsuDTO.getMake()+quantity);
-            gumsuService.createGumsu(gumsuDTO);
-        }
-        attr.addAttribute("baljuNo", baljuNo);
-        return "redirect:/partner/view_product";
-    }
-    @PostMapping("/returnCheck")
-    public String returnCheck(@RequestParam Long reNo){
-        returnsService.addReturnCheck(reNo);
-        return "redirect:/partner/list_return";
     }
 }
