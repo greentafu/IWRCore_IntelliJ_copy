@@ -60,4 +60,9 @@ public class PageRequestDTO2 {
     private List<Long> jodalPlans;
     // 배송지
     private String loc;
+
+    // 거래명세서 등록 중 배송목록들
+    private List<Long> shipments;
+    // 거래명세서 수정 중 수정중인 거래명세서 번호
+    private Long code;
 }

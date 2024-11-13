@@ -18,32 +18,24 @@ import java.util.List;
 public interface ShipmentService {
     // 저장, 삭제
     ShipmentDTO saveShipment(ShipmentDTO shipmentDTO);
-    void deleteShipment(Long id);
-    ShipmentDTO modifyShipment(Long id, ShipmentDTO shipmentDTO);
 
     void updateShipmentInvoicebGo(Long shipNo);
     void updateShipmentDate(LocalDateTime dateTime, Long shipNo);
     void updateMemberCheck(Member member, Long shipNo);
-    void updateSHipmentInvoice(Invoice invoice, String text, Long shipNo);
+    void updateShipmentInvoice(Invoice invoice, String text, Long shipNo);
 
     // 변환
     Shipment dtoToEntity(ShipmentDTO dto);
-    ShipmentDTO entityToDTO(Shipment entity);
+    ShipmentDTO entityToDto(Shipment entity);
 
     // 조회
     ShipmentDTO getShipment(Long id);
     Shipment getShipmentEntity(Long shipNo);
     List<ShipmentDTO> getShipmentByBalju(Long baljuNo);
+    List<ShipmentDTO> getShipmentByInvoice(Long tranNO);
 
 
-
-
-    List<ShipmentDTO> getInvoiceContent(Long tranNO);
     ShipmentReturnDTO findShipment(Long shipNo);
-    List<ShipmentDTO> canInvoiceShipment(Long pno);
-    List<PartnerDTO> canInvoicePartner();
-
-
 
 
     // 메인페이지> 배송갯수
@@ -56,6 +48,8 @@ public interface ShipmentService {
     PageResultDTO<ShipmentDTO, Object[]> noneInvoiceShipment(PageRequestDTO requestDTO);
     // 거래명세서> 거래명세서 발급 완료 목록
     PageResultDTO<InvoicePartnerDTO, Object[]> pageFinInvoice(PageRequestDTO2 requestDTO2);
+    // 거래명세서> 거래명세서 발급 가능 배송 목록
+    PageResultDTO<ShipmentDTO, Shipment> couldInvoiceShipment(PageRequestDTO2 requestDTO2);
     // 협력회사> 거래명세서 목록
     PageResultDTO<InvoicePartnerDTO, Object[]> partnerInvoicePage(PageRequestDTO requestDTO);
 

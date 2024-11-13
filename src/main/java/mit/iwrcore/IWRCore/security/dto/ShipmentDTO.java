@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class ShipmentDTO {
-    private Long shipNO;               // 출고 번호
-    private Long shipNum;              // 출고 수량
-    private LocalDateTime receipt;     // 입고 일
+    private Long shipNO;
+    private Long shipNum;
+    private LocalDateTime receipt;
     private String text;
     private Long receiveCheck;
     private LocalDateTime regDate;
     private String bGo;
 
-    private ReturnsDTO returnsDTO;            // 관련된 Returns ID
-    private InvoiceDTO invoiceDTO;            // 관련된 Invoice ID
-    private BaljuDTO baljuDTO;              // 관련된 Balju I
+    private ReturnsDTO returnsDTO;
+    private InvoiceDTO invoiceDTO;
+    private BaljuDTO baljuDTO;
     private MemberDTO memberDTO;
 }

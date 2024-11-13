@@ -529,4 +529,71 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom{
 
         return new PageImpl<>(objectList, pageable, total);
     }
+
+    @Override
+    public Page<Shipment> getInvoiceShipment(PageRequestDTO2 requestDTO){
+        QShipment qShipment=QShipment.shipment;
+        QBalju qBalju=QBalju.balju;
+        QContract qContract=QContract.contract;
+        QPartner qPartner=QPartner.partner;
+
+        QJodalPlan qJodalPlan=QJodalPlan.jodalPlan;
+        QMaterial qMaterial=QMaterial.material;
+        QMaterL qMaterL=QMaterL.materL;
+        QMaterM qMaterM=QMaterM.materM;
+        QMaterS qMaterS=QMaterS.materS;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO.getMaterL2() != null) { builder.and(qMaterS.materM.materL.materLcode.eq(requestDTO.getMaterL2())); }
+        if (requestDTO.getMaterM2() != null) { builder.and(qMaterS.materM.materMcode.eq(requestDTO.getMaterM2())); }
+        if (requestDTO.getMaterS2() != null) { builder.and(qMaterS.materScode.eq(requestDTO.getMaterS2())); }
+        if (requestDTO.getMaterialSearch2()!=null){
+            builder.and(qMaterial.name.containsIgnoreCase(requestDTO.getMaterialSearch2())
+                    .or(qMaterial.standard.containsIgnoreCase(requestDTO.getMaterialSearch2()))
+                    .or(qMaterial.unit.containsIgnoreCase(requestDTO.getMaterialSearch2())));
+        }
+        if (requestDTO.getShipments() != null) {
+            builder.and(qShipment.shipNO.notIn(requestDTO.getShipments()));
+        }
+        if (requestDTO.getCode() != null) {
+            builder.and(qShipment.invoice.isNull().or(qShipment.invoice.tranNO.eq(requestDTO.getCode())));
+        }else{
+            builder.and(qShipment.invoice.isNull());
+        }
+
+        builder.and(qPartner.pno.eq(requestDTO.getPno2()));
+        builder.and(qShipment.receiveCheck.eq(1L));
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage2()-1, requestDTO.getSize2());
+        List<Shipment> shipmentList= queryFactory
+                .selectFrom(qShipment)
+                .leftJoin(qShipment.balju, qBalju)
+                .leftJoin(qBalju.contract, qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .leftJoin(qContract.jodalPlan, qJodalPlan)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qShipment.shipNO.desc())
+                .fetch();
+        long total=queryFactory
+                .selectFrom(qShipment)
+                .leftJoin(qShipment.balju, qBalju)
+                .leftJoin(qBalju.contract, qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .leftJoin(qContract.jodalPlan, qJodalPlan)
+                .leftJoin(qJodalPlan.material, qMaterial)
+                .leftJoin(qMaterial.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(shipmentList, pageable, total);
+    }
 }

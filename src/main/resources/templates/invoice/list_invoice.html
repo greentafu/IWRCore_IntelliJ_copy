@@ -292,7 +292,9 @@
                     <th></th>
                     <th>협력업체명</th>
                     <th>발행일</th>
-                    <th>다운로드</th>
+                    <th>금액</th>
+                    <th>비고</th>
+                    <th>거래명세서 확인</th>
                     <th>수정/삭제</th>
                   </tr>
                 </thead>
@@ -307,7 +309,26 @@
     </div>
 
     <!--Modal-->
-
+    <div class="modal fade" id="modalToggle" aria-labelledby="modalToggleLabel"
+         tabindex="-1" style="display: none" aria-hidden="true" >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalToggleLabel">삭제하시겠습니까?</h5>
+          </div>
+          <div class="modal-body" id="deleteText"></div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-target="#modalToggle2" data-bs-dismiss="modal"
+                    id="deleteBtn" onclick="deleteInvoice(this)">
+              삭제
+            </button>
+            <button class="btn btn-primary" data-bs-dismiss="modal">
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!--/Modal-->
     <!--Script-->
     <script>
@@ -467,29 +488,48 @@
               const tranNO=x.invoiceDTO.tranNO;
               const partnerName=x.partnerDTO.name;
               const regDate=x.invoiceDTO.dateCreated.split('T')[0];
+              const cash=x.invoiceDTO.cash;
+              const tempText=x.invoiceDTO.text;
+              const invoiceText=(tempText!=null)?tempText.substring(0,10):null;
 
               const newRow = document.createElement("tr");
 
-              [tranNO, partnerName, regDate].forEach(text => {
-                const item = document.createElement("td");
-                item.textContent = text;
-                newRow.appendChild(item);
-              });
+              const tranNOTd = document.createElement("td");
+              tranNOTd.textContent = tranNO;
+              newRow.appendChild(tranNOTd);
 
-              const btn0Td = document.createElement("td");
-              btn0Td.innerHTML=`
-                <button type="button" class="btn btn-sm btn-outline-primary">
-                  <span class="bx bx-arrow-to-bottom"></span>
-                </button>
+              const partnerTd = document.createElement("td");
+              partnerTd.id = 'partnerName'+tranNO;
+              partnerTd.textContent = partnerName;
+              newRow.appendChild(partnerTd);
+
+              const dateTd = document.createElement("td");
+              dateTd.id = 'regDate'+tranNO;
+              dateTd.textContent = regDate;
+              newRow.appendChild(dateTd);
+
+              const cashTd = document.createElement("td");
+              cashTd.textContent = cash;
+              newRow.appendChild(cashTd);
+
+              const textTd = document.createElement("td");
+              textTd.textContent = invoiceText;
+              newRow.appendChild(textTd);
+
+              const btnTd = document.createElement("td");
+              btnTd.innerHTML=`
+                <a href="/invoice/invoice?tranNO=${tranNO}">
+                  <button class="btn btn-primary">거래명세서 확인</button>
+                </a>
               `;
-              newRow.appendChild(btn0Td);
+              newRow.appendChild(btnTd);
 
               const btn1Td = document.createElement("td");
               btn1Td.innerHTML=`
                 <a href="/invoice/modify_invoice?tranNO=${tranNO}">
                   <button class="btn btn-primary">수정</button>
                 </a>
-                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle">삭제</button>
+                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${tranNO}" onclick="deleteBtn(this)">삭제</button>
               `;
               newRow.appendChild(btn1Td);
 
@@ -529,6 +569,28 @@
         loadItems();
         loadItems2();
       });
+    </script>
+    <script>
+      function deleteBtn(button){
+        var tranNO=button.value;
+
+        const partnerName=document.getElementById('partnerName'+tranNO).innerText;
+        const regDate=document.getElementById('regDate'+tranNO).innerText;
+
+        document.getElementById('deleteText').innerHTML=regDate+"("+partnerName+")에 발행한 거래명세서를 삭제합니다.<br/>삭제시 복구가 불가능합니다.";
+        document.getElementById('deleteBtn').value=tranNO;
+      }
+      function deleteInvoice(button){
+        var tranNO=button.value;
+        $.ajax({
+          url:'/deleteInvoice',
+          method:'GET',
+          data:{tranNO:tranNO},
+          success:function(response){
+            window.location.reload();
+          }
+        });
+      }
     </script>
 
     <!--Script-->

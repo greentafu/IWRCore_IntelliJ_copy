@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -38,39 +39,9 @@ public class ShipmentServiceImpl implements ShipmentService {
     public ShipmentDTO saveShipment(ShipmentDTO shipmentDTO) {
         Shipment shipment = dtoToEntity(shipmentDTO);
         Shipment savedShipment = shipmentRepository.save(shipment);
-        return entityToDTO(savedShipment);
+        return entityToDto(savedShipment);
     }
-    @Override
-    @Transactional
-    public void deleteShipment(Long id) {
-        shipmentRepository.deleteById(id);
-    }
-    @Override
-    @Transactional
-    public ShipmentDTO modifyShipment(Long id, ShipmentDTO shipmentDTO) {
-        Shipment existingShipment = shipmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("ID가 " + id + "인 ShipmentDTO를 찾을 수 없습니다."));
 
-        if (shipmentDTO.getShipNum() != null) existingShipment.setShipNum(shipmentDTO.getShipNum());
-        if (shipmentDTO.getReceipt() != null) existingShipment.setReceipt(shipmentDTO.getReceipt());
-
-        if (shipmentDTO.getInvoiceDTO() != null) existingShipment.setInvoice(invoiceService.convertToEntity(shipmentDTO.getInvoiceDTO()));
-        else existingShipment.setInvoice(null);
-
-        if (shipmentDTO.getBaljuDTO() != null) existingShipment.setBalju(baljuService.dtoToEntity(shipmentDTO.getBaljuDTO()));
-        else existingShipment.setBalju(null);
-
-        if (shipmentDTO.getMemberDTO() != null) existingShipment.setWriter(memberService.memberdtoToEntity(shipmentDTO.getMemberDTO()));
-
-        if (shipmentDTO.getReturnsDTO() != null) {
-            Returns returns = returnsRepository.findById(shipmentDTO.getReturnsDTO().getReNO())
-                    .orElseThrow(() -> new RuntimeException("Returns not found"));
-            existingShipment.setReturns(returns);
-        } else existingShipment.setReturns(null);
-
-        Shipment updatedShipment = shipmentRepository.save(existingShipment);
-        return entityToDTO(updatedShipment);
-    }
     @Override
     @Transactional
     public void updateShipmentInvoicebGo(Long shipNo){
@@ -85,7 +56,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         shipmentRepository.updateShipmentMemberCheck(member, shipNo);
     }
     @Override
-    public void updateSHipmentInvoice(Invoice invoice, String text, Long shipNo){
+    public void updateShipmentInvoice(Invoice invoice, String text, Long shipNo){
         shipmentRepository.updateShipmentInvoice(invoice, text, shipNo);
     }
 
@@ -100,13 +71,13 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .receiveCheck(dto.getReceiveCheck())
                 .bGo(dto.getBGo())
                 .writer(dto.getMemberDTO()!=null ? memberService.memberdtoToEntity(dto.getMemberDTO()) : null)
-                .invoice(dto.getInvoiceDTO() != null ? invoiceService.convertToEntity(dto.getInvoiceDTO()) : null)
+                .invoice(dto.getInvoiceDTO() != null ? invoiceService.dtoToEntity(dto.getInvoiceDTO()) : null)
                 .balju(dto.getBaljuDTO() != null ? baljuService.dtoToEntity(dto.getBaljuDTO()) : null)
                 .build();
     }
     @Transactional
     @Override
-    public ShipmentDTO entityToDTO(Shipment entity) {
+    public ShipmentDTO entityToDto(Shipment entity) {
         return ShipmentDTO.builder()
                 .shipNO(entity.getShipNO())
                 .shipNum(entity.getShipNum())
@@ -115,7 +86,7 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .receiveCheck(entity.getReceiveCheck())
                 .regDate(entity.getRegDate())
                 .bGo(entity.getBGo())
-                .invoiceDTO(entity.getInvoice() != null ? invoiceService.convertToDTO(entity.getInvoice()) : null)
+                .invoiceDTO(entity.getInvoice() != null ? invoiceService.entityToDto(entity.getInvoice()) : null)
                 .baljuDTO(entity.getBalju() != null ? baljuService.entityToDTO(entity.getBalju()) : null)
                 .memberDTO(entity.getWriter()!=null ? memberService.memberTodto(entity.getWriter()) : null)
                 .build();
@@ -125,7 +96,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public ShipmentDTO getShipment(Long id) {
         Shipment shipment=shipmentRepository.findById(id).get();
-        return entityToDTO(shipment);
+        return entityToDto(shipment);
     }
     @Override
     public Shipment getShipmentEntity(Long shipNo){
@@ -134,22 +105,16 @@ public class ShipmentServiceImpl implements ShipmentService {
     @Override
     public List<ShipmentDTO> getShipmentByBalju(Long baljuNo){
         List<Shipment> entityList=shipmentRepository.getShipmentByBalju(baljuNo);
-        return entityList.stream().map(this::entityToDTO).toList();
+        return entityList.stream().map(this::entityToDto).toList();
     }
-
-
-
-
-
-
-
-
-
-
     @Override
-    public List<ShipmentDTO> getInvoiceContent(Long tranNO){
-        return shipmentRepository.getInvoiceContent(tranNO).stream().map(this::entityToDTO).toList();
+    public List<ShipmentDTO> getShipmentByInvoice(Long tranNO){
+        List<Shipment> entityList=shipmentRepository.getInvoiceContent(tranNO);
+        return entityList.stream().map(this::entityToDto).toList();
     }
+
+
+
     @Override
     public ShipmentReturnDTO findShipment(Long shipNo){
         Shipment shipment=shipmentRepository.findShipment(shipNo);
@@ -158,24 +123,6 @@ public class ShipmentServiceImpl implements ShipmentService {
             return new ShipmentReturnDTO(shipNo, shipment.getShipNum(), materialName);
         }else return null;
     }
-    @Override
-    public List<ShipmentDTO> canInvoiceShipment(Long pno){
-        List<Shipment> entityList=shipmentRepository.couldInvoice(pno);
-        return entityList.stream().map(x->entityToDTO(x)).toList();
-    }
-    private ShipmentDTO extractShipmentDTO(Object[] objects){
-        Shipment shipment=(Shipment) objects[0];
-        ShipmentDTO shipmentDTO=(shipment!=null)?entityToDTO(shipment):null;
-        return shipmentDTO;
-    }
-    @Override
-    public List<PartnerDTO> canInvoicePartner(){
-        List<Partner> entityList=shipmentRepository.couldInvoicePartner();
-        List<PartnerDTO> dtoList=new ArrayList<>();
-        entityList.stream().forEach(x->dtoList.add(partnerService.partnerTodto(x)));
-        return dtoList;
-    }
-
 
 
 
@@ -201,7 +148,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         Gumsu gumsu=(Gumsu) objects[1];
         Long totalShipment=(Long) objects[2];
         Long reNo=(Long) objects[3];
-        ShipmentDTO shipmentDTO=(shipment!=null)? entityToDTO(shipment):null;
+        ShipmentDTO shipmentDTO=(shipment!=null)? entityToDto(shipment):null;
         GumsuDTO gumsuDTO=(gumsu!=null)? gumsuService.entityToDTO(gumsu):null;
         totalShipment=(totalShipment!=null)?totalShipment:0L;
         reNo=(reNo!=null)?reNo:0L;
@@ -221,7 +168,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
     private ShipmentDTO shipmentContractToDTO(Object[] objects){
         Shipment shipment=(Shipment) objects[0];
-        return (shipment!=null)? entityToDTO(shipment):null;
+        return (shipment!=null)? entityToDto(shipment):null;
     }
     // 거래명세서> 거래명세서 발급 완료 목록
     @Override
@@ -232,9 +179,15 @@ public class ShipmentServiceImpl implements ShipmentService {
     private InvoicePartnerDTO invoicePartnerToDTO(Object[] objects){
         Invoice invoice=(Invoice) objects[0];
         Partner partner=(Partner) objects[1];
-        InvoiceDTO invoiceDTO=(invoice!=null)? invoiceService.convertToDTO(invoice):null;
+        InvoiceDTO invoiceDTO=(invoice!=null)? invoiceService.entityToDto(invoice):null;
         PartnerDTO partnerDTO=(partner!=null)? partnerService.partnerTodto(partner):null;
         return new InvoicePartnerDTO(invoiceDTO, partnerDTO);
+    }
+    // 거래명세서> 거래명세서 발급 가능 배송 목록
+    public PageResultDTO<ShipmentDTO, Shipment> couldInvoiceShipment(PageRequestDTO2 requestDTO2){
+        Page<Shipment> entityPage=shipmentRepository.getInvoiceShipment(requestDTO2);
+        Function<Shipment, ShipmentDTO> fn = (entity -> entityToDto(entity));
+        return new PageResultDTO<>(entityPage, fn);
     }
     // 협력회사> 거래명세서 목록
     @Override
@@ -252,7 +205,7 @@ public class ShipmentServiceImpl implements ShipmentService {
         List<Shipment> shipments = shipmentRepository.findByReceiveCheckWithDetails(receiveCheck);
 
         List<ShipmentDTO> shipmentDTOs = shipments.stream()
-                .map(this::entityToDTO)
+                .map(this::entityToDto)
                 .collect(Collectors.toList());
 
         log.info("Converted Shipment Entities to DTOs: {}", shipmentDTOs);

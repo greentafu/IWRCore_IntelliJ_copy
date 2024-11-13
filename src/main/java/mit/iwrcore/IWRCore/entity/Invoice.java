@@ -23,7 +23,8 @@ public class Invoice extends BaseEntity {
     private String plz;                    // 영수.정구 (영수증 여부)
     @NotNull
     private LocalDateTime dateCreated;      // 작성일
-    private String filename;                // 파일
+    private String email1;
+    private String email2;
 
     private String text;
 

@@ -47,17 +47,6 @@ public interface ShipmentRepository extends JpaRepository<Shipment,Long>, Shipme
 
     @Transactional
     @EntityGraph(attributePaths = {"balju", "writer", "returns", "invoice"})
-    @Query("select s from Shipment s where s.receiveCheck=1 and s.invoice is null and s.balju.contract.partner.pno=:pno")
-    List<Shipment> couldInvoice(Long pno);
-
-    @Transactional
-    @EntityGraph(attributePaths = {"balju", "writer", "returns", "invoice"})
-    @Query("select distinct s.balju.contract.partner from Shipment s " +
-            "where s.receiveCheck=1 and s.invoice is null")
-    List<Partner> couldInvoicePartner();
-
-    @Transactional
-    @EntityGraph(attributePaths = {"balju", "writer", "returns", "invoice"})
     @Query("select distinct i, s.balju.contract.partner, p, pp from Invoice i " +
             "join Shipment s on (s.invoice.tranNO=i.tranNO) " +
             "left join Product p on (p.manuCode=s.balju.contract.jodalPlan.proPlan.product.manuCode) " +

@@ -99,10 +99,12 @@ function loadItems(type){
     if(type==="contract") getAllPartner();
     if(type==="balju") getBaljuPartner();
     if(type==="gumsu") getGumsuPartner();
+    if(type==="invoice") getInvoicePartner();
 }
 
 function loadItems2(type){
-    if(type="contract") getAllNonContractJodalPlan();
+    if(type==="contract") getAllNonContractJodalPlan();
+    if(type==="invoice") getNonInvoiceShipment();
 }
 
 // 협력회사 선택
@@ -113,8 +115,27 @@ function getOnePartner(pno, type){
         method:'POST',
         data:{pno:pno},
         success:function(data){
-            document.getElementById('partnerName').value=data.name;
-            document.getElementById('partnerNo').value=data.pno;
+            if(word!=='invoice'){
+                document.getElementById('partnerName').value=data.name;
+                document.getElementById('partnerNo').value=data.pno;
+            }else{
+                document.getElementById('pno').value=pno;
+                document.getElementById('partnerRegister').innerText=data.registrationNumber;
+                document.getElementById('partnerName').innerText=data.name;
+                document.getElementById('partnerCEO').innerText=data.ceo;
+                document.getElementById('partnerLocation').innerText=data.location;
+                document.getElementById('partnerType').innerText=data.type;
+                document.getElementById('partnerSector').innerText=data.sector;
+                document.getElementById('partnerEmail').value=data.email;
+                document.getElementById('partnerEmail2').value=data.contacterEmail;
+
+                document.getElementById('selectMaterL2').value='';
+                document.getElementById('selectMaterM2').value='';
+                document.getElementById('selectMaterS2').value='';
+                document.getElementById('materialSearch2').value='';
+
+                materialSearchBtn2(word);
+            }
 
             document.getElementById('selectPartL').value='';
             document.getElementById('selectPartM').value='';
@@ -898,3 +919,508 @@ function saveBalju(){
 }
 
 
+
+
+
+
+
+
+// 거래명세서> 협력회사 목록 가져오기
+function getInvoicePartner() {
+    const content1 = document.getElementById("content1");
+    const firstTbody = document.getElementById("firstTbody");
+    $.ajax({
+        url:'/select/getInvoicePartner',
+        method:'POST',
+        data:{page:page, selectPartL:selectPartL, selectPartM:selectPartM, selectPartS:selectPartS, partnerSearch:partnerSearch},
+        success:function(data){
+            if(data.totalPage<page) finPage=true;
+            data.dtoList.forEach(x=>{
+                const pno=x.pno;
+                const name=x.name;
+                const number=x.registrationNumber;
+
+                const newRow = document.createElement("tr");
+
+                [name, number].forEach(text => {
+                    const item = document.createElement("td");
+                    item.textContent = text;
+                    newRow.appendChild(item);
+                });
+
+                const btnTd = document.createElement("td");
+                btnTd.innerHTML=`<button class="btn btn-sm btn-outline-primary" onclick="getOnePartner(${pno}, 'invoice')">선택</button>`;
+                newRow.appendChild(btnTd);
+
+                firstTbody.appendChild(newRow);
+            });
+        }
+    });
+    page++;
+}
+// 거래명세서> 초기값 가져오기
+function initInvoice(){
+    const pno=document.getElementById('pno').value;
+    const shipNumber=document.getElementById('shipNumber').value;
+
+    if(pno!=null && pno!='') getOnePartner(pno, 'invoice');
+    if(shipNumber!=null && shipNumber!='') {
+        $.ajax({
+            url:'/select/getOneNonInvoiceShipment',
+            method:'POST',
+            data:{shipNo:shipNumber},
+            success:function(data){
+                const planRows=document.querySelectorAll('#secondTbody tr');
+                const insertPoint=document.querySelector('#insertPoint');
+
+                const materCode=data.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.materCode;
+                const name=data.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name;
+                const receipt=data.receipt.split('T')[0];
+                const month=receipt.split('-')[1];
+                const day=receipt.split('-')[2];
+
+                const shipNum=parseFloat(data.shipNum)||0;
+                const standard=data.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.standard;
+                const unitCost=parseFloat(data.baljuDTO.contractDTO.money)||0;
+                const supplyValue=shipNum*unitCost;
+                const tax=supplyValue/10;
+
+                const shipNo=data.shipNO;
+
+                const newRow = document.createElement('tr');
+
+                [month, day].forEach(text => {
+                    const td = document.createElement('td');
+                    td.innerText = text;
+                    newRow.appendChild(td);
+                });
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-sm btn-secondary';
+                button.innerText = '삭제';
+                button.onclick = function() {
+                    newRow.remove();
+                    calMoney();
+                    refreshShipment();
+                };
+
+                const nameTd = document.createElement('td');
+                nameTd.colSpan=6;
+                nameTd.innerHTML = name+'&nbsp;&nbsp;';
+                nameTd.appendChild(button);
+                newRow.appendChild(nameTd);
+
+                const standardTd = document.createElement('td');
+                standardTd.colSpan=2;
+                standardTd.innerText = standard;
+                newRow.appendChild(standardTd);
+
+                const shipNumTd = document.createElement('td');
+                shipNumTd.innerText = shipNum;
+                newRow.appendChild(shipNumTd);
+
+                const unitCostTd = document.createElement('td');
+                unitCostTd.colSpan=4;
+                unitCostTd.innerText = unitCost;
+                newRow.appendChild(unitCostTd);
+
+                const supplyValueTd = document.createElement('td');
+                supplyValueTd.colSpan=3;
+                supplyValueTd.innerText = supplyValue;
+                supplyValueTd.id = 'presupplyValue'+shipNo;
+                newRow.appendChild(supplyValueTd);
+
+                const taxTd = document.createElement('td');
+                taxTd.colSpan=3;
+                taxTd.innerText = tax;
+                taxTd.id = 'pretax'+shipNo;
+                newRow.appendChild(taxTd);
+
+                const inputText = document.createElement('input');
+                inputText.type = 'text';
+                inputText.style.border = '0px';
+                inputText.style.width = '150px';
+                inputText.id = 'inputText'+shipNo;
+
+                const EmptyTd = document.createElement('td');
+                EmptyTd.appendChild(inputText);
+                newRow.appendChild(EmptyTd);
+
+                const shipNoTd = document.createElement('td');
+                shipNoTd.innerText = shipNo;
+                shipNoTd.style.display = 'none';
+                shipNoTd.id = 'shipNo'+shipNo;
+                newRow.appendChild(shipNoTd);
+
+                insertPoint.appendChild(newRow);
+
+                calMoney();
+            }
+        });
+    }
+}
+// 거래명세서> 수정화면 초기값 가져오기
+function initModifyInvoice(){
+    const tranNumber=document.getElementById('tranNumber').value;
+
+    $.ajax({
+        url:'/select/getModifyInvoiceShipment',
+        method:'POST',
+        data:{tranNO:tranNumber},
+        success:function(data){
+            const planRows=document.querySelectorAll('#secondTbody tr');
+            const insertPoint=document.querySelector('#insertPoint');
+
+            data.forEach(x=>{
+                const materCode=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.materCode;
+                const name=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name;
+                const receipt=x.receipt.split('T')[0];
+                const month=receipt.split('-')[1];
+                const day=receipt.split('-')[2];
+
+                const shipText=x.bgo;
+
+                const shipNum=parseFloat(x.shipNum)||0;
+                const standard=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.standard;
+                const unitCost=parseFloat(x.baljuDTO.contractDTO.money)||0;
+                const supplyValue=shipNum*unitCost;
+                const tax=supplyValue/10;
+
+                const shipNo=x.shipNO;
+
+                const newRow = document.createElement('tr');
+
+                [month, day].forEach(text => {
+                    const td = document.createElement('td');
+                    td.innerText = text;
+                    newRow.appendChild(td);
+                });
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-sm btn-secondary';
+                button.innerText = '삭제';
+                button.onclick = function() {
+                    newRow.remove();
+                    calMoney();
+                    refreshShipment();
+                };
+
+                const nameTd = document.createElement('td');
+                nameTd.colSpan=6;
+                nameTd.innerHTML = name+'&nbsp;&nbsp;';
+                nameTd.appendChild(button);
+                newRow.appendChild(nameTd);
+
+                const standardTd = document.createElement('td');
+                standardTd.colSpan=2;
+                standardTd.innerText = standard;
+                newRow.appendChild(standardTd);
+
+                const shipNumTd = document.createElement('td');
+                shipNumTd.innerText = shipNum;
+                newRow.appendChild(shipNumTd);
+
+                const unitCostTd = document.createElement('td');
+                unitCostTd.colSpan=4;
+                unitCostTd.innerText = unitCost;
+                newRow.appendChild(unitCostTd);
+
+                const supplyValueTd = document.createElement('td');
+                supplyValueTd.colSpan=3;
+                supplyValueTd.innerText = supplyValue;
+                supplyValueTd.id = 'presupplyValue'+shipNo;
+                newRow.appendChild(supplyValueTd);
+
+                const taxTd = document.createElement('td');
+                taxTd.colSpan=3;
+                taxTd.innerText = tax;
+                taxTd.id = 'pretax'+shipNo;
+                newRow.appendChild(taxTd);
+
+                const inputText = document.createElement('input');
+                inputText.type = 'text';
+                inputText.value = shipText;
+                inputText.style.border = '0px';
+                inputText.style.width = '150px';
+                inputText.id = 'inputText'+shipNo;
+
+                const EmptyTd = document.createElement('td');
+                EmptyTd.appendChild(inputText);
+                newRow.appendChild(EmptyTd);
+
+                const shipNoTd = document.createElement('td');
+                shipNoTd.innerText = shipNo;
+                shipNoTd.style.display = 'none';
+                shipNoTd.id = 'shipNo'+shipNo;
+                newRow.appendChild(shipNoTd);
+
+                insertPoint.appendChild(newRow);
+            });
+            calMoney();
+        }
+    });
+
+}
+// 거래명세서> 협력회사별 거래명세서 발급 가능한 배송 목록
+function getNonInvoiceShipment() {
+    const pno=document.getElementById('pno').value;
+    const shipNumber=document.getElementById('shipNumber').value;
+    let tranNumber=document.getElementById('tranNumber').value;
+    const content2 = document.getElementById("content2");
+    const secondTbody = document.getElementById("secondTbody");
+
+    if(tranNumber==='') tranNumber=null;
+
+    const allInputCash=document.querySelectorAll('[id^="shipNo"]');
+    const longList=[];
+
+    if(shipNumber!=null && shipNumber!='') longList.push(shipNumber);
+
+    // 선택된 배송번호 목록
+    allInputCash.forEach(x=>{
+        const num=x.id.substring(6);
+        longList.push(num);
+    });
+
+    $.ajax({
+        url:'/select/getInvoiceShipment',
+        method:'POST',
+        data:{pno:pno, page2:page2, longList:longList, tranNO:tranNumber, selectMaterL2:selectMaterL2,
+                selectMaterM2:selectMaterM2, selectMaterS2:selectMaterS2, materialSearch2:materialSearch2},
+        success:function(data){
+            document.getElementById('shipNumber').value=null;
+
+            if(data.totalPage<page2) finPage2=true;
+
+            data.dtoList.forEach(x=>{
+                const shipNo=x.shipNO;
+                const materCode=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.materCode;
+                const name=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name;
+                const receipt=x.receipt.split('T')[0];
+                const shipNum=x.shipNum;
+                const standard=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.standard;
+                const money=x.baljuDTO.contractDTO.money;
+                const conNum=x.baljuDTO.contractDTO.conNum;
+                const unitCost=money/conNum;
+
+                const newRow = document.createElement('tr');
+
+                const inputTd = document.createElement('td');
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.id = 'checkbox'+shipNo;
+                input.class='form-check-input';
+                inputTd.appendChild(input);
+                newRow.appendChild(inputTd);
+
+                [materCode, name, receipt, shipNum].forEach(function(text) {
+                    const td = document.createElement('td');
+                    td.innerText = text;
+                    newRow.appendChild(td);
+                });
+                [standard, money, shipNo].forEach(function(text) {
+                    const td = document.createElement('td');
+                    td.innerText = text;
+                    td.style.display = 'none';
+                    newRow.appendChild(td);
+                });
+
+                secondTbody.appendChild(newRow);
+            });
+        }
+    });
+    page2++;
+}
+// 거래명세서> 배송목록 새로고침
+function refreshShipment(){
+    page2 = 1;
+    finPage2=false;
+    document.getElementById("secondTbody").innerText='';
+    getNonInvoiceShipment();
+}
+// 거래명세서> 하단에 거래명세서 내역 추가
+function addInvoiceShipment(){
+    const planRows=document.querySelectorAll('#secondTbody tr');
+    const insertPoint=document.querySelector('#insertPoint');
+
+    planRows.forEach(x=>{
+        const checkbox=x.querySelector('input[type="checkbox"]');
+        if(checkbox&&checkbox.checked){
+            const cells=x.querySelectorAll('td');
+
+            const materCode=cells[1].innerText;
+            const name=cells[2].innerText;
+            const receipt=cells[3].innerText;
+            const month=receipt.split('-')[1];
+            const day=receipt.split('-')[2];
+
+            const shipNum=parseFloat(cells[4].innerText)||0;
+            const standard=cells[5].innerText;
+            const unitCost=parseFloat(cells[6].innerText)||0;
+            const supplyValue=shipNum*unitCost;
+            const tax=supplyValue/10;
+
+            const shipNo=cells[7].innerText;
+
+            const newRow = document.createElement('tr');
+
+            [month, day].forEach(text => {
+                const td = document.createElement('td');
+                td.innerText = text;
+                newRow.appendChild(td);
+            });
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-sm btn-secondary';
+            button.innerText = '삭제';
+            button.onclick = function() {
+                newRow.remove();
+                calMoney();
+                refreshShipment();
+            };
+
+            const nameTd = document.createElement('td');
+            nameTd.colSpan=6;
+            nameTd.innerHTML = name+'&nbsp;&nbsp;';
+            nameTd.appendChild(button);
+            newRow.appendChild(nameTd);
+
+            const standardTd = document.createElement('td');
+            standardTd.colSpan=2;
+            standardTd.innerText = standard;
+            newRow.appendChild(standardTd);
+
+            const shipNumTd = document.createElement('td');
+            shipNumTd.innerText = shipNum;
+            newRow.appendChild(shipNumTd);
+
+            const unitCostTd = document.createElement('td');
+            unitCostTd.colSpan=4;
+            unitCostTd.innerText = unitCost;
+            newRow.appendChild(unitCostTd);
+
+            const supplyValueTd = document.createElement('td');
+            supplyValueTd.colSpan=3;
+            supplyValueTd.innerText = supplyValue;
+            supplyValueTd.id = 'presupplyValue'+shipNo;
+            newRow.appendChild(supplyValueTd);
+
+            const taxTd = document.createElement('td');
+            taxTd.colSpan=3;
+            taxTd.innerText = tax;
+            taxTd.id = 'pretax'+shipNo;
+            newRow.appendChild(taxTd);
+
+            const inputText = document.createElement('input');
+            inputText.type = 'text';
+            inputText.style.border = '0px';
+            inputText.style.width = '150px';
+            inputText.id = 'inputText'+shipNo;
+
+            const EmptyTd = document.createElement('td');
+            EmptyTd.appendChild(inputText);
+            newRow.appendChild(EmptyTd);
+
+            const shipNoTd = document.createElement('td');
+            shipNoTd.innerText = shipNo;
+            shipNoTd.style.display = 'none';
+            shipNoTd.id = 'shipNo'+shipNo;
+            newRow.appendChild(shipNoTd);
+
+            insertPoint.appendChild(newRow);
+        }
+    });
+    calMoney();
+    refreshShipment();
+}
+// 거래명세서> 금액 계산
+function calMoney(){
+    const allSupplyValue=document.querySelectorAll('[id^="presupplyValue"]');
+    let totalSupplyValue=0;
+    allSupplyValue.forEach(x => {
+        const SupplyValue=parseFloat(x.innerText)||0;
+        totalSupplyValue+=SupplyValue;
+    });
+    const allTax=document.querySelectorAll('[id^="pretax"]');
+        let totalTax=0;
+        allTax.forEach(x => {
+            const tax=parseFloat(x.innerText)||0;
+        totalTax+=tax;
+    });
+    let totalSum=totalSupplyValue+totalTax;
+
+    document.getElementById('totalSum').innerText=totalSum;
+    document.getElementById('totalSupply').innerText=totalSupplyValue;
+    document.getElementById('totalTax').innerText=totalTax;
+    document.getElementById('cash').value=totalSum;
+}
+// 거래명세서> 거래명세서 저장
+function saveInvoice(){
+    const partnerEmail=document.getElementById('partnerEmail').value;
+    const partnerEmail2=document.getElementById('partnerEmail2').value;
+    const email1=(partnerEmail!=='')? partnerEmail : null;
+    const email2=(partnerEmail2!=='')? partnerEmail2 : null;
+
+    const writeDate=document.getElementById('writeDate').value;
+    const text=document.getElementById('text').value;
+    const cash=document.getElementById('cash').value;
+    const cheque=document.getElementById('cheque').value;
+    const promissory=document.getElementById('promissory').value;
+    const receivable=document.getElementById('receivable').value;
+    const radio=whoChecked();
+    let tranNumber=document.getElementById('tranNumber').value;
+    if(tranNumber==='') tranNumber=null;
+
+    const shipmentSelTable=document.querySelector('#insertPoint');
+    const shipmentRows=shipmentSelTable.querySelectorAll('tr');
+    const shipmentData=[];
+    shipmentRows.forEach(x=>{
+        const cells=x.querySelectorAll('td');
+        const shipNo=parseFloat(cells[9].innerText);
+        const shipText=document.getElementById('inputText'+shipNo).value;
+
+        shipmentData.push({shipNo:shipNo, shipText:shipText});
+    });
+
+    $.ajax({
+        url:'/saveInvoice',
+        method:'POST',
+        contentType:'application/json',
+        data: JSON.stringify({
+            tranNO:tranNumber,
+            writeDate:writeDate,
+            text:text,
+            email1:email1,
+            email2:email2,
+            cash:parseFloat(cash),
+            cheque:parseFloat(cheque),
+            promissory:parseFloat(promissory),
+            receivable:parseFloat(receivable),
+            radio:radio,
+            invoiceTextDTOs:shipmentData,
+        }),
+        success: function(response) {
+            window.location.href = '/invoice/list_invoice';
+        }
+    });
+}
+// 거래명세서> 어떤 발급
+function whoChecked(){
+    const radios=document.querySelectorAll('input[name="type"]');
+    let selectedValue;
+    radios.forEach(x => {
+        if(x.checked){selectedValue=x.value;}
+    });
+    return selectedValue;
+}
+// 거래명세서> 오늘 날짜
+function todayDate(){
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}

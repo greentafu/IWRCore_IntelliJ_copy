@@ -32,6 +32,6 @@ public class MemberPartnerTests {
     @Transactional
     public void testRead(){
         PageRequestDTO requestDTO=PageRequestDTO.builder().page(1).size(5).build();
-        System.out.println(partnerService.getBaljuPartner(requestDTO));
+        System.out.println(partnerService.getInvoicePartner(requestDTO));
     }
 }

@@ -70,7 +70,7 @@ public class ReturnsServiceImpl implements ReturnsService {
                 .email(entity.getEmail())
                 .returnCheck(entity.getReturnCheck())
                 .regDate(entity.getRegDate())
-                .shipmentDTO(shipmentService.entityToDTO(entity.getShipment()))
+                .shipmentDTO(shipmentService.entityToDto(entity.getShipment()))
                 .memberDTO(memberService.memberTodto(entity.getWriter()))
                 .build();
     }

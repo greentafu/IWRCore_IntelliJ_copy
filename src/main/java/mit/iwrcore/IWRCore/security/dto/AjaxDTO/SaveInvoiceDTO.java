@@ -13,6 +13,8 @@ public class SaveInvoiceDTO {
     private Long tranNO;
     private String writeDate;
     private String text;
+    private String email1;
+    private String email2;
     private Long cash;
     private Long cheque;
     private Long promissory;

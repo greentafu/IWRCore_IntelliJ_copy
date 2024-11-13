@@ -13,4 +13,6 @@ public interface PartnerRepositoryCustom {
     Page<Partner> getBaljuPartner(PageRequestDTO requestDTO);
     // 검수차수> 소속회사 외 검수차수 설정 가능한 협력회사 모두 보기
     Page<Partner> getGumsuPartner(PageRequestDTO requestDTO);
+    // 거래명세서> 소속회사 외 거래명세서 발급 가능한 협력회사 모두 보기
+    Page<Partner> getInvoicePartner(PageRequestDTO requestDTO);
 }

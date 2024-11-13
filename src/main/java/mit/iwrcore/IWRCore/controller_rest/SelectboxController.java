@@ -2,12 +2,8 @@ package mit.iwrcore.IWRCore.controller_rest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.JodalPlan;
-import mit.iwrcore.IWRCore.entity.Location;
-import mit.iwrcore.IWRCore.entity.Material;
-import mit.iwrcore.IWRCore.entity.Partner;
+import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.*;
-import mit.iwrcore.IWRCore.security.dto.AjaxDTO.NoneGumsuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.NoneGumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
@@ -35,7 +31,6 @@ import java.util.*;
 @Log4j2
 @RequiredArgsConstructor
 public class SelectboxController {
-
     private final PartCodeService partCodeService;
     private final MaterService materService;
     private final ProCodeService proCodeService;
@@ -51,7 +46,6 @@ public class SelectboxController {
     private final LocationService locationService;
     private final BaljuService baljuService;
     private final ReturnsService returnsService;
-    private final JodalChasuService jodalChasuService;
     private final EmergencyService emergencyService;
     private final BaljuChasuService baljuChasuService;
 
@@ -145,18 +139,6 @@ public class SelectboxController {
         }
         return list;
     }
-    @GetMapping("/getInvoicePartner")
-    public List<PartnerDTO> getPartner(@RequestParam(required = false) Long shipNo){
-        return shipmentService.canInvoicePartner();
-    }
-    @PostMapping("/selectInvoicePartner")
-    public PartnerDTO selectInvoicePartner(@RequestParam(required = false) Long pno){
-        return partnerService.findPartnerDto(pno, null, null);
-    }
-    @GetMapping("/getInvoiceShipment")
-    public List<ShipmentDTO> getShipment(@RequestParam(required = false) Long pno){
-        return shipmentService.canInvoiceShipment(pno);
-    }
 
 
 
@@ -194,11 +176,6 @@ public class SelectboxController {
         return proplanService.checkProPlan(manuCode);
     }
 
-    @PostMapping("/modify_invoice")
-    public List<ShipmentDTO> modify_invoice(@RequestParam(required = false) Long tranNO){
-        return shipmentService.getInvoiceContent(tranNO);
-    }
-
     @PostMapping("/stockDetail")
     public List<StockDetailDTO> stockDetail(@RequestParam(required = false) Long materCode){
         return contractService.detailStock(materCode);
@@ -232,7 +209,7 @@ public class SelectboxController {
                 .build();
         return jodalPlanService.noneContractJodalPlan(requestDTO2);
     }
-    // 계약서> 계약하지 않은 조달계획 목록 가져오기
+    // 계약서> 계약하지 않은 조달계획 가져오기
     @PostMapping("/getOneNonContractJodalPlan")
     public JodalPlanJodalChsuDTO getOneNonContractJodalPlan(@RequestParam(required = false) Long joNo){
         return jodalPlanService.selectedJodalPlan(joNo);
@@ -350,4 +327,44 @@ public class SelectboxController {
 
         return partnerMainDTO;
     }
+
+
+    // 거래명세서> 거래명세서 발급 가능한 협력회사 목록 가져오기
+    @PostMapping("/getInvoicePartner")
+    public PageResultDTO<PartnerDTO, Partner> getInvoicePartner(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) Long selectPartL, @RequestParam(required = false) Long selectPartM,
+            @RequestParam(required = false) Long selectPartS, @RequestParam(required = false) String partnerSearch){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .partL(selectPartL).partM(selectPartM).partS(selectPartS).partnerSearch(partnerSearch)
+                .build();
+        return partnerService.getInvoicePartner(requestDTO);
+    }
+    // 거래명세서> 협력회사별 거래명세서 발급 가능한 배송 목록 가져오기
+    @PostMapping("/getInvoiceShipment")
+    public PageResultDTO<ShipmentDTO, Shipment> getShipment(
+            @RequestParam(required = false) Long pno, @RequestParam(required = false) int page2,
+            @RequestParam(required = false) List<Long> longList, @RequestParam(required = false) Long tranNO,
+            @RequestParam(required = false) Long selectMaterL2, @RequestParam(required = false) Long selectMaterM2,
+            @RequestParam(required = false) Long selectMaterS2, @RequestParam(required = false) String materialSearch2){
+        if(pno==null) return null;
+        PageRequestDTO2 requestDTO2=PageRequestDTO2.builder()
+                .page2(page2).size2(15)
+                .materL2(selectMaterL2).materM2(selectMaterM2).materS2(selectMaterS2).materialSearch2(materialSearch2)
+                .pno2(pno).shipments(longList).code(tranNO)
+                .build();
+        return shipmentService.couldInvoiceShipment(requestDTO2);
+    }
+    // 거래명세서> 거래명세서 없는 배송정보 가져오기
+    @PostMapping("/getOneNonInvoiceShipment")
+    public ShipmentDTO getOneNonInvoiceShipment(@RequestParam(required = false) Long shipNo){
+        return shipmentService.getShipment(shipNo);
+    }
+    // 거래명세서> 거래명세서에 해당하는 배송목록 가져오기
+    @PostMapping("/getModifyInvoiceShipment")
+    public List<ShipmentDTO> getModifyInvoiceShipment(@RequestParam(required = false) Long tranNO){
+        return shipmentService.getShipmentByInvoice(tranNO);
+    }
+
 }

@@ -141,19 +141,19 @@
               <table class="table table-bordered mb-4">
                 <thead>
                   <tr>
-                    <th rowspan="2">수령일자</th>
-                    <th rowspan="2">자재번호</th>
-                    <th rowspan="2">자재명</th>
-                    <th colspan="4" class="text-center">수량</th>
-                    <th rowspan="2">
+                    <th>수령일자</th>
+                    <th>자재번호</th>
+                    <th>자재명</th>
+                    <th>입고/반품</th>
+                    <th>
                       <select class="form-select form-select-sm" style="width: fit-content;" id="baljuFin">
                         <option value="">전체 입고상태</option>
                         <option value="0">미완료</option>
                         <option value="1">완료</option>
                       </select>
                     </th>
-                    <th rowspan="2">업체명</th>
-                    <th rowspan="2">
+                    <th>업체명</th>
+                    <th>
                       <select class="form-select form-select-sm" style="width: fit-content;" id="receiveReturn">
                         <option value="">전체 상태</option>
                         <option value="0">수령 준비</option>
@@ -162,13 +162,7 @@
                         <option value="3">반품 상태</option>
                       </select>
                     </th>
-                    <th rowspan="2">추가 요청</th>
-                  </tr>
-                  <tr>
-                    <th>요청</th>
-                    <th>총입고</th>
-                    <th>필요</th>
-                    <th>검수량</th>
+                    <th>추가 요청</th>
                   </tr>
                 </thead>
                 <tbody id="firstTbody"></tbody>
@@ -351,12 +345,6 @@
               `;
               newRow.appendChild(materialNameTd);
 
-              [baljuNum, totalShipment, baljuNum-totalShipment].forEach(text => {
-                const item = document.createElement("td");
-                item.textContent = text;
-                newRow.appendChild(item);
-              });
-
               const recieveBtnTd = document.createElement("td");
               if(receipt!=null) {
                 if(receiveCheck==1) { recieveBtnTd.innerHTML=`<span style="color: green;">${shipNum} (입고)</span>`; }
@@ -365,10 +353,11 @@
               }
               newRow.appendChild(recieveBtnTd);
 
-              const totalRecieveTd = document.createElement("td");
-              if(baljuNum-totalShipment==0) { totalRecieveTd.innerHTML=`<span style="color: green;">완료</span>`; }
-              if(baljuNum-totalShipment!=0) { totalRecieveTd.innerHTML=`<span style="color: red;">미완료</span>`; }
-              newRow.appendChild(totalRecieveTd);
+              [totalShipment+'/'+baljuNum].forEach(text => {
+                const item = document.createElement("td");
+                item.textContent = text;
+                newRow.appendChild(item);
+              });
 
               const partnerNameTd = document.createElement("td");
               partnerNameTd.textContent = partnerName;

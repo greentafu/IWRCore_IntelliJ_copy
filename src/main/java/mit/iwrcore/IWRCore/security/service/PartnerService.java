@@ -21,6 +21,8 @@ public interface PartnerService {
     PageResultDTO<PartnerDTO, Partner> getBaljuPartner(PageRequestDTO pageRequestDTO);
     // 검수차수> 소속회사 외 검수차수 설정가능한 협력회사 모두 보기
     PageResultDTO<PartnerDTO, Partner> getGumsuPartner(PageRequestDTO pageRequestDTO);
+    // 거래명세서> 소속회사 외 거래명세서 발급가능한 협력회사 모두 보기
+    PageResultDTO<PartnerDTO, Partner> getInvoicePartner(PageRequestDTO pageRequestDTO);
 
 
     // 회사 추가, 삭제
