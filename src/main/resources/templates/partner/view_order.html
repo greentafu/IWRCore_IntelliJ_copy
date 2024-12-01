@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<html
+        lang="ko" xmlns:th="http://www.thymeleaf.org"
+        class="light-style layout-menu-fixed"
+        dir="ltr"
+        data-theme="theme-default"
+        data-assets-path="../assets/"
+        data-template="vertical-menu-template-free"
+>
+<th:block th:replace="~{layout/partlayout::all(~{this::#head} ,~{this::#content})}">
+
+  <span id="head">
+    <title>발주 내용</title>
+    <!--Style-->
+
+    <!--/Style-->
+  </span>
+
+  <span id="content">
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">서류 확인 /</span> 발주 내용 상세 보기</h4>
+      <div class="fullscreen-background">
+        <div class="card mb-4">
+          <div class="card-body">
+            <label class="col-form-label"><h5>발주 내용</h5></label>
+            <div id="setTable">
+              <table class="table table-bordered mb-4" th:each="list:${baljuList}" th:id="'autoTable'+${list.contractDTO.conNo}">
+                <tr>
+                  <th style="width: 200px;" >자재번호</th>
+                  <th>자재명</th>
+                  <th style="width: 80px;" ></th>
+                  <th style="width: 150px;" th:id="'sumCount'+${list.contractDTO.conNo}">
+                    수량
+                    <span th:if="${list.remainder>0}">(+[[${list.remainder}]])</span>
+                    <span th:if="${list.remainder<=0}">([[${list.remainder}]])</span>
+                  </th>
+                  <th>요청일</th>
+                </tr>
+                <tr>
+                  <td rowspan="3">[[${list.contractDTO.jodalPlanDTO.materialDTO.materCode}]]</td>
+                  <td rowspan="3">[[${list.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
+                  <td>1차</td>
+                  <td>[[${list.baljuChasuDTOs[0].balNum}]]</td>
+                  <td>[[${#temporals.format(list.baljuChasuDTOs[0].balDate, 'yyyy-MM-dd')}]]</td>
+                </tr>
+                <tr>
+                  <td>2차</td>
+                  <td>[[${list.baljuChasuDTOs[1].balNum}]]</td>
+                  <td>[[${#temporals.format(list.baljuChasuDTOs[1].balDate, 'yyyy-MM-dd')}]]</td>
+                </tr>
+                <tr>
+                  <td>3차</td>
+                  <td>[[${list.baljuChasuDTOs[2].balNum}]]</td>
+                  <td>[[${#temporals.format(list.baljuChasuDTOs[2].balDate, 'yyyy-MM-dd')}]]</td>
+                </tr>
+                <tr>
+                  <td>배송장소</td>
+                  <td colspan="4">[[${list.baljuDTO.baljuWhere}]]</td>
+                </tr>
+                <tr>
+                  <td>배송 요청 사항</td>
+                  <td colspan="4">[[${list.baljuDTO.baljuPlz}]]</td>
+                </tr>
+              </table>
+            </div>
+            <div class="d-flex justify-content-between w-100">
+              <button type="button" class="btn btn-outline-secondary" th:onclick="|location.href='@{/partner/list_order}'|">뒤로가기</button>
+              <div></div>
+            </div>
+          </div>
+          <!--/Card body-->
+        </div>
+        <!--/ Card-->
+      </div>
+    </div>
+
+    <!--Script-->
+    <!--Script-->
+  </span>
+
+</th:block>
+</html>

@@ -63,4 +63,9 @@ public class StructureServiceImpl implements StructureService {
         List<Structure> list=structureRepository.findByProduct_ManuCode(manuCode);
         return list.stream().map(x->entityToDto(x)).toList();
     }
+    @Override
+    public List<StructureDTO> getStructureByProductMaterial(Long manuCode, Long materCode) {
+        List<Structure> list=structureRepository.findByProductMaterial(manuCode, materCode);
+        return list.stream().map(x->entityToDto(x)).toList();
+    }
 }

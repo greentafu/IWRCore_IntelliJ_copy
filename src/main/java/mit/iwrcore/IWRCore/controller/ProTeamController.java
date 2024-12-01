@@ -42,13 +42,17 @@ public class ProTeamController {
     private final ShipmentService shipmentService;
     private final LineService lineService;
     private final PlanService planService;
+    private final LineStructureService lineStructureService;
 
 
     @GetMapping("/list_pro")
     public void list_pro() {}
     @GetMapping("/input_pro")
-    public void input_pro(@RequestParam("manuCode") Long manuCode, Model model) {
-        model.addAttribute("product", productService.getProduct(manuCode));
+    public void input_pro(@RequestParam(value = "manuCode", required = false) Long manuCode, Model model) {
+        if(manuCode!=null) {
+            model.addAttribute("manuCode", manuCode);
+            model.addAttribute("productName", productService.getProduct(manuCode).getName());
+        }
         model.addAttribute("line_list", lineService.getLines());
     }
     @GetMapping("/modify_plan")
@@ -58,7 +62,16 @@ public class ProTeamController {
         model.addAttribute("proplan", proplanDTO);
         model.addAttribute("product", proplanDTO.getProductDTO());
         model.addAttribute("line_list", lineService.getLines());
-        model.addAttribute("useLine", String.join(",", proplanDTO.getLine()));
+
+        String tempLine="";
+        List<LineStructureDTO> lineStructureDTOs=lineStructureService.getLineStructureByProPlanNo(proplanNo);
+        if(lineStructureDTOs!=null){
+            for(int i=0; i<lineStructureDTOs.size(); i++){
+                tempLine=tempLine+lineStructureDTOs.get(i).getLineDTO().getLineCode();
+                if(i+1<lineStructureDTOs.size()) tempLine=tempLine+",";
+            }
+        }
+        model.addAttribute("useLine", tempLine);
     }
     @GetMapping("/details_plan")
     public void details_plan(@RequestParam("proplanNo") Long proplanNo, Model model) {
@@ -67,7 +80,16 @@ public class ProTeamController {
 
         model.addAttribute("proplan", proplanDTO);
         model.addAttribute("lines", planService.getLineByProduct(manuCode));
-        model.addAttribute("useLine", String.join(", ", proplanDTO.getLine()));
+
+        String tempLine="";
+        List<LineStructureDTO> lineStructureDTOs=lineStructureService.getLineStructureByProPlanNo(proplanNo);
+        if(lineStructureDTOs!=null){
+            for(int i=0; i<lineStructureDTOs.size(); i++){
+                tempLine=tempLine+lineStructureDTOs.get(i).getLineDTO().getLineName();
+                if(i+1<lineStructureDTOs.size()) tempLine=tempLine+",";
+            }
+        }
+        model.addAttribute("useLine", tempLine);
     }
 
 

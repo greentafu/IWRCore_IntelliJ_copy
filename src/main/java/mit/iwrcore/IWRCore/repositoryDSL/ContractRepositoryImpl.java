@@ -168,7 +168,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
 
         Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
         List<Tuple> tupleList = queryFactory
-                .select(qJodalPlan, qContract, qJodalChasu, qJodalChasu.jcnum.sum())
+                .select(qJodalPlan, qContract, qJodalChasu, qJodalChasu.joNum.sum())
                 .from(qJodalPlan)
                 .leftJoin(qJodalPlan.proPlan, qProPlan)
                 .leftJoin(qProPlan.product, qProduct)
@@ -213,10 +213,41 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
                         tuple.get(qJodalPlan),
                         tuple.get(qContract),
                         tuple.get(qJodalChasu),
-                        tuple.get(qJodalChasu.jcnum.sum())
+                        tuple.get(qJodalChasu.joNum.sum())
                 })
                 .collect(Collectors.toList());
 
         return new PageImpl<>(objectList, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public Page<Contract> partnerContractPage(PageRequestDTO requestDTO){
+        QContract qContract=QContract.contract;
+        QPartner qPartner=QPartner.partner;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO.getPno()!=null) { builder.and(qPartner.pno.eq(requestDTO.getPno())); }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Contract> contractlList = queryFactory
+                .select(qContract)
+                .from(qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qContract.conDate.desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(qContract)
+                .from(qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(contractlList, pageable, total);
     }
 }

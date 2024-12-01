@@ -47,7 +47,6 @@ function loadItems() {
                 const unit=x.unit;
                 const color=x.color;
                 const boxName=x.boxDTO.boxname;
-                const file=x.file;
 
                 const newRow = document.createElement('tr');
 
@@ -75,7 +74,7 @@ function loadItems() {
                     td.innerText = text;
                     newRow.appendChild(td);
                 });
-                [boxName, file].forEach(function(text) {
+                [boxName].forEach(function(text) {
                     const td = document.createElement('td');
                     td.innerText = text;
                     td.style.display = 'none';
@@ -108,7 +107,6 @@ function addToLowerTable(){
             const unit=cells[7].innerText;
             const color=cells[8].innerText;
             const box=cells[9].innerText;
-            const file=cells[10].innerText;
 
             const newRow = document.createElement('tr');
 
@@ -128,7 +126,7 @@ function addToLowerTable(){
             inputTd.appendChild(input);
             newRow.appendChild(inputTd);
 
-            [matL, matM, matS, standard, unit, color, box, file].forEach(text => {
+            [matL, matM, matS, standard, unit, color, box].forEach(text => {
                 const td = document.createElement('td');
                 td.innerText = text;
                 newRow.appendChild(td);
@@ -201,7 +199,7 @@ function saveToLowerTable(whatButton){
             const quantity=inputElement.value;
             if(quantity==null || quantity=='') quantityBlank=false;
 
-            const sno=cells[12].innerText;
+            const sno=cells[11].innerText;
 
             materData.push({code:code, quantity:quantity, sno:sno});
         });
@@ -259,7 +257,6 @@ function initStructure(){
                 const unit=x.materialDTO.unit;
                 const color=x.materialDTO.color;
                 const box=x.materialDTO.boxDTO.boxname;
-                const file=x.materialDTO.file;
                 const quantity=x.quantity;
                 const sno=x.sno;
 
@@ -282,7 +279,7 @@ function initStructure(){
                 inputTd.appendChild(input);
                 newRow.appendChild(inputTd);
 
-                [matL, matM, matS, standard, unit, color, box, file].forEach(text => {
+                [matL, matM, matS, standard, unit, color, box].forEach(text => {
                     const td = document.createElement('td');
                     td.innerText = text;
                     newRow.appendChild(td);

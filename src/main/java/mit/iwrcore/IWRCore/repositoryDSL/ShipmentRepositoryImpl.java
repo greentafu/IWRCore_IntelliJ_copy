@@ -596,4 +596,54 @@ public class ShipmentRepositoryImpl implements ShipmentRepositoryCustom{
 
         return new PageImpl<>(shipmentList, pageable, total);
     }
+
+    @Override
+    @Transactional
+    public Page<Object[]> partnerInvoicePage(PageRequestDTO requestDTO){
+        QContract qContract=QContract.contract;
+        QBalju qBalju=QBalju.balju;
+        QShipment qShipment=QShipment.shipment;
+        QInvoice qInvoice=QInvoice.invoice;
+
+        QPartner qPartner=QPartner.partner;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO.getPno()!=null) { builder.and(qPartner.pno.eq(requestDTO.getPno())); }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Tuple> tupleList = queryFactory
+                .select(qInvoice, qPartner, qContract)
+                .from(qInvoice)
+                .leftJoin(qInvoice.shipments, qShipment)
+                .leftJoin(qShipment.balju, qBalju)
+                .leftJoin(qBalju.contract, qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .where(builder)
+                .groupBy(qInvoice.tranNO)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qInvoice.tranNO.desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(qInvoice, qPartner, qContract)
+                .from(qInvoice)
+                .leftJoin(qInvoice.shipments, qShipment)
+                .leftJoin(qShipment.balju, qBalju)
+                .leftJoin(qBalju.contract, qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .where(builder)
+                .groupBy(qInvoice.tranNO)
+                .fetchCount();
+
+        List<Object[]> objectList = tupleList.stream()
+                .map(tuple -> new Object[]{
+                        tuple.get(qInvoice),
+                        tuple.get(qContract)
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(objectList, pageable, total);
+    }
 }

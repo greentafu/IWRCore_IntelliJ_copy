@@ -25,7 +25,6 @@ public class Product extends BaseEntity{
     private String name;
     private String color;
     private String text;
-    private String uuid;
     private String supervisor;
     @NotNull
     private Long mater_imsi;

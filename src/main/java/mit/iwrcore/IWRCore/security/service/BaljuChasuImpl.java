@@ -116,6 +116,43 @@ public class BaljuChasuImpl implements BaljuChasuService{
         }
         return modifyOrderDTOList;
     }
+    @Override
+    public ModifyOrderDTO getOneBalju(Long balNo){
+        List<Object[]> entityList=baljuChasuRepository.getOneBalju(balNo);
+        List<ModifyOrderDTO> modifyOrderDTOList=new ArrayList<>();
+        Set<ContractDTO> contractDTOSet=new HashSet<>();
+        Set<BaljuChasuDTO> baljuChasuDTOSet=new HashSet<>();
+        Set<BaljuDTO> baljuDTOSet=new HashSet<>();
+
+        for(Object[] objects:entityList){
+            Contract contract=(Contract) objects[0];
+            BaljuChasu baljuChasu=(BaljuChasu) objects[1];
+            Balju balju=(Balju) objects[2];
+            ContractDTO contractDTO=(contract!=null)?contractService.entityToDTO(contract):null;
+            BaljuChasuDTO baljuChasuDTO=(baljuChasu!=null)?entityToDto(baljuChasu):null;
+            BaljuDTO baljuDTO=(balju!=null)?baljuService.entityToDTO(balju):null;
+            contractDTOSet.add(contractDTO);
+            baljuChasuDTOSet.add(baljuChasuDTO);
+            baljuDTOSet.add(baljuDTO);
+
+            if(baljuChasuDTOSet.size()==3){
+                ContractDTO saveContractDTO=contractDTOSet.stream().toList().get(0);
+                List<BaljuChasuDTO> saveBaljuChasuDTOList=baljuChasuDTOSet.stream().toList();
+                List<BaljuChasuDTO> sortedBaljuChsasuList=saveBaljuChasuDTOList.stream()
+                        .sorted(Comparator.comparing(BaljuChasuDTO::getBalNo))
+                        .collect(Collectors.toList());
+                BaljuDTO saveBaljuDTO=baljuDTOSet.stream().toList().get(0);
+                Long remainder=saveBaljuDTO.getBaljuNum()-saveContractDTO.getConNum();
+
+                ModifyOrderDTO modifyOrderDTO=new ModifyOrderDTO(saveContractDTO, sortedBaljuChsasuList, saveBaljuDTO, remainder);
+                modifyOrderDTOList.add(modifyOrderDTO);
+                contractDTOSet.clear();
+                baljuChasuDTOSet.clear();
+                baljuDTOSet.clear();
+            }
+        }
+        return modifyOrderDTOList.get(0);
+    }
 
 
     // 협력회사> 협력회사 메인화면 목록

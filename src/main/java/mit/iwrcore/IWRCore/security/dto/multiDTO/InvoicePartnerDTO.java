@@ -2,8 +2,6 @@ package mit.iwrcore.IWRCore.security.dto.multiDTO;
 
 import lombok.Builder;
 import lombok.Data;
-import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
-import mit.iwrcore.IWRCore.security.dto.ContractDTO;
 import mit.iwrcore.IWRCore.security.dto.InvoiceDTO;
 import mit.iwrcore.IWRCore.security.dto.PartnerDTO;
 

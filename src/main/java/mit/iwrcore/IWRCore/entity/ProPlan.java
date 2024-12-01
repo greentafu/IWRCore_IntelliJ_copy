@@ -20,17 +20,13 @@ public class ProPlan extends BaseEntity {
     private Long proplanNo;       // 생산계획 번호
     @NotNull
     private Long pronum;         // 수량
-    private String filename;     // 파일
     @NotNull
     private LocalDateTime startDate;  // 시작일
     @NotNull
     private LocalDateTime endDate;    // 마감일
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name="line_id")
-    private List<Line> line;         // 라인
-
     private String details;      // 상세내용
+    private Long finCheck;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id")  // 외래 키 컬럼 이름

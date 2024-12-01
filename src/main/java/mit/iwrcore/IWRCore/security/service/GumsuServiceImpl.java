@@ -75,6 +75,7 @@ public class GumsuServiceImpl implements GumsuService{
     @Override
     public GumsuDTO getGumsuByBalju(Long baljuNo){
         Gumsu gumsu=gumsuRepository.getGumsuByBaljuNo(baljuNo);
+        if(gumsu==null) return null;
         return entityToDTO(gumsu);
     }
     @Override

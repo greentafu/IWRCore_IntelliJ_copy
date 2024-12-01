@@ -8,6 +8,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.PartnerDTO;
 import mit.iwrcore.IWRCore.security.dto.ShipmentDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.InvoiceContractDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.InvoicePartnerDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ShipmentGumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ShipmentReturnDTO;
@@ -51,7 +52,7 @@ public interface ShipmentService {
     // 거래명세서> 거래명세서 발급 가능 배송 목록
     PageResultDTO<ShipmentDTO, Shipment> couldInvoiceShipment(PageRequestDTO2 requestDTO2);
     // 협력회사> 거래명세서 목록
-    PageResultDTO<InvoicePartnerDTO, Object[]> partnerInvoicePage(PageRequestDTO requestDTO);
+    PageResultDTO<InvoiceContractDTO, Object[]> partnerInvoicePage(PageRequestDTO requestDTO);
 
 
 

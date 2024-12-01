@@ -50,6 +50,10 @@ public class LoginService implements UserDetailsService {
             authMember.setName(member.getName());
             authMember.setDepartment(member.getDepartment());
 
+            authMember.setAutoJodalChasu(member.getAutoJodalChasu());
+            authMember.setAutoBaljuChasu(member.getAutoBaljuChasu());
+            authMember.setAutoGumsuChasu(member.getAutoGumsuChasu());
+
             return authMember;
         }else if(result2.isPresent()){
             Partner partner=result2.get();

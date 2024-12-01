@@ -31,9 +31,9 @@
           <label class="form-label">생산 라인</label>
           <div>
             <div class="row mb-1" th:each="line:${line_list}">
-              <span class="col-md-1" style="width: fit-content;">[[${line}]]라인:</span>
+              <span class="col-md-1" style="width: fit-content;">[[${line.lineName}]]라인:</span>
               <div class="col-md-2">
-                <input type="number" class="form-control col-md-2" th:id="'line'+${line}" value="0"/>
+                <input type="number" class="form-control col-md-2" th:id="'line'+${line.lineCode}" value="0"/>
               </div>
             </div>
           </div>
@@ -51,7 +51,12 @@
           <div style="display:none;" id="endDay">[[${proplan.endDate}]]</div>
           <label class="form-label">제품 생산을 위한 라인</label>
           <div class="mb-4" th:each="line:${line_list}">
-            <input type="checkbox" class="form-check-input" th:value=${line} th:id="'ckeck'+${line}"> [[${line}]]라인
+            <input type="checkbox"
+                   class="form-check-input"
+                   th:value=${line.lineCode}
+                   th:id="'ckeck'+${line.lineCode}"
+            >
+            [[${line.lineName}]]라인
           </div>
           <label class="form-label">총 수량 입력</label>
           <label class="form-label">총 수량 입력</label>

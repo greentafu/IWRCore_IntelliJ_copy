@@ -37,7 +37,6 @@ public interface ProductService {
 
 
 
-
     List<ProductDTO> searchProducts(String query);
     List<ProplanDTO> convertProPlans(Product entity);
 

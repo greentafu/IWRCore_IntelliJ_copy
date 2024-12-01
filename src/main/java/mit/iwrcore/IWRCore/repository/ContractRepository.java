@@ -13,6 +13,9 @@ public interface ContractRepository extends JpaRepository<Contract, Long>, Contr
     @Query("select c from Contract c where c.partner.pno=:pno")
     Page<Contract> contractListByPartner(Pageable pageable, Long pno);
 
+    @Query("select c from Contract c where c.jodalPlan.joNo=:joNo")
+    Contract getContractByJodalPlan(Long joNo);
+
     @Query("select c, jc from Contract c " +
             "left join Balju b on (c.conNo=b.contract.conNo) " +
             "left join JodalChasu jc on (c.jodalPlan.joNo=jc.jodalPlan.joNo) " +

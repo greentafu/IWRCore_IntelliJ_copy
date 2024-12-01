@@ -3,8 +3,6 @@ package mit.iwrcore.IWRCore.controller;
 import lombok.RequiredArgsConstructor;
 import mit.iwrcore.IWRCore.security.service.BoxService;
 import mit.iwrcore.IWRCore.security.service.ContractService;
-import mit.iwrcore.IWRCore.security.service.MaterService;
-import mit.iwrcore.IWRCore.security.service.ProCodeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/jago")
 @RequiredArgsConstructor
 public class JagoController {
-
     private final ContractService contractService;
     private final BoxService boxService;
 

@@ -79,6 +79,12 @@ public class ContractServiceImpl implements ContractService {
     public ContractDTO getContract(Long id) {
         return entityToDTO(contractRepository.getReferenceById(id));
     }
+    @Override
+    public ContractDTO getContractByJodalPlan(Long joNo){
+        Contract contract=contractRepository.getContractByJodalPlan(joNo);
+        if(contract==null) return null;
+        return entityToDTO(contract);
+    }
 
 
     // 조달계획> 조달차수 있는(조달계획한) 자재 목록+계약서 등록여부
@@ -140,8 +146,7 @@ public class ContractServiceImpl implements ContractService {
     // 협력회사> 협력회사용 계약서목록
     @Override
     public PageResultDTO<ContractDTO, Contract> partnerContractList(PageRequestDTO requestDTO) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("conNo").descending());
-        Page<Contract> entityPage=contractRepository.contractListByPartner(pageable, requestDTO.getPno());
+        Page<Contract> entityPage=contractRepository.partnerContractPage(requestDTO);
         Function<Contract, ContractDTO> fn = (entity -> entityToDTO(entity));
         return new PageResultDTO<>(entityPage, fn);
     }

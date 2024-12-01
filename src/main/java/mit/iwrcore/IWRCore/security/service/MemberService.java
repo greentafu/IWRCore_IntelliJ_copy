@@ -14,6 +14,7 @@ public interface MemberService {
     PageResultDTO<MemberDTO, Member> findMemberList(PageRequestDTO requestDTO);
     // 직원 삽입, 수정
     Integer insertMember(MemberDTO dto, Long role);
+    MemberDTO updateMemberAuto(Long mno, Long jCheck, Long bCheck, Long gCheck);
     // 직원 삭제
     void deleteMember(Long mno);
 
@@ -26,6 +27,9 @@ public interface MemberService {
                 .phonenumber(dto.getPhonenumber())
                 .pw(dto.getPw())
                 .password(dto.getPassword())
+                .autoJodalChasu(dto.getAutoJodalChasu())
+                .autoBaljuChasu(dto.getAutoBaljuChasu())
+                .autoGumsuChasu(dto.getAutoGumsuChasu())
                 .roleSet(dto.getRoleSet())
                 .build();
     }
@@ -38,6 +42,9 @@ public interface MemberService {
                 .phonenumber(entity.getPhonenumber())
                 .pw(entity.getPw())
                 .password(entity.getPassword())
+                .autoJodalChasu(entity.getAutoJodalChasu())
+                .autoBaljuChasu(entity.getAutoBaljuChasu())
+                .autoGumsuChasu(entity.getAutoGumsuChasu())
                 .roleSet(entity.getRoleSet())
                 .build();
     }

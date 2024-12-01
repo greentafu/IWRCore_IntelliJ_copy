@@ -17,13 +17,26 @@ public interface BaljuRepository extends JpaRepository<Balju, Long>, BaljuReposi
     @Query("select b from Balju b where b.contract.partner.pno=:pno")
     List<Balju> partListBalju(Long pno);
 
-    @Query("select b from Balju b where b.contract.partner.pno=:pno")
-    Page<Balju> partnerBaljuList(Pageable pageable, Long pno);
-
     @Transactional
     @EntityGraph(attributePaths = {"contract"})
     @Query("select distinct b.contract.jodalPlan.proPlan.product from Balju b " +
             "left join Contract c on (b.contract.conNo=c.conNo) " +
             "where b.finCheck=0")
     List<Product> baljuProductList();
+
+    @Transactional
+    @EntityGraph(attributePaths = {"contract"})
+    @Query("select count(b) from Balju b where b.contract.conNo=:conNo")
+    Long baljuCountByContract(Long conNo);
+
+    @Transactional
+    @EntityGraph(attributePaths = {"contract"})
+    @Query("select b from Balju b where b.contract.conNo=:conNo")
+    List<Balju> baljuByContract(Long conNo);
+
+    @Transactional
+    @EntityGraph(attributePaths = {"contract"})
+    @Query("select b from Balju b " +
+            "where b.baljuNo=(select max(bb.baljuNo) from Balju bb where bb.contract.jodalPlan.material.materCode=:materCode)")
+    Balju recentBaljuByMaterial(Long materCode);
 }

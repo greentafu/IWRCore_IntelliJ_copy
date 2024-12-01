@@ -17,4 +17,6 @@ public interface ShipmentRepositoryCustom {
 
     // 거래명세서> 협력회사별 거래명세서 발급 가능 배송 목록
     Page<Shipment> getInvoiceShipment(PageRequestDTO2 requestDTO);
+    // 협력회사 거래명세서 목록
+    Page<Object[]> partnerInvoicePage(PageRequestDTO requestDTO);
 }

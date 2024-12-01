@@ -298,6 +298,39 @@
                         </div>
                       </a>
                     </li>
+                    <span sec:authorize="hasRole('MANAGER') || hasRole('MATERIAL_TEAM')">
+                      <li>
+                        <div class="dropdown-divider"></div>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#">
+                          <div class="d-flex">
+                            <div class="flex-shrink-0 me-3">
+                              <span class="fw-semibold d-block">자동등록</span>
+                            </div>
+                            <div class="flex-grow-1">
+                              <span sec:authorize="hasRole('MANAGER')">
+                                <span class="d-block">
+                                  <input type="checkbox" class="form-check-input" id="autoJodalCheck"
+                                         th:checked="${#authorization.expression('principal.autoJodalChasu==1')}"
+                                  > 조달계획
+                                </span>
+                              </span>
+                              <span class="d-block">
+                                <input type="checkbox" class="form-check-input" id="autoBaljuCheck"
+                                       th:checked="${#authorization.expression('principal.autoBaljuChasu==1')}"
+                                > 발주
+                              </span>
+                              <span class="d-block">
+                                <input type="checkbox" class="form-check-input" id="autoGumsuCheck"
+                                       th:checked="${#authorization.expression('principal.autoGumsuChasu==1')}"
+                                > 검수
+                              </span>
+                            </div>
+                          </div>
+                        </a>
+                      </li>
+                    </span>
                     <li>
                       <div class="dropdown-divider"></div>
                     </li>
@@ -354,6 +387,7 @@
 
     <!-- Main JS -->
     <script src="../assets/js/main.js"></script>
+    <script src="../assets/js/auto-checkbox.js"></script>
     <script src="../assets/js/category-part.js"></script>
     <script src="../assets/js/category-mater.js"></script>
     <script src="../assets/js/category-pro.js"></script>

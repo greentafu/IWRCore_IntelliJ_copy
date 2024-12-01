@@ -92,7 +92,17 @@ public class ManagerController {
 
         MemberDTO memberDTO=MemberDTO.builder()
                 .mno((mno!=null)?mno:null).name(name).phonenumber(phonenumber).department(department)
-                .id(temp_id).pw(temp_pw).password(passwordEncoder.encode(temp_pw)).build();
+                .id(temp_id).pw(temp_pw).password(passwordEncoder.encode(temp_pw))
+                .autoJodalChasu(0L).autoBaljuChasu(0L).autoGumsuChasu(0L)
+                .build();
+
+        if(mno!=null) {
+            MemberDTO exMemberDTO=memberService.findMemberDto(mno, null);
+            memberDTO.setAutoJodalChasu(exMemberDTO.getAutoJodalChasu());
+            memberDTO.setAutoBaljuChasu(exMemberDTO.getAutoBaljuChasu());
+            memberDTO.setAutoGumsuChasu(exMemberDTO.getAutoGumsuChasu());
+        }
+
         memberService.insertMember(memberDTO, role);
 
         return "redirect:/manager/list_member";

@@ -24,10 +24,7 @@ public class Contract extends BaseEntity {
     @NotNull
     private Long money;       // 단가
     @NotNull
-    private Long howDate;     // 걸리는 일수
-    @NotNull
     private LocalDateTime conDate;  // 체결일
-    private String filename; // 파일
 
     private String who;      // 담당자
 

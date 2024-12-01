@@ -1,40 +1,23 @@
 package mit.iwrcore.IWRCore.service;
 
-import jakarta.transaction.Transactional;
-import mit.iwrcore.IWRCore.repository.MemberRepository;
-import mit.iwrcore.IWRCore.repository.ProductRepository;
-import mit.iwrcore.IWRCore.repository.ProPlanRepository;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
-import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
-import mit.iwrcore.IWRCore.security.service.MemberService;
-import mit.iwrcore.IWRCore.security.service.ProductService;
-import mit.iwrcore.IWRCore.security.service.ProplanServiceImpl;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturctureDTO;
+import mit.iwrcore.IWRCore.security.service.ProplanService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @SpringBootTest
 public class ProplanServiceTests {
 
     @Autowired
-    private ProplanServiceImpl proplanService;
+    private ProplanService proplanService;
 
-    @Autowired
-    private ProPlanRepository proPlanRepository;
+    @Test
+    @Transactional
+    public void test(){
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private MemberService memberService;
-
+    }
 }

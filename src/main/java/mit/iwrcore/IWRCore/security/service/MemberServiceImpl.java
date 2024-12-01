@@ -8,6 +8,7 @@ import mit.iwrcore.IWRCore.repository.MemberRepository;
 import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -78,6 +79,12 @@ public class MemberServiceImpl implements MemberService{
             memberRepository.save(member);
             return 1;
         }
+    }
+    // 자동 변경
+    @Override
+    public MemberDTO updateMemberAuto(Long mno, Long jCheck, Long bCheck, Long gCheck){
+        memberRepository.updateAuto(mno, jCheck, bCheck, gCheck);
+        return findMemberDto(mno, null);
     }
     // 직원 삭제
     @Override

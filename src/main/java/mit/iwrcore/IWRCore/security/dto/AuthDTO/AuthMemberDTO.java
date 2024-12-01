@@ -19,6 +19,10 @@ public class AuthMemberDTO extends User {
     private String name;
     private String department;
 
+    private Long autoJodalChasu;
+    private Long autoBaljuChasu;
+    private Long autoGumsuChasu;
+
     public AuthMemberDTO(
             String username,
             String password,

@@ -29,7 +29,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final InvoiceService invoiceService;
     private final BaljuService baljuService;
     private final MemberService memberService;
-    private final ReturnsRepository returnsRepository;
+    private final ContractService contractService;
     private final GumsuService gumsuService;
     private final PartnerService partnerService;
 
@@ -191,10 +191,16 @@ public class ShipmentServiceImpl implements ShipmentService {
     }
     // 협력회사> 거래명세서 목록
     @Override
-    public PageResultDTO<InvoicePartnerDTO, Object[]> partnerInvoicePage(PageRequestDTO requestDTO){
-        Pageable pageable=requestDTO.getPageable(Sort.by("tranNO").descending());
-        Page<Object[]> entityPage=shipmentRepository.partnerInvoicePage(pageable, requestDTO.getPno());
-        return new PageResultDTO<>(entityPage, this::invoicePartnerToDTO);
+    public PageResultDTO<InvoiceContractDTO, Object[]> partnerInvoicePage(PageRequestDTO requestDTO){
+        Page<Object[]> entityPage=shipmentRepository.partnerInvoicePage(requestDTO);
+        return new PageResultDTO<>(entityPage, this::invoiceContractToDTO);
+    }
+    private InvoiceContractDTO invoiceContractToDTO(Object[] objects){
+        Invoice invoice=(Invoice) objects[0];
+        Contract contract=(Contract) objects[1];
+        InvoiceDTO invoiceDTO=(invoice!=null)? invoiceService.entityToDto(invoice):null;
+        ContractDTO contractDTO=(contract!=null)? contractService.entityToDTO(contract):null;
+        return new InvoiceContractDTO(invoiceDTO, contractDTO);
     }
 
 

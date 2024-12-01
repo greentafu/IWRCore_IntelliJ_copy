@@ -9,4 +9,8 @@ import java.util.List;
 public interface StructureRepository extends JpaRepository<Structure,Long> {
     @Query("select s from Structure s where s.product.manuCode=:manuCode")
     List<Structure> findByProduct_ManuCode(Long manuCode);
+
+    @Query("select s from Structure s " +
+            "where s.product.manuCode=:manuCode and s.material.materCode=:materCode")
+    List<Structure> findByProductMaterial(Long manuCode, Long materCode);
 }

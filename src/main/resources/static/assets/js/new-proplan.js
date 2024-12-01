@@ -1,25 +1,92 @@
+// 변수
+let page = 1;
+let finPage=false;
+let selectProL = null;
+let selectProM = null;
+let selectProS = null;
+let productSearch = null;
+
 let exLine=[];
+
+// 제품 검색
+function productSearchBtn(type){
+    page = 1;
+    finPage=false;
+    document.getElementById("firstTbody").innerText='';
+    selectProL = (document.getElementById("selectProL").value!=null)?document.getElementById("selectProL").value:null;
+    selectProM = (document.getElementById("selectProM").value!=null)?document.getElementById("selectProM").value:null;
+    selectProS = (document.getElementById("selectProS").value!=null)?document.getElementById("selectProS").value:null;
+    productSearch = (document.getElementById("productSearch").value!=null)?document.getElementById("productSearch").value:null;
+    loadItems(type);
+}
+
+function loadItems(type){
+    if(type==="proplan") getAllProduct();
+}
+
+// 전체 제품목록 가져오기
+function getAllProduct(){
+    const content1 = document.getElementById("content1");
+    const firstTbody = document.getElementById("firstTbody");
+    $.ajax({
+        url:'/select/getAllProduct',
+        method:'POST',
+        data:{page:page, selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch},
+        success:function(data){
+            if(data.totalPage<page) finPage=true;
+            data.dtoList.forEach(x=>{
+                const manuCode=x.manuCode;
+                const name=x.name;
+
+                const newRow = document.createElement("tr");
+
+                [manuCode, name].forEach(text => {
+                    const item = document.createElement("td");
+                    item.textContent = text;
+                    newRow.appendChild(item);
+                });
+
+                const btnTd = document.createElement("td");
+                btnTd.innerHTML=`<button class="btn btn-sm btn-outline-primary" onclick="getOneProduct(${manuCode}, '${name}')">선택</button>`;
+                newRow.appendChild(btnTd);
+
+                firstTbody.appendChild(newRow);
+            });
+        }
+    });
+    page++;
+}
+// 제품 하나 선택
+function getOneProduct(manuCode, name){
+    document.getElementById('manuCode').value=manuCode;
+    document.getElementById('productName').value=name;
+    initLine();
+
+    $('#modalScrollable').modal('hide');
+}
 
 // 생산계획 생산라인 수량 가져오기
 function initLine(){
     const manuCode=document.getElementById('manuCode').value;
-    $.ajax({
-        url:'/getLines',
-        method:'GET',
-        data:{manuCode:manuCode},
-        success:function(data){
-            if(data){
-                data.forEach(x=>{
-                    const quantity=x.quantity;
-                    const lineId='line'+x.line;
-                    const input=document.getElementById(lineId);
-                    input.value=quantity;
+    if(manuCode!==null && manuCode!==''){
+        $.ajax({
+            url:'/getLines',
+            method:'GET',
+            data:{manuCode:manuCode},
+            success:function(data){
+                if(data){
+                    data.forEach(x=>{
+                        const quantity=x.quantity;
+                        const lineId='line'+x.line.lineCode;
+                        const input=document.getElementById(lineId);
+                        input.value=quantity;
 
-                    exLine.push(quantity);
-                });
+                        exLine.push(quantity);
+                    });
+                }
             }
-        }
-    });
+        });
+    }
 }
 // 생산계획 생산라인 수량 저장
 function saveLine(){
@@ -30,7 +97,7 @@ function saveLine(){
     let trueNum=false;
     let minNum=false;
     lines.forEach(x=>{
-        const temp=x.value;
+        let temp=x.value;
         if(temp===null || temp==='') temp=0;
         const number=Number(temp);
         list.push(number);
@@ -38,7 +105,9 @@ function saveLine(){
         if(number<0) minNum=true;
     });
 
-    if(trueNum || minNum){
+    if(manuCode===null || manuCode===''){
+        alert('제품을 선택해주세요.');
+    }else if(trueNum || minNum){
         alert('생산라인의 일일생산량은 0이상의 정수만 입력해주세요.');
     }else{
         $.ajax({
@@ -120,6 +189,8 @@ function initModifyProPlan(){
     const end=endDay.split('T')[0];
     document.getElementById('startDate').value=start;
     document.getElementById('endDate').value=end;
+
+
 
     const lines=document.getElementById('lines').innerText;
     const line=lines.split(',');

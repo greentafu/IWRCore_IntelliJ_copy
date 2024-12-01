@@ -13,7 +13,12 @@
   <span id="head">
     <title>생산 계획 등록</title>
       <!--Style-->
-
+      <style>
+        #content1 {
+          height: 250px;
+          overflow-y: auto; /* 내부 스크롤 활성화 */
+        }
+      </style>
       <!--/Style-->
   </span>
 
@@ -23,17 +28,30 @@
       <div class="card mb-4">
         <div class="card-body">
           <h5>일일 생산 라인 능력 등록</h5>
-          <div class="mb-3 col-md-6">
-            <input type="hidden" id="manuCode" th:value="${product.manuCode}" readonly/>
-            <label for="productName" class="form-label">제품명</label>
-            <input class="form-control" type="text" id="productName" th:value="${product.name}" readonly/>
+
+          <label class="form-label">제품명</label>
+          <div class="row">
+            <div class="col-md-6">
+              <input class="form-control" type="text" id="productName" th:value="${productName}" readonly/>
+            </div>
+            <div class="col-md-6">
+              <button
+                      type="button"
+                      class="btn btn-outline-primary"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalScrollable"
+              >
+                제품 선택
+              </button>
+            </div>
           </div>
+          <input type="number" style="display:none;" id="manuCode" th:value="${manuCode}" readonly/>
           <label class="form-label">생산 라인</label>
           <div>
             <div class="row mb-1" th:each="line:${line_list}">
-              <span class="col-md-1" style="width: fit-content;">[[${line}]]라인:</span>
+              <span class="col-md-1" style="width: fit-content;">[[${line.lineName}]]라인:</span>
               <div class="col-md-2">
-                <input type="number" class="form-control col-md-2" th:id="'line'+${line}" value="0"/>
+                <input type="number" class="form-control col-md-2" th:id="'line'+${line.lineCode}" value="0"/>
               </div>
             </div>
           </div>
@@ -48,7 +66,7 @@
           <input type="hidden" id="proplanNo" readonly/>
           <label class="form-label">제품 생산을 위한 라인</label>
           <div class="mb-4" th:each="line:${line_list}">
-            <input type="checkbox" class="form-check-input" th:value=${line} th:id="'ckeck'+${line}"> [[${line}]]라인
+            <input type="checkbox" class="form-check-input" th:value=${line.lineCode} th:id="'ckeck'+${line.lineCode}"> [[${line.lineName}]]라인
           </div>
           <label class="form-label">총 수량 입력</label>
           <input type="number" class="form-control mb-3" id="pronum">
@@ -87,13 +105,71 @@
     </div>
 
     <!--Modal-->
-
+    <div class="modal fade" id="modalScrollable" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <h5 class="modal-title mb-4">제품 검색</h5>
+            <div class="row mb-10 mb-2">
+              <label class="form-label col-md-2" style="width: fit-content;">제품</label>
+              <div class="col-md-10">
+                <div class="row mb-2">
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectProL" onchange="updateProCode('L')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectProM" onchange="updateProCode('M')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectProS" onchange="updateProCode('S')"></select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn('proplan')">검색</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="modal-body" style="height: 350px;">
+            <div id="content1">
+              <table class="table table-hover">
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!--/Modal-->
     <!--Script-->
     <script src="../assets/js/new-proplan.js"></script>
     <script src="../assets/js/file.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+            if(finPage==false){
+                const scrollTop = content1.scrollTop;
+                const scrollHeight = content1.scrollHeight;
+                const clientHeight = content1.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    loadItems('proplan');
+                }
+            }
+        });
+
+        loadItems('proplan');
         initLine();
       });
     </script>

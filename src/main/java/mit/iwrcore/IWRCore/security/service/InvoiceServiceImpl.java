@@ -1,10 +1,17 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
+import mit.iwrcore.IWRCore.entity.Contract;
 import mit.iwrcore.IWRCore.entity.Invoice;
 import mit.iwrcore.IWRCore.repository.InvoiceRepository;
+import mit.iwrcore.IWRCore.security.dto.ContractDTO;
 import mit.iwrcore.IWRCore.security.dto.InvoiceDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor

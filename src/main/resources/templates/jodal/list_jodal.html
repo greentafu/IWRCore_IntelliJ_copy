@@ -121,7 +121,6 @@
                       <th>제품 이름</th>
                       <th>자재번호</th>
                       <th>자재명</th>
-                      <th>수량</th>
                       <th>생산계획 예정일</th>
                       <th>등록</th>
                     </tr>
@@ -383,7 +382,7 @@
 
               const newRow = document.createElement("tr");
 
-              [productName, materCode, materialName, pronum, date].forEach(text => {
+              [productName, materCode, materialName, date].forEach(text => {
                 const item = document.createElement("td");
                 item.textContent = text;
                 newRow.appendChild(item);

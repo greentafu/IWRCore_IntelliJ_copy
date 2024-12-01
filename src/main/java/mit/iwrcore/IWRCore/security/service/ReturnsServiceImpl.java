@@ -91,19 +91,9 @@ public class ReturnsServiceImpl implements ReturnsService {
     }
     // 협력회사> 반품 목록
     @Override
-    public PageResultDTO<ReturnBaljuDTO, Object[]> getReturnPage(PageRequestDTO requestDTO, Long pno) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("reNO").descending());
-        Page<Object[]> entityPage=returnsRepository.pageReturns(pageable, pno);
-        Function<Object[], ReturnBaljuDTO> fn=(entity->returnBaljuToDTO(entity));
+    public PageResultDTO<ReturnsDTO, Returns> getReturnPage(PageRequestDTO requestDTO) {
+        Page<Returns> entityPage=returnsRepository.partnerReturnsPage(requestDTO);
+        Function<Returns, ReturnsDTO> fn = (entity -> entityToDTO(entity));
         return new PageResultDTO<>(entityPage, fn);
-    }
-    private ReturnBaljuDTO returnBaljuToDTO(Object[] objects) {
-        Returns returns=(Returns) objects[0];
-        Long shipNum=(Long) objects[1];
-        LocalDateTime regDate=(LocalDateTime) objects[2];
-        Balju balju=(Balju) objects[3];
-        ReturnsDTO returnsDTO=entityToDTO(returns);
-        BaljuDTO baljuDTO=baljuService.entityToDTO(balju);
-        return new ReturnBaljuDTO(returnsDTO, shipNum, regDate, baljuDTO);
     }
 }

@@ -85,6 +85,22 @@ public class BaljuServiceImpl implements BaljuService {
         if(id==null) return null;
         return entityToDTO(baljuRepository.findById(id).get());
     }
+    @Override
+    public BaljuDTO getRecentBaljuByMaterial(Long materCode){
+        Balju balju=baljuRepository.recentBaljuByMaterial(materCode);
+        if(balju==null) return null;
+        return entityToDTO(balju);
+    }
+    @Override
+    public BaljuDTO getBaljuByContract(Long conNo){
+        List<Balju> balju=baljuRepository.baljuByContract(conNo);
+        if(balju.size()==0) return null;
+        return entityToDTO(balju.get(0));
+    }
+    @Override
+    public Long getBaljuCountByContract(Long conNo){
+        return baljuRepository.baljuCountByContract(conNo);
+    }
 
 
     // 계약서> 계약 완료 목록
@@ -121,8 +137,7 @@ public class BaljuServiceImpl implements BaljuService {
     // 협력회사> 협력회사용 발주서 목록
     @Override
     public PageResultDTO<BaljuDTO, Balju> partnerBaljuList(PageRequestDTO requestDTO) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("baljuNo").descending());
-        Page<Balju> entityPage=baljuRepository.partnerBaljuList(pageable, requestDTO.getPno());
+        Page<Balju> entityPage=baljuRepository.partnerOrderPage(requestDTO);
         Function<Balju, BaljuDTO> fn = (entity -> entityToDTO(entity));
         return new PageResultDTO<>(entityPage, fn);
     }

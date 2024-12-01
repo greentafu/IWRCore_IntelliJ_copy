@@ -6,6 +6,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.JodalPlanJodalChsuDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturctureDTO;
 
 import java.util.List;
 
@@ -24,9 +25,11 @@ public interface JodalPlanService {
     Long newNoneJodalChasuCount();
     List<JodalPlanDTO> getJodalPlanByProPlan(Long proplanNo);
     List<JodalPlanJodalChsuDTO> noneContract();
+    List<JodalPlanDTO> getJodalPlanByProductMaterial(Long manuCode, Long materCode);
 
-
-    // 자재팀> 조달계획 필요 자재 목록
+    // 생산부서> 생산계획에 따른 제품구성 및 수량
+    List<ProPlanSturctureDTO> getStructureStock(Long proplanNo);
+    // 자재부서> 조달계획 필요 자재 목록
     PageResultDTO<JodalPlanDTO, JodalPlan> nonJodalplanMaterial2(PageRequestDTO requestDTO);
     // 계약서> 계약하지 않은 조달계획 목록
     PageResultDTO<JodalPlanJodalChsuDTO, Object[]> noneContractJodalPlan(PageRequestDTO2 requestDTO2);

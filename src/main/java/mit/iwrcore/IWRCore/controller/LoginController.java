@@ -5,10 +5,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.BoxRepository;
+import mit.iwrcore.IWRCore.repository.Category.Mater.MaterSRepository;
+import mit.iwrcore.IWRCore.repository.Category.Part.PartSCodeRepository;
+import mit.iwrcore.IWRCore.repository.Category.Pro.ProSCodeRepository;
 import mit.iwrcore.IWRCore.repository.LineRepository;
 import mit.iwrcore.IWRCore.repository.MemberRepository;
 import mit.iwrcore.IWRCore.repository.PartnerRepository;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartCodeListDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartLDTO;
@@ -45,9 +54,14 @@ public class LoginController {
     private final BaljuService baljuService;
     private final LineRepository lineRepository;
 
+    private final PartSCodeRepository partSCodeRepository;
+    private final MaterSRepository materSRepository;
+    private final ProSCodeRepository proSCodeRepository;
+
     @GetMapping("/login")
     @Transactional
     public void login(){
+        // 생산라인
         if(lineRepository.findAll().size()==0){
             Line line0=Line.builder().lineName("A").build();
             Line line1=Line.builder().lineName("B").build();
@@ -56,6 +70,7 @@ public class LoginController {
             lineRepository.save(line1);
             lineRepository.save(line2);
         }
+        // 창고
         if(boxRepository.findAll().size()==0){
             Box box0=Box.builder().boxName("미정").boxCode(1L).build();
             Box box1=Box.builder().boxName("A창고").boxCode(2L).build();
@@ -66,6 +81,7 @@ public class LoginController {
             boxRepository.save(box2);
             boxRepository.save(box3);
         }
+        // 관리자
         if(memberRepository.findAll().size()==0){
             Member member = Member.builder()
                     .mno(1L)
@@ -75,17 +91,46 @@ public class LoginController {
                     .password(passwordEncoder.encode("1111"))
                     .phonenumber("000-0000-0000")
                     .department("자재부서")
+                    .autoJodalChasu(0L)
+                    .autoBaljuChasu(0L)
+                    .autoGumsuChasu(0L)
                     .build();
             member.changeMemberRole(MemberRole.MANAGER);
             memberRepository.save(member);
         }
-        if(partnerRepository.findAll().size()==0){
-            PartLDTO partLDTO=PartLDTO.builder().Lname("협력회사대분류1").build();
+        // 제품코드
+        if(proSCodeRepository.findAll().size()==0){
+            ProLDTO proLDTO=ProLDTO.builder().Lname("미정").build();
+            ProLDTO savedL=proCodeService.insertProL(proLDTO);
+            ProMDTO proMDTO=ProMDTO.builder().Mname("미정").proLDTO(savedL).build();
+            ProMDTO savedM=proCodeService.insertProM(proMDTO);
+            ProSDTO proSDTO=ProSDTO.builder().Sname("미정").proMDTO(savedM).build();
+            ProSDTO savedS=proCodeService.insertProS(proSDTO);
+        }
+        // 자재코드
+        if(materSRepository.findAll().size()==0){
+            MaterLDTO materLDTO=MaterLDTO.builder().lname("미정").build();
+            MaterLDTO savedL=materService.insertML(materLDTO);
+            MaterMDTO materMDTO=MaterMDTO.builder().Mname("미정").materLDTO(savedL).build();
+            MaterMDTO savedM=materService.insertMM(materMDTO);
+            MaterSDTO materSDTO=MaterSDTO.builder().Sname("미정").materMDTO(savedM).build();
+            MaterSDTO savedS=materService.insertMS(materSDTO);
+        }
+        // 회사코드
+        if(partSCodeRepository.findAll().size()==0){
+            PartLDTO partLDTO=PartLDTO.builder().Lname("미정").build();
             PartLDTO savedL=partCodeService.insertPartL(partLDTO);
-            PartMDTO partMDTO=PartMDTO.builder().Mname("협력회사중분류1").partLDTO(savedL).build();
+            PartMDTO partMDTO=PartMDTO.builder().Mname("미정").partLDTO(savedL).build();
             PartMDTO savedM=partCodeService.insertPartM(partMDTO);
-            PartSDTO partSDTO=PartSDTO.builder().Sname("협력회사소분류1").partMDTO(savedM).build();
+            PartSDTO partSDTO=PartSDTO.builder().Sname("미정").partMDTO(savedM).build();
             PartSDTO savedS=partCodeService.insertPartS(partSDTO);
+
+            PartLDTO partLDTO2=PartLDTO.builder().Lname("소속회사").build();
+            PartLDTO savedL2=partCodeService.insertPartL(partLDTO2);
+            PartMDTO partMDTO2=PartMDTO.builder().Mname("소속회사").partLDTO(savedL2).build();
+            PartMDTO savedM2=partCodeService.insertPartM(partMDTO2);
+            PartSDTO partSDTO2=PartSDTO.builder().Sname("소속회사").partMDTO(savedM2).build();
+            PartSDTO savedS2=partCodeService.insertPartS(partSDTO2);
 
             Partner partner=Partner.builder()
                     .name("소속회사")
@@ -100,7 +145,7 @@ public class LoginController {
                     .contacter("담당자")
                     .contacterNumber("000-0000-0000")
                     .contacterEmail("damdang@mail.com")
-                    .partS(partCodeService.partSdtoToEntity(savedS))
+                    .partS(partCodeService.partSdtoToEntity(savedS2))
                     .id("company")
                     .pw("1111")
                     .password(passwordEncoder.encode("1111"))

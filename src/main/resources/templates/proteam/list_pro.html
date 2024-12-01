@@ -80,16 +80,21 @@
             <div id="content1" class="mb-4">
               <table class="table table-bordered mb-4">
                 <thead>
-                  <tr>
-                    <th>등록일자</th>
-                    <th>제품번호</th>
-                    <th>제품명</th>
-                    <th>색상</th>
-                    <th>생산계획 등록</th>
-                  </tr>
+                <tr>
+                  <th>등록일자</th>
+                  <th>제품번호</th>
+                  <th>제품명</th>
+                  <th>색상</th>
+                  <th>생산계획 등록</th>
+                </tr>
                 </thead>
                 <tbody class="table-border-bottom-0" id="firstTbody"></tbody>
               </table>
+            </div>
+            <div class="mt-3 text-end mb-4">
+              <a th:href="@{/proteam/input_pro}">
+                <button type="button" class="btn btn-primary">등록</button>
+              </a>
             </div>
           </div>
         </div>

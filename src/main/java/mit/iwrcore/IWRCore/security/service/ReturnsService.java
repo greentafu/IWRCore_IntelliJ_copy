@@ -27,5 +27,5 @@ public interface ReturnsService {
     // 협력회사> 반품 목록 확인
     List<ReturnsDTO> getReturnsList(Long baljuNo);
     // 협력회사> 반품 목록
-    PageResultDTO<ReturnBaljuDTO, Object[]> getReturnPage(PageRequestDTO requestDTO, Long pno);
+    PageResultDTO<ReturnsDTO, Returns> getReturnPage(PageRequestDTO requestDTO);
 }

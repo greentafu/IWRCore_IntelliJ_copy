@@ -109,6 +109,49 @@ public class JodalPlanRepositoryImpl implements JodalPlanRepositoryCustom {
 
     @Override
     @Transactional
+    public List<Object[]> getStructureStock(Long proplanNo){
+        QProPlan qProPlan=QProPlan.proPlan;
+        QStructure qStructure=QStructure.structure;
+        QMaterial qMaterial=QMaterial.material;
+        QShipment qShipment=QShipment.shipment;
+        QRequest qRequest=QRequest.request;
+
+        QJodalPlan qJodalPlan=QJodalPlan.jodalPlan;
+        QContract qContract=QContract.contract;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        builder.and( qProPlan.proplanNo.eq(proplanNo) );
+
+        List<Tuple> tupleList = queryFactory
+                .select(qProPlan, qStructure, qJodalPlan, qShipment.shipNum.sum(), qRequest.requestNum.sum())
+                .from(qProPlan)
+                .leftJoin(qStructure).on(qStructure.product.eq(qProPlan.product))
+                .leftJoin(qMaterial).on(qMaterial.structures.contains(qStructure))
+                .leftJoin(qRequest).on(qRequest.material.eq(qMaterial).and(qRequest.reqCheck.eq(1L)))
+                .leftJoin(qJodalPlan).on(qJodalPlan.material.eq(qMaterial))
+                .leftJoin(qContract).on(qContract.jodalPlan.eq(qJodalPlan))
+                .leftJoin(qShipment).on(qShipment.balju.contract.eq(qContract).and(qShipment.receiveCheck.eq(1L)))
+                .where(builder)
+                .groupBy(qMaterial.materCode)
+                .orderBy(qStructure.sno.desc())
+                .fetch();
+
+        List<Object[]> objectList = tupleList.stream()
+                .map(tuple -> new Object[]{
+                        tuple.get(qProPlan),
+                        tuple.get(qStructure),
+                        tuple.get(qJodalPlan),
+                        tuple.get(qShipment.shipNum.sum()),
+                        tuple.get(qRequest.requestNum.sum())
+                })
+                .collect(Collectors.toList());
+
+        return objectList;
+    }
+
+    @Override
+    @Transactional
     public Page<Object[]> noneContractJodalPlan(PageRequestDTO2 requestDTO2){
         QJodalPlan qJodalPlan=QJodalPlan.jodalPlan;
         QJodalChasu qJodalChasu=QJodalChasu.jodalChasu;

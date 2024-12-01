@@ -22,6 +22,7 @@ import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.*;
 import mit.iwrcore.IWRCore.security.service.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -48,6 +49,7 @@ public class SelectboxController {
     private final ReturnsService returnsService;
     private final EmergencyService emergencyService;
     private final BaljuChasuService baljuChasuService;
+    private final ProductService productService;
 
     @GetMapping("/getPart")
     public PartCodeListDTO getPart(){
@@ -182,7 +184,18 @@ public class SelectboxController {
     }
 
 
-
+    // 생산계획> 모든 제품 목록 가져오기
+    @PostMapping("/getAllProduct")
+    public PageResultDTO<ProductDTO, Product> getAllProduct(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) Long selectProL, @RequestParam(required = false) Long selectProM,
+            @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
+                .build();
+        return productService.getCheckProducts(requestDTO);
+    }
 
     // 계약서> 모든 협력회사 목록 가져오기
     @PostMapping("/getAllPartner")
@@ -367,4 +380,22 @@ public class SelectboxController {
         return shipmentService.getShipmentByInvoice(tranNO);
     }
 
+    // 출하요청> 생산계획 존재하는 모든 제품목록 가져오기
+    @PostMapping("/getPlanProduct")
+    public PageResultDTO<ProplanDTO, ProPlan> getPlanProduct(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) Long selectProL, @RequestParam(required = false) Long selectProM,
+            @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
+                .build();
+        return proplanService.getNotFinProPlan(requestDTO);
+    }
+    // 출하요청> 생산계획 하나 선택
+    @PostMapping("/getOneProPlan")
+    public List<ProPlanSturctureDTO> getOneProPlan(
+            @RequestParam(required = false) Long proplanNo){
+        return jodalPlanService.getStructureStock(proplanNo);
+    }
 }

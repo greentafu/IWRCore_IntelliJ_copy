@@ -15,4 +15,10 @@ public interface BaljuChasuRepository extends JpaRepository<BaljuChasu, Long> {
             "left join BaljuChasu bc on (b.baljuNo=bc.balju.baljuNo) " +
             "where b.baljuNo is not null and b.finCheck=0 and c.partner.pno=:pno")
     List<Object[]> modifyBalju(Long pno);
+
+    @Query("select c, bc, b from Contract c " +
+            "left join Balju b on (c.conNo=b.contract.conNo) " +
+            "left join BaljuChasu bc on (b.baljuNo=bc.balju.baljuNo) " +
+            "where b.baljuNo=:baljuNo")
+    List<Object[]> getOneBalju(Long baljuNo);
 }

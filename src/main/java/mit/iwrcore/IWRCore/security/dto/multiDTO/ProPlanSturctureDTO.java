@@ -2,13 +2,10 @@ package mit.iwrcore.IWRCore.security.dto.multiDTO;
 
 import lombok.Builder;
 import lombok.Data;
-import mit.iwrcore.IWRCore.entity.JodalChasu;
 import mit.iwrcore.IWRCore.security.dto.JodalChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.JodalPlanDTO;
 import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
 import mit.iwrcore.IWRCore.security.dto.StructureDTO;
-
-import java.util.List;
 
 @Builder
 @Data

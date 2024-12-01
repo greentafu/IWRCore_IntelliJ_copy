@@ -1,6 +1,7 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import mit.iwrcore.IWRCore.entity.Plan;
+import mit.iwrcore.IWRCore.security.dto.LineDTO;
 import mit.iwrcore.IWRCore.security.dto.PlanDTO;
 
 import java.util.List;
@@ -15,6 +16,6 @@ public interface PlanService {
     PlanDTO entityToDTO(Plan entity);
 
     // 조회
-    PlanDTO getLineByLine(Long manuCode, String line);
+    PlanDTO getLineByLine(Long manuCode, LineDTO line);
     List<PlanDTO> getLineByProduct(Long productId);
 }

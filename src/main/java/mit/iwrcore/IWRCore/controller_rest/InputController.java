@@ -1,15 +1,21 @@
 package mit.iwrcore.IWRCore.controller_rest;
 
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
 import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.PartnerDTO;
 import mit.iwrcore.IWRCore.security.service.MemberService;
 import mit.iwrcore.IWRCore.security.service.PartnerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.web.bind.annotation.*;
+
+import javax.management.relation.Role;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/input")
@@ -76,5 +82,27 @@ public class InputController {
         }
 
         return result;
+    }
+
+    // 자동버튼 선택
+    @PostMapping("/changeAuto")
+    public void changeAuto(@RequestParam(required = false) Long jCheck,
+                           @RequestParam(required = false) Long bCheck,
+                           @RequestParam(required = false) Long gCheck){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        AuthMemberDTO authMemberDTO=(AuthMemberDTO) authentication.getPrincipal();
+        MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
+
+        memberService.updateMemberAuto(memberDTO.getMno(), jCheck, bCheck, gCheck);
+
+        authMemberDTO.setAutoJodalChasu(jCheck);
+        authMemberDTO.setAutoBaljuChasu(bCheck);
+        authMemberDTO.setAutoGumsuChasu(gCheck);
+
+        Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
+            authMemberDTO, authentication.getCredentials(), authentication.getAuthorities()
+        );
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(newAuthentication);
     }
 }

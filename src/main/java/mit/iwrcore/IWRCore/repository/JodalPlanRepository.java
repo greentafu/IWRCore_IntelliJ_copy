@@ -1,6 +1,7 @@
 package mit.iwrcore.IWRCore.repository;
 
 import mit.iwrcore.IWRCore.entity.JodalPlan;
+import mit.iwrcore.IWRCore.entity.Structure;
 import mit.iwrcore.IWRCore.repositoryDSL.JodalPlanRepositoryCustom;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,4 +28,8 @@ public interface JodalPlanRepository extends JpaRepository<JodalPlan, Long>, Jod
             "where j.joNo=:joNo " +
             "group by j")
     List<Object[]> selectedJodalPlan(Long joNo);
+
+    @Query("select j from JodalPlan j " +
+            "where j.proPlan.product.manuCode=:manuCode and j.material.materCode=:materCode")
+    List<JodalPlan> findByProductMaterial(Long manuCode, Long materCode);
 }

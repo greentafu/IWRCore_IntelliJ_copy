@@ -362,5 +362,37 @@ public class BaljuRepositoryImpl implements BaljuRepositoryCustom{
         return new PageImpl<>(objectList, pageable, total);
     }
 
+    @Override
+    @Transactional
+    public Page<Balju> partnerOrderPage(PageRequestDTO requestDTO){
+        QBalju qBalju=QBalju.balju;
+        QContract qContract=QContract.contract;
+        QPartner qPartner=QPartner.partner;
 
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO.getPno()!=null) { builder.and(qPartner.pno.eq(requestDTO.getPno())); }
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Balju> baljulList = queryFactory
+                .select(qBalju)
+                .from(qBalju)
+                .leftJoin(qBalju.contract, qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(qBalju.baljuDate.desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(qBalju)
+                .from(qBalju)
+                .leftJoin(qBalju.contract, qContract)
+                .leftJoin(qContract.partner, qPartner)
+                .where(builder)
+                .fetchCount();
+
+        return new PageImpl<>(baljulList, pageable, total);
+    }
 }

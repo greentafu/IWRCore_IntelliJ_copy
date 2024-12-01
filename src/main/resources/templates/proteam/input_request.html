@@ -12,161 +12,167 @@
 
   <span id="head">
     <title>출하 요청</title>
-      <!--Style-->
-
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 350px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
-    <span id="content">
-     <div class="container-xxl flex-grow-1 container-p-y">
-            <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">생산부서 /</span> 출하 요청</h4>
+  <span id="content">
+    <div class="container-xxl flex-grow-1 container-p-y">
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">생산부서 /</span> 출하 요청</h4>
+      <div class="row">
+        <div class="fullscreen-background">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5>제품 정보</h5>
+              <label class="form-label">제품명</label>
+              <div class="row mb-2">
+                <div class="col-md-6">
+                  <input class="form-control" type="text" id="productName" readonly/>
+                </div>
+                <div class="col-md-6">
+                  <button
+                          type="button"
+                          class="btn btn-outline-primary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#exLargeModal"
+                  >
+                    제품 선택
+                  </button>
+                </div>
+              </div>
+              <input class="form-control" type="number" id="productNo" style="display:none;" readonly/>
+              <div>
+                <label class="form-label">비고</label>
+                <textarea class="form-control" id="requestText" rows="3"></textarea>
+              </div>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+              <h5>출하 요청 정보</h5>
+              <div class="row mb-4">
+                <div class="col-md-2">
+                  <select class="form-select form-select-sm" style="width: fit-content;" id="selectLine"></select>
+                </div>
+                <label class="col-sm-1 col-form-label" for="product-quantity">제품수량 :</label>
+                <div class="col-sm-1" style="width: 150px;">
+                  <div class="input-group input-group-merge">
+                    <input type="number" id="product-quantity" class="form-control" />
+                    <span class="input-group-text" id="product-quantity-unit">개</span>
+                  </div>
+                </div>
+                <label class="col-sm-1 col-form-label" for="desired-date">희망일자 :</label>
+                <div class="col-sm-1" style="width: 150px;">
+                  <input type="date" id="desired-date" class="form-control" />
+                </div>
+                <button type="button" class="btn btn-outline-primary" style="width: fit-content;" onclick="autoBtn()">
+                  자동입력
+                </button>&nbsp;
+              </div>
+              <div class="table-responsive text-nowrap">
+                <div id="content2">
+                  <table class="table table-hover">
+                    <tbody id="secondTbody"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between w-100">
+                <a th:href="@{/proteam/list_request}">
+                  <button type="reset" class="btn btn-outline-secondary">뒤로가기</button>
+                </a>
+                <button type="button" class="btn btn-primary" id="submitbutton">출하 요청</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <div class="row">
-              <div class="fullscreen-background">
-                <div class="card mb-4">
-                  <div class="card mb-4">
-                    <div class="card-body">
-                      <h5>제품 정보</h5>
-                      <div>
-                        <label for="exampleDataList" class="form-label">제품 이름</label>
-                        <div class="row">
-                          <div class="col-md-4">
-                            <input type="text" class="form-control" id="product-name">
-                          </div>
-                          <button type="button" class="btn btn-outline-primary col-md-1" data-bs-toggle="modal"
-                                  data-bs-target="#modalScrollable2">
-                            제품선택
-                          </button>
-                        </div>
-                        <div>
-                          <label for="exampleFormControlTextarea1" class="form-label">비고</label>
-                          <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-                        </div>
-                      </div>
-                    </div>
-                    <hr class="m-0">
-                    <div class="card-body table-responsive text-nowrap">
-
-                      <div class="row mb-3">
-                        <h5>출하 요청 정보</h5>
-                    <div class="col-sm-2">
-  <button type="button" class="btn btn-outline-primary dropdown-toggle" id="line-select-button" data-bs-toggle="dropdown" aria-expanded="false">
-    라인 선택
-  </button>
-  <ul class="dropdown-menu" id="line-select-menu">
-    <li><a class="dropdown-item" href="javascript:void(0);" data-line="A">A 라인</a></li>
-    <li><a class="dropdown-item" href="javascript:void(0);" data-line="B">B 라인</a></li>
-    <li><a class="dropdown-item" href="javascript:void(0);" data-line="C">C 라인</a></li>
-  </ul>
-</div>
-                          <!-- 제품수량 입력 필드 -->
-                        <label class="col-sm-1 col-form-label" for="product-quantity">제품수량 :</label>
-                        <div class="col-sm-1" style="width: 150px;">
-                          <div class="input-group input-group-merge">
-                            <input type="number" id="product-quantity" class="form-control" />
-                            <span class="input-group-text" id="product-quantity-unit">개</span>
-                          </div>
-                        </div>
-
-                          <!-- 희망일자 입력 필드 -->
-                        <label class="col-sm-1 col-form-label" for="desired-date">희망일자 :</label>
-                        <div class="col-sm-1" style="width: 150px;">
-                          <input type="date" id="desired-date" class="form-control" />
-                        </div>
-                      </div>
-
-                      <table class="table table-bordered mb-4">
-                        <thead>
-                          <tr>
-                            <th>자재번호</th>
-                            <th>자재명</th>
-                            <th>제품 1개당 소요량</th>
-                            <th style="width: 100px;">현재 보유 수량</th>
-                            <th style="width: 100px;">필요 수량</th>
-                            <th>부족 수량</th>
-                          </tr>
-                        </thead>
-                        <tbody id="product-table-body">
-                          <!-- 동적으로 추가된 행이 여기에 삽입됩니다. -->
-                        </tbody>
-                      </table>
-                      <div class="d-flex justify-content-between w-100">
-                         <a th:href="@{/proteam/list_request}">
-                          <button type="reset" class="btn btn-outline-secondary">뒤로가기</button>
-                        </a>
-                         <button type="button" class="btn btn-primary" id="submitbutton">출하 요청</button>
-
-                      </div>
-                    </div>
+    <!--Modal-->
+    <div class="modal fade" id="exLargeModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <h5 class="modal-title mb-4">제품 검색</h5>
+            <div class="row mb-10 mb-2">
+              <label class="form-label col-md-2" style="width: fit-content;">제품</label>
+              <div class="col-md-10">
+                <div class="row mb-2">
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectProL" onchange="updateProCode('L')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectProM" onchange="updateProCode('M')"></select>
+                  </div>
+                  <div class="col-md-4">
+                    <select class="form-select form-select-sm" id="selectProS" onchange="updateProCode('S')"></select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-8">
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn('request')">검색</button>
                   </div>
                 </div>
               </div>
             </div>
-
-         <!-- Modal -->
-<div class="modal fade" id="modalScrollable2" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" role="document">
-        <div class="modal-content" style="width: fit-content;">
-            <div class="modal-body">
-                <h5 class="modal-title mb-4" id="modalScrollableTitle">생산계획 등록 제품</h5>
-                <div class="row mb-10 mb-2">
-                    <label class="form-label col-md-2" style="width: fit-content;">제품</label>
-                    <div class="col-md-10">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <select class="form-select form-select-sm" id="selectProL" onchange="updateProCode('L')"></select>
-                            </div>
-                            <div class="col-md-4">
-                                <select class="form-select form-select-sm" id="selectProM" onchange="updateProCode('M')"></select>
-                            </div>
-                            <div class="col-md-4">
-                                <select class="form-select form-select-sm" id="selectProS" onchange="updateProCode('S')"></select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <form class="d-flex" onsubmit="return false">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                        <button class="btn btn-outline-primary" type="submit" id="searchButton">Search</button>
-                    </form>
-                </div>
+          </div>
+          <hr class="m-0">
+          <div class="modal-body" style="height: 350px;">
+            <div id="content1">
+              <table class="table table-hover">
+                <thead>
+                  <th>제품번호</th>
+                  <th>제품명</th>
+                  <th>예정일</th>
+                  <th>예정수량</th>
+                  <th></th>
+                </thead>
+                <tbody id="firstTbody"></tbody>
+              </table>
             </div>
-            <hr class="m-0">
-            <div class="modal-body" style="height: 350px;">
-                <div class="table-responsive text-nowrap">
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th></th>
-                            <th>제품번호</th>
-                            <th>제품명</th>
-                            <th>생산계획 시작일</th>
-                            <th>생산계획 마감일</th>
-                            <th>생산계획 수량</th>
-                        </tr>
-                        </thead>
-                        <tbody id="searchResults">
-                            <!-- 검색 결과는 AJAX를 통해 동적으로 추가됩니다. -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="confirmButton" data-bs-dismiss="modal">
-                    확인
-                </button>
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    닫기
-                </button>
-            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              닫기
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-         <!-- /Modal -->
-         <!--Script-->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+    <!--/Modal-->
+
+    <!--Script-->
+    <script src="../assets/js/new-request-jago.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+            if(finPage==false){
+                const scrollTop = content1.scrollTop;
+                const scrollHeight = content1.scrollHeight;
+                const clientHeight = content1.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 10) {
+                    loadItems('request');
+                }
+            }
+        });
+
+        loadItems('request');
+      });
+    </script>
+    <script>
+
+
+
 $(document).ready(function() {
     $('#searchButton').on('click', function() {
         var query = $('input[type="search"]').val().trim();

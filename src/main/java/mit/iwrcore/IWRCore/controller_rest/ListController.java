@@ -1,19 +1,17 @@
 package mit.iwrcore.IWRCore.controller_rest;
 
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.JodalPlan;
-import mit.iwrcore.IWRCore.entity.Material;
-import mit.iwrcore.IWRCore.entity.Product;
-import mit.iwrcore.IWRCore.security.dto.JodalPlanDTO;
-import mit.iwrcore.IWRCore.security.dto.MaterialDTO;
+import mit.iwrcore.IWRCore.entity.*;
+import mit.iwrcore.IWRCore.security.dto.*;
+import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthPartnerDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
-import mit.iwrcore.IWRCore.security.dto.ProductDTO;
-import mit.iwrcore.IWRCore.security.dto.ShipmentDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.*;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,6 +39,8 @@ public class ListController {
     private GumsuChasuService gumsuChasuService;
     @Autowired
     private ShipmentService shipmentService;
+    @Autowired
+    private ReturnsService returnsService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -370,5 +370,51 @@ public class ListController {
                 .materL2(selectMaterL2).materM2(selectMaterM2).materS2(selectMaterS2).materialSearch2(materialSearch2).build();
 
         return shipmentService.pageFinInvoice(requestDTO);
+    }
+
+    // 협력회사> 계약서 목록
+    @GetMapping("/partnerContractList")
+    public PageResultDTO<ContractDTO, Contract> partnerContractList(@RequestParam(required = false) int page){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .pno(authPartnerDTO.getPno()).build();
+        return contractService.partnerContractList(requestDTO);
+    }
+    // 협력회사> 발주서 목록
+    @GetMapping("/partnerOrderList")
+    public PageResultDTO<BaljuDTO, Balju> partnerOrderList(@RequestParam(required = false) int page){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .pno(authPartnerDTO.getPno()).build();
+        return baljuService.partnerBaljuList(requestDTO);
+    }
+    // 협력회사> 거래명세서 목록
+    @GetMapping("/partnerInvoiceList")
+    public PageResultDTO<InvoiceContractDTO, Object[]> partnerInvoiceList(@RequestParam(required = false) int page){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .pno(authPartnerDTO.getPno()).build();
+        return shipmentService.partnerInvoicePage(requestDTO);
+    }
+    // 협력회사> 반품 목록
+    @GetMapping("/partnerReturnList")
+    public PageResultDTO<ReturnsDTO, Returns> partnerReturnList(@RequestParam(required = false) int page, Long selectedBox){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .pno(authPartnerDTO.getPno()).returnCheck(selectedBox).build();
+
+        return returnsService.getReturnPage(requestDTO);
     }
 }

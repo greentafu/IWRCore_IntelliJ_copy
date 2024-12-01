@@ -58,4 +58,7 @@ public class PageRequestDTO {
 
     // 제품등록 중 자재들
     private List<Long> materials;
+
+    // 반품확인 여부
+    private Long returnCheck;
 }

@@ -10,6 +10,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.JodalPlanJodalChsuDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturctureDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -99,9 +100,35 @@ public class JodalPlanServiceImpl implements JodalPlanService {
         List<Object[]> entityList=jodalPlanRepository.noneContractJodalPlanList();
         return entityList.stream().map(this::exJodalPlanJodalChsuDTO).toList();
     }
+    @Override
+    public List<JodalPlanDTO> getJodalPlanByProductMaterial(Long manuCode, Long materCode){
+        List<JodalPlan> entityList=jodalPlanRepository.findByProductMaterial(manuCode, materCode);
+        return entityList.stream().map(x->entityToDTO(x)).toList();
+    }
 
 
-    // 자재팀> 조달계획 필요 자재 목록
+    // 생산부서> 생산계획에 따른 제품구성 및 수량
+    @Override
+    public List<ProPlanSturctureDTO> getStructureStock(Long proplanNo){
+        List<Object[]> list = jodalPlanRepository.getStructureStock(proplanNo);
+        return list.stream().map(this::proPlanSturctureToDTO).toList();
+    }
+    private ProPlanSturctureDTO proPlanSturctureToDTO(Object[] objects) {
+        ProPlan proPlan = (ProPlan) objects[0];
+        Structure structure = (Structure) objects[1];
+        JodalPlan jodalPlan = (JodalPlan) objects[2];
+        Long tempSumShip = (Long) objects[3];
+        Long tempSumRequest = (Long) objects[4];
+
+        ProplanDTO proplanDTO = (proPlan != null) ? proplanService.entityToDTO(proPlan) : null;
+        StructureDTO structureDTO = (structure != null) ? structureService.entityToDto(structure) : null;
+        JodalPlanDTO jodalPlanDTO = (jodalPlan !=null) ? entityToDTO(jodalPlan) : null;
+        Long sumShip = (tempSumShip != null) ? tempSumShip : 0L;
+        Long sumRequest = (tempSumRequest != null) ? tempSumRequest : 0L;
+
+        return new ProPlanSturctureDTO(proplanDTO, structureDTO, sumRequest, sumShip, jodalPlanDTO, null, null);
+    }
+    // 자재부서> 조달계획 필요 자재 목록
     @Override
     public PageResultDTO<JodalPlanDTO, JodalPlan> nonJodalplanMaterial2(PageRequestDTO requestDTO){
         Page<JodalPlan> entityPage = jodalPlanRepository.findJodalPlanByCustomQuery(requestDTO);

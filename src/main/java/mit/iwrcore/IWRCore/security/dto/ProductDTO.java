@@ -17,7 +17,6 @@ public class ProductDTO {
     private String name;
     private String color;
     private String text;
-    private String uuid;
     private String supervisor;
     private Long mater_imsi;
     private Long mater_check;

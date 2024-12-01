@@ -1,3 +1,7 @@
+let page = 1;
+let finPage=false;
+let selectedBox=null;
+
 function initPartnerMain(){
     const allCard=document.querySelectorAll('[id^="card"]');
     allCard.forEach(x=>{
@@ -202,7 +206,6 @@ function release(){
         }
     });
 }
-
 // 반품 확인
 function returnCheck(){
     const reNo=document.getElementById('reNo').value;
@@ -212,6 +215,168 @@ function returnCheck(){
         data:{reNo:reNo},
         success:function(data){
             window.location.href = '/partner/view_return?reNO='+reNo;
+        }
+    });
+}
+
+// 계약서, 발주서, 거래명세서, 반품, 긴급납품 목록 보기
+function loadItems(type) {
+    const content1 = document.getElementById("content1");
+    const firstTbody = document.getElementById("firstTbody");
+
+    if(type==='contract') contractList();
+    if(type==='order') orderList();
+    if(type==='invoice') invoiceList();
+    if(type==='returns') returnList();
+    if(type==='urgent') urgentList();
+
+    page++;
+}
+// 계약서 목록
+function contractList(){
+    $.ajax({
+        url:'/list/partnerContractList',
+        method:'GET',
+        data:{page:page},
+        success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+                const conNo=x.conNo;
+                const conName=x.jodalPlanDTO.materialDTO.name;
+                const conNum=x.conNum;
+                const conMoney=x.money;
+                const conDate=x.conDate.split('T')[0];
+
+                const newRow = document.createElement("tr");
+
+                [conDate, conName, conNum, conMoney].forEach(text => {
+                    const item = document.createElement("td");
+                    item.textContent = text;
+                    newRow.appendChild(item);
+                });
+
+                const btnTd = document.createElement("td");
+                btnTd.innerHTML=`<a href="/partner/view_contract?conNo=${conNo}"><button class="btn btn-primary">내용 보기</button></a>`;
+                newRow.appendChild(btnTd);
+
+                firstTbody.appendChild(newRow);
+            });
+        }
+    });
+}
+// 발주서 목록
+function orderList(){
+    $.ajax({
+        url:'/list/partnerOrderList',
+        method:'GET',
+        data:{page:page},
+        success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+                const baljuNo=x.baljuNo;
+                const conName=x.contractDTO.jodalPlanDTO.materialDTO.name;
+                const baljuNum=x.baljuNum;
+                const baljuDate=x.baljuDate.split('T')[0];
+                const baljuWhere=x.baljuWhere;
+
+                const newRow = document.createElement("tr");
+
+                [baljuDate, conName, baljuNum, baljuWhere].forEach(text => {
+                    const item = document.createElement("td");
+                    item.textContent = text;
+                    newRow.appendChild(item);
+                });
+
+                const btnTd = document.createElement("td");
+                btnTd.innerHTML=`<a href="/partner/view_order?baljuNo=${baljuNo}"><button class="btn btn-primary">내용 보기</button></a>`;
+                newRow.appendChild(btnTd);
+
+                firstTbody.appendChild(newRow);
+            });
+        }
+    });
+}
+// 거래명세서 목록
+function invoiceList(){
+    $.ajax({
+        url:'/list/partnerInvoiceList',
+        method:'GET',
+        data:{page:page},
+        success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            console.log(data);
+
+            data.dtoList.forEach(x=>{
+                const tranNO=x.invoiceDTO.tranNO;
+                const conName=x.contractDTO.jodalPlanDTO.materialDTO.name;
+                const dateCreated=x.invoiceDTO.dateCreated.split('T')[0];
+                const text=x.invoiceDTO.text;
+
+                const cash=x.invoiceDTO.cash;
+                const cheque=x.invoiceDTO.cheque;
+                const promissory=x.invoiceDTO.promissory;
+                const receivable=x.invoiceDTO.receivable;
+                const sumMoney=cash+cheque+promissory+receivable;
+
+                const newRow = document.createElement("tr");
+
+                [dateCreated, conName, sumMoney, text].forEach(text => {
+                    const item = document.createElement("td");
+                    item.textContent = text;
+                    newRow.appendChild(item);
+                });
+
+                const btnTd = document.createElement("td");
+                btnTd.innerHTML=`<a href="/partner/view_invoice?tranNO=${tranNO}"><button class="btn btn-primary">내용 보기</button></a>`;
+                newRow.appendChild(btnTd);
+
+                firstTbody.appendChild(newRow);
+            });
+        }
+    });
+}
+// 반품 목록
+function returnList(){
+    selectedBox = (document.getElementById("selectedBox").value!='')?document.getElementById("selectedBox").value:null;
+    $.ajax({
+        url:'/list/partnerReturnList',
+        method:'GET',
+        data:{page:page, selectedBox:selectedBox},
+        success:function(data){
+            if(data.totalPage<page) finPage=true;
+            data.dtoList.forEach(x=>{
+                const reNo=x.reNO;
+                const shipDate=x.shipmentDTO.regDate.split('T')[0];
+                const returnDate=x.regDate.split('T')[0];
+                const conName=x.shipmentDTO.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name;
+                const shipNum=x.shipmentDTO.shipNum;
+                const returnText=x.whyRe;
+                const checkNum=x.returnCheck;
+
+                const newRow = document.createElement("tr");
+
+                [shipDate, returnDate, conName, shipNum, returnText].forEach(text => {
+                    const item = document.createElement("td");
+                    item.textContent = text;
+                    newRow.appendChild(item);
+                });
+
+                if(checkNum===0){
+                    const btnTd = document.createElement("td");
+                    btnTd.innerHTML=`<a href="/partner/view_return?reNO=${reNo}"><button class="btn btn-primary">확인 미완료</button></a>`;
+                    newRow.appendChild(btnTd);
+                }
+                if(checkNum===1){
+                    const btnTd = document.createElement("td");
+                    btnTd.innerHTML=`<a href="/partner/view_return?reNO=${reNo}"><button class="btn btn-secondary">확인 완료</button></a>`;
+                    newRow.appendChild(btnTd);
+                }
+
+                firstTbody.appendChild(newRow);
+            });
         }
     });
 }

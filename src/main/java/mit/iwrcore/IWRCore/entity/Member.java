@@ -31,10 +31,13 @@ public class Member extends BaseEntity{
     @NotNull
     private String password;
 
+    private Long autoJodalChasu;
+    private Long autoBaljuChasu;
+    private Long autoGumsuChasu;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @Builder.Default
     private Set<MemberRole> roleSet=new HashSet<>();
-
 
     @PostPersist
     public void generateId(){

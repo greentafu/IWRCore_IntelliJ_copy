@@ -2,19 +2,19 @@ package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.entity.FileProPlan;
-import mit.iwrcore.IWRCore.entity.Line;
-import mit.iwrcore.IWRCore.entity.ProPlan;
+import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.ProPlanRepository;
+import mit.iwrcore.IWRCore.security.dto.*;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
-import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanContractNumDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturctureDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 @Service
 @Log4j2
@@ -24,13 +24,14 @@ public class ProplanServiceImpl implements ProplanService{
     private final ProductService productService;
     private final MemberService memberService;
     private final LineService lineService;
+    private final StructureService structureService;
 
     // 저장, 삭제
     @Override
     public ProplanDTO saveProPlan(ProplanDTO dto, List<FileProPlan> fileList) {
         ProPlan proPlan = dtoToEntity(dto);
         proPlan.setFiles(fileList);
-        ProPlan savedProPlan=proPlanRepository.save(proPlan); // savedProPlan = 저장된 proplan
+        ProPlan savedProPlan=proPlanRepository.save(proPlan);
         return entityToDTO(savedProPlan);
     }
     @Override
@@ -46,17 +47,13 @@ public class ProplanServiceImpl implements ProplanService{
     // 변환
     @Override
     public ProPlan dtoToEntity(ProplanDTO dto) {
-        List<String> strings=dto.getLine();
-        List<Line> lines=new ArrayList<>();
-        strings.forEach(x->lines.add(lineService.stringToLine(x)));
         ProPlan entity=ProPlan.builder()
                 .proplanNo(dto.getProplanNo())
                 .pronum(dto.getPronum())
-                .filename(dto.getFilename())
                 .startDate(dto.getStartDate())
                 .endDate(dto.getEndDate())
-                .line(lines)
                 .details(dto.getDetails())
+                .finCheck(dto.getFinCheck())
                 .product(productService.dtoToEntity(dto.getProductDTO()))
                 .writer(memberService.memberdtoToEntity(dto.getMemberDTO()))
                 .build();
@@ -64,17 +61,13 @@ public class ProplanServiceImpl implements ProplanService{
     }
     @Override
     public ProplanDTO entityToDTO(ProPlan entity) {
-        List<Line> lines=entity.getLine();
-        List<String> strings=new ArrayList<>();
-        lines.forEach(x->strings.add(x.getLineName()));
         ProplanDTO dto=ProplanDTO.builder()
                 .proplanNo(entity.getProplanNo())
                 .pronum(entity.getPronum())
-                .filename(entity.getFilename())
                 .startDate(entity.getStartDate())
                 .endDate(entity.getEndDate())
-                .line(strings)
                 .details(entity.getDetails())
+                .finCheck(entity.getFinCheck())
                 .regDate(entity.getRegDate())
                 .productDTO(productService.entityToDto(entity.getProduct()))
                 .memberDTO(memberService.memberTodto(entity.getWriter()))
@@ -94,7 +87,7 @@ public class ProplanServiceImpl implements ProplanService{
     }
 
 
-    // 생산팀> 모든 생산계획 목록
+    // 생산부서> 모든 생산계획 목록
     @Override
     public PageResultDTO<ProPlanContractNumDTO, Object[]> getAllProPlans(PageRequestDTO2 requestDTO){
         Page<Object[]> entityPage=proPlanRepository.findProPlanByCustomQuery(requestDTO);
@@ -107,5 +100,31 @@ public class ProplanServiceImpl implements ProplanService{
         ProplanDTO proplanDTO=(proPlan!=null)?entityToDTO(proPlan):null;
         return new ProPlanContractNumDTO(proplanDTO, (jcnum!=null)?jcnum:0L, (contractNum!=null)?contractNum:0L);
     }
+    // 생산부서> 진행중인 생산계획 목록
+    @Override
+    public PageResultDTO<ProplanDTO, ProPlan> getNotFinProPlan(PageRequestDTO requestDTO) {
+        Page<ProPlan> entityPage=proPlanRepository.getPlanProPlan(requestDTO);
+        Function<ProPlan, ProplanDTO> fn = (entity -> entityToDTO(entity));
+        return new PageResultDTO<>(entityPage, fn);
+    }
+//    // 생산부서> 생산계획에 따른 제품구성 및 수량
+//    @Override
+//    public List<ProPlanSturctureDTO> getStructureStock(Long proplanNo){
+//        List<Object[]> list = proPlanRepository.getStructureStock(proplanNo);
+//        return list.stream().map(this::proPlanSturctureToDTO).toList();
+//    }
+//    private ProPlanSturctureDTO proPlanSturctureToDTO(Object[] objects) {
+//        ProPlan proPlan = (ProPlan) objects[0];
+//        Structure structure = (Structure) objects[1];
+//        Long tempSumShip = (Long) objects[2];
+//        Long tempSumRequest = (Long) objects[3];
+//
+//        ProplanDTO proplanDTO = (proPlan != null) ? entityToDTO(proPlan) : null;
+//        StructureDTO structureDTO = (structure != null) ? structureService.entityToDto(structure) : null;
+//        Long sumShip = (tempSumShip != null) ? tempSumShip : 0L;
+//        Long sumRequest = (tempSumRequest != null) ? tempSumRequest : 0L;
+//
+//        return new ProPlanSturctureDTO(proplanDTO, structureDTO, sumRequest, sumShip, null, null, null);
+//    }
 }
 

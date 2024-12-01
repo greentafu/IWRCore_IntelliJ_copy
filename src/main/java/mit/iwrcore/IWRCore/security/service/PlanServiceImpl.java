@@ -2,8 +2,10 @@ package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.Line;
 import mit.iwrcore.IWRCore.entity.Plan;
 import mit.iwrcore.IWRCore.repository.PlanRepository;
+import mit.iwrcore.IWRCore.security.dto.LineDTO;
 import mit.iwrcore.IWRCore.security.dto.PlanDTO;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +36,7 @@ public class PlanServiceImpl implements PlanService{
         if(dto==null) return null;
         return Plan.builder()
                 .plancode(dto.getPlancode())
-                .line(lineService.stringToLine(dto.getLine()))
+                .line(lineService.dtoToEntity(dto.getLine()))
                 .product(productServiceImpl.dtoToEntity(dto.getProductDTO()))
                 .quantity(dto.getQuantity())
                 .build();
@@ -44,7 +46,7 @@ public class PlanServiceImpl implements PlanService{
         if(entity==null) return null;
         return PlanDTO.builder()
                 .plancode(entity.getPlancode())
-                .line(lineService.lineToString(entity.getLine()))
+                .line(lineService.entityToDto(entity.getLine()))
                 .productDTO(productServiceImpl.entityToDto(entity.getProduct()))
                 .quantity(entity.getQuantity())
                 .build();
@@ -52,8 +54,8 @@ public class PlanServiceImpl implements PlanService{
 
     // 조회
     @Override
-    public PlanDTO getLineByLine(Long manuCode, String line){
-        Plan plan=planRepository.findLineByLine(manuCode, line);
+    public PlanDTO getLineByLine(Long manuCode, LineDTO line){
+        Plan plan=planRepository.findLineByLine(manuCode, line.getLineName());
         return entityToDTO(plan);
     }
     @Override

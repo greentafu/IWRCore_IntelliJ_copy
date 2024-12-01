@@ -16,5 +16,6 @@ public interface StructureService {
     // 조회
     StructureDTO getStructure(Long sno);
     List<StructureDTO> getStructureByProduct(Long manuCode);
+    List<StructureDTO> getStructureByProductMaterial(Long manuCode, Long materCode);
 }
 

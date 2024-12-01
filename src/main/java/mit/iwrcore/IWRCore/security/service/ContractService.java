@@ -24,6 +24,7 @@ public interface ContractService {
 
     // 조회
     ContractDTO getContract(Long id);
+    ContractDTO getContractByJodalPlan(Long joNo);
 
 
     // 조달계획> 조달차수 있는(조달계획한) 자재 목록+계약서 등록여부

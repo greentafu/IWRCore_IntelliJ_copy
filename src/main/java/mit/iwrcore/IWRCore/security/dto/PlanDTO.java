@@ -16,5 +16,5 @@ public class PlanDTO {
     private Long plancode;
     private ProductDTO productDTO;
     private Long quantity;
-    private String line;
+    private LineDTO line;
 }

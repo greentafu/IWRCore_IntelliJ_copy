@@ -17,9 +17,7 @@ public class ContractDTO {
     private Long conNo;
     private Long conNum;
     private Long money;
-    private Long howDate;
     private LocalDateTime conDate;
-    private String filename;
     private String who;
     private LocalDateTime regDate;
 
