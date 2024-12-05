@@ -6,10 +6,7 @@ import mit.iwrcore.IWRCore.security.dto.ContractDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractJodalChasuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.NewOrderDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.StockDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.StockDetailDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.*;
 
 import java.util.List;
 
@@ -24,7 +21,7 @@ public interface ContractService {
 
     // 조회
     ContractDTO getContract(Long id);
-    ContractDTO getContractByJodalPlan(Long joNo);
+    List<Long> getConDateList();
 
 
     // 조달계획> 조달차수 있는(조달계획한) 자재 목록+계약서 등록여부
@@ -35,9 +32,11 @@ public interface ContractService {
     List<NewOrderDTO> newOrderContract(Long pno);
     // 협력회사> 협력회사용 계약서목록
     PageResultDTO<ContractDTO, Contract> partnerContractList(PageRequestDTO requestDTO);
+    // 재고> 재고목록
+    PageResultDTO<StockQuantityDTO, Object[]> stockList(PageRequestDTO requestDTO);
+    // 재고> 재고상세목록
+    PageResultDTO<StockDetailDTO, Object[]> stockdetailList(PageRequestDTO requestDTO);
 
 
-    List<StockDTO> stockList();
     List<StockDetailDTO> detailStock(Long materCode);
-
 }

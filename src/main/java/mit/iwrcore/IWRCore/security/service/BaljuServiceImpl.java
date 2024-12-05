@@ -97,10 +97,6 @@ public class BaljuServiceImpl implements BaljuService {
         if(balju.size()==0) return null;
         return entityToDTO(balju.get(0));
     }
-    @Override
-    public Long getBaljuCountByContract(Long conNo){
-        return baljuRepository.baljuCountByContract(conNo);
-    }
 
 
     // 계약서> 계약 완료 목록

@@ -22,7 +22,6 @@ public interface GumsuService {
     // 조회
     GumsuDTO getGumsu(Long id);
     GumsuDTO getGumsuByBalju(Long baljuNo);
-    Long getQuantityMake(Long baljuNo);
 
 
     // 검수차수> 검수해야할 목록

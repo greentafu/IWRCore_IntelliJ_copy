@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public class RequestDTO {
     private Long requestCode;
     private Long requestNum;
-    private LocalDate eventDate;
+    private LocalDateTime eventDate;
+    private LocalDateTime releaseDate;
     private String text;
     private Long reqCheck;
     private String line;

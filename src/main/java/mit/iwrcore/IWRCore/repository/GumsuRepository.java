@@ -9,9 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface GumsuRepository extends JpaRepository<Gumsu,Long>, GumsuRepositoryCustom {
-    @Query("select g.make from Gumsu g where g.balju.baljuNo=:baljuNo")
-    Long quantityMake(Long baljuNo);
-
     @Query("select g from Gumsu g where g.balju.baljuNo=:baljuNo")
     Gumsu getGumsuByBaljuNo(Long baljuNo);
 

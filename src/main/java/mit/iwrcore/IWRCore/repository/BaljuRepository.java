@@ -26,11 +26,6 @@ public interface BaljuRepository extends JpaRepository<Balju, Long>, BaljuReposi
 
     @Transactional
     @EntityGraph(attributePaths = {"contract"})
-    @Query("select count(b) from Balju b where b.contract.conNo=:conNo")
-    Long baljuCountByContract(Long conNo);
-
-    @Transactional
-    @EntityGraph(attributePaths = {"contract"})
     @Query("select b from Balju b where b.contract.conNo=:conNo")
     List<Balju> baljuByContract(Long conNo);
 

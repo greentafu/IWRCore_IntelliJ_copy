@@ -78,10 +78,6 @@ public class GumsuServiceImpl implements GumsuService{
         if(gumsu==null) return null;
         return entityToDTO(gumsu);
     }
-    @Override
-    public Long getQuantityMake(Long baljuNo){
-        return gumsuRepository.quantityMake(baljuNo);
-    }
 
 
     // 검수차수> 검수해야할 목록

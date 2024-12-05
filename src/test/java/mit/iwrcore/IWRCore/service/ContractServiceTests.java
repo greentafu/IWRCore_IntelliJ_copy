@@ -34,6 +34,13 @@ public class ContractServiceTests {
     @Autowired
     private PartnerService partnerService;
 
-
+    @Test
+    @Transactional
+    public void test(){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .size(15).page(1).materCode(1L).selectedYear(2023)
+                .build();
+        System.out.println("@@@@@@@@@ "+contractService.stockdetailList(requestDTO));
+    }
 
 }

@@ -2,21 +2,20 @@ package mit.iwrcore.IWRCore.security.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.repository.ContractRepository;
 import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractJodalChasuDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.NewOrderDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.StockDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.StockDetailDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -80,12 +79,16 @@ public class ContractServiceImpl implements ContractService {
         return entityToDTO(contractRepository.getReferenceById(id));
     }
     @Override
-    public ContractDTO getContractByJodalPlan(Long joNo){
-        Contract contract=contractRepository.getContractByJodalPlan(joNo);
-        if(contract==null) return null;
-        return entityToDTO(contract);
-    }
+    public List<Long> getConDateList(){
+        List<LocalDateTime> localDateTimeList=contractRepository.conDateList();
 
+        Set<Long> dateSet=new HashSet<>();
+        localDateTimeList.forEach(x->dateSet.add((long)x.getYear()));
+        List<Long> longList=new ArrayList<>(dateSet);
+        longList.sort(Comparator.reverseOrder());
+
+        return longList;
+    }
 
     // 조달계획> 조달차수 있는(조달계획한) 자재 목록+계약서 등록여부
     @Override
@@ -150,39 +153,55 @@ public class ContractServiceImpl implements ContractService {
         Function<Contract, ContractDTO> fn = (entity -> entityToDTO(entity));
         return new PageResultDTO<>(entityPage, fn);
     }
-
-
-
-
-    // 재고관리> 재고목록??
+    // 재고> 재고목록
     @Override
-    public List<StockDTO> stockList(){
-        List<Object[]> entityList=contractRepository.stockList();
-        List<StockDTO> dtoList=entityList.stream().map(this::exStockDTO).toList();
-        return dtoList;
+    public PageResultDTO<StockQuantityDTO, Object[]> stockList(PageRequestDTO requestDTO){
+        Page<Object[]> entityPage=contractRepository.stockQuantityPage(requestDTO);
+        return new PageResultDTO<>(entityPage, this::exStockQunatityDTO);
     }
-    private StockDTO exStockDTO(Object[] objects){
+    private StockQuantityDTO exStockQunatityDTO(Object[] objects){
         Material material=(Material) objects[0];
-        Long tempMoney=(Long) objects[1];
-        Long tempSumShip=(Long) objects[2];
-        Long tempSumReq=(Long) objects[3];
-        Long tempCountBal=(Long) objects[4];
+        Long tempConNo=(Long) objects[1];
+        Long tempShipNum=(Long) objects[2];
+        Long tempReqNum=(Long) objects[3];
+        Long tempOrderNum=(Long) objects[4];
 
         MaterialDTO materialDTO=(material!=null)?materialService.entityToDto(material):null;
-        Long money=(tempMoney!=null)?tempMoney:0L;
+        ContractDTO contractDTO=(tempConNo!=null)?getContract(tempConNo):null;
+        Long shipNum=(tempShipNum!=null)?tempShipNum:0L;
+        Long reqNum=(tempReqNum!=null)?tempReqNum:0L;
+        Long orderNum=(tempOrderNum!=null)?tempOrderNum:0L;
+
+        return new StockQuantityDTO(materialDTO, contractDTO, shipNum, reqNum, orderNum);
+    }
+    // 재고> 재고상세목록
+    public PageResultDTO<StockDetailDTO, Object[]> stockdetailList(PageRequestDTO requestDTO){
+        Page<Object[]> entityPage=contractRepository.stockDetailPage(requestDTO);
+        return new PageResultDTO<>(entityPage, this::exStockDetailDTO);
+    }
+    private StockDetailDTO exStockDetailDTO(Object[] objects){
+        Long tempConNo=(Long) objects[0];
+        Long tempSumShip=(Long) objects[1];
+        Long tempSumReq=(Long) objects[2];
+
+        ContractDTO contractDTO=(tempConNo!=null)?getContract(tempConNo):null;
         Long sumShip=(tempSumShip!=null)?tempSumShip:0L;
         Long sumReq=(tempSumReq!=null)?tempSumReq:0L;
-        Long countBal=(tempCountBal!=null)?tempCountBal:0L;
-
-        return new StockDTO(materialDTO, money, sumShip, sumReq, countBal);
+        return new StockDetailDTO(contractDTO, sumShip, sumReq);
     }
+
+
+
+
+
+
     @Override
     public List<StockDetailDTO> detailStock(Long materCode){
         List<Object[]> entityList=contractRepository.detailStock(materCode);
-        List<StockDetailDTO> dtoList=entityList.stream().map(this::exStockDetailDTO).toList();
+        List<StockDetailDTO> dtoList=entityList.stream().map(this::exStockDetailDTO2).toList();
         return dtoList;
     }
-    private StockDetailDTO exStockDetailDTO(Object[] objects){
+    private StockDetailDTO exStockDetailDTO2(Object[] objects){
         Contract contract=(Contract) objects[0];
         Long tempSumShip=(Long) objects[1];
         Long tempSumReq=(Long) objects[2];

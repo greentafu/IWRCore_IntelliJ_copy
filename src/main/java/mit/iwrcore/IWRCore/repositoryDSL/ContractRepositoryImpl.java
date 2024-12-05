@@ -2,6 +2,10 @@ package mit.iwrcore.IWRCore.repositoryDSL;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Coalesce;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -249,5 +253,177 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
                 .fetchCount();
 
         return new PageImpl<>(contractlList, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public Page<Object[]> stockQuantityPage(PageRequestDTO requestDTO){
+        QProduct qProduct=QProduct.product;
+        QStructure qStructure=QStructure.structure;
+        QMaterial qMaterial=QMaterial.material;
+        QMaterial qMaterial1=QMaterial.material;
+        QShipment qShipment=QShipment.shipment;
+        QRequest qRequest=QRequest.request;
+
+        QContract qContract=QContract.contract;
+        QBalju qBalju=QBalju.balju;
+
+        QProL qProL=QProL.proL;
+        QProM qProM=QProM.proM;
+        QProS qProS=QProS.proS;
+        QMaterL qMaterL=QMaterL.materL;
+        QMaterM qMaterM=QMaterM.materM;
+        QMaterS qMaterS=QMaterS.materS;
+
+        BooleanBuilder builder=new BooleanBuilder();
+
+        if (requestDTO.getProL() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL())); }
+        if (requestDTO.getProM() != null) { builder.and(qProS.proM.proMcode.eq(requestDTO.getProM())); }
+        if (requestDTO.getProS() != null) { builder.and(qProS.proScode.eq(requestDTO.getProS())); }
+        if (requestDTO.getProductSearch()!=null){
+            builder.and(qProduct.name.containsIgnoreCase(requestDTO.getProductSearch())
+                    .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch())));
+        }
+        if (requestDTO.getMaterL() != null) { builder.and(qMaterS.materM.materL.materLcode.eq(requestDTO.getMaterL())); }
+        if (requestDTO.getMaterM() != null) { builder.and(qMaterS.materM.materMcode.eq(requestDTO.getMaterM())); }
+        if (requestDTO.getMaterS() != null) { builder.and(qMaterS.materScode.eq(requestDTO.getMaterS())); }
+        if (requestDTO.getMaterialSearch()!=null){
+            builder.and(qMaterial1.name.containsIgnoreCase(requestDTO.getMaterialSearch())
+                    .or(qMaterial1.standard.containsIgnoreCase(requestDTO.getMaterialSearch()))
+                    .or(qMaterial1.unit.containsIgnoreCase(requestDTO.getMaterialSearch())));
+        }
+        if (requestDTO.getBox()!=null) { builder.and(qMaterial1.box.boxCode.eq(requestDTO.getBox())); }
+
+        BooleanBuilder havingBuilder=new BooleanBuilder();
+        if (requestDTO.getBaljuStatus()!=null){
+            if(requestDTO.getBaljuStatus()==0L) havingBuilder.and(qBalju.countDistinct().eq(0L));
+            else havingBuilder.and(qBalju.countDistinct().ne(0L));
+        }
+        if (requestDTO.getStockStatus()!=null){
+            if(requestDTO.getStockStatus()==0L){
+                havingBuilder.and(qShipment.shipNum.sum().isNull())
+                        .or(qShipment.shipNum.sum().isNotNull().and(qRequest.requestNum.sum().isNotNull())
+                                .and(qShipment.shipNum.sum().eq(qRequest.requestNum.sum()))
+                        );
+            }else{
+                havingBuilder.and(qShipment.shipNum.sum().isNotNull().and(qRequest.requestNum.sum().isNull()))
+                        .or(qShipment.shipNum.sum().isNotNull().and(qRequest.requestNum.sum().isNotNull())
+                                .and(qShipment.shipNum.sum().ne(qRequest.requestNum.sum()))
+                        );
+            }
+        }
+
+        JPAQuery<Material> subQuery=new JPAQuery<>()
+                .select(qMaterial1).distinct()
+                .from(qMaterial1)
+                .leftJoin(qMaterial1.materS, qMaterS)
+                .leftJoin(qMaterS.materM, qMaterM)
+                .leftJoin(qMaterM.materL, qMaterL)
+                .leftJoin(qStructure).on(qStructure.material.eq(qMaterial1))
+                .leftJoin(qStructure.product, qProduct)
+                .leftJoin(qProduct.proS, qProS)
+                .leftJoin(qProS.proM, qProM)
+                .leftJoin(qProM.proL, qProL)
+                .where(builder);
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Tuple> tupleList = queryFactory
+                .select(qMaterial, qContract.conNo.max(), qShipment.shipNum.sum(), qRequest.requestNum.sum(), qBalju.countDistinct())
+                .from(qMaterial)
+                .leftJoin(qRequest).on(qRequest.material.eq(qMaterial).and(qRequest.reqCheck.eq(1L)))
+                .leftJoin(qContract).on(qContract.jodalPlan.material.eq(qMaterial))
+                .leftJoin(qBalju).on(qBalju.contract.eq(qContract).and(qBalju.finCheck.eq(0L)))
+                .leftJoin(qShipment).on(qShipment.balju.contract.eq(qContract).and(qShipment.receiveCheck.eq(1L)))
+                .where(qMaterial.in(subQuery))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .groupBy(qMaterial.materCode)
+                .having(havingBuilder)
+                .orderBy(qMaterial.materCode.desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(qMaterial, qContract.conNo.max(), qShipment.shipNum.sum(), qRequest.requestNum.sum(), qBalju.countDistinct())
+                .from(qMaterial)
+                .leftJoin(qRequest).on(qRequest.material.eq(qMaterial).and(qRequest.reqCheck.eq(1L)))
+                .leftJoin(qContract).on(qContract.jodalPlan.material.eq(qMaterial))
+                .leftJoin(qBalju).on(qBalju.contract.eq(qContract).and(qBalju.finCheck.eq(0L)))
+                .leftJoin(qShipment).on(qShipment.balju.contract.eq(qContract).and(qShipment.receiveCheck.eq(1L)))
+                .where(qMaterial.in(subQuery))
+                .groupBy(qMaterial.materCode)
+                .having(havingBuilder)
+                .orderBy(qMaterial.materCode.desc())
+                .fetchCount();
+
+        List<Object[]> objectList = tupleList.stream()
+                .map(tuple -> new Object[]{
+                        tuple.get(qMaterial),
+                        tuple.get(qContract.conNo.max()),
+                        tuple.get(qShipment.shipNum.sum()),
+                        tuple.get(qRequest.requestNum.sum()),
+                        tuple.get(qBalju.countDistinct())
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(objectList, pageable, total);
+    }
+
+    @Override
+    @Transactional
+    public Page<Object[]> stockDetailPage(PageRequestDTO requestDTO){
+        QMaterial qMaterial=QMaterial.material;
+        QContract qContract=QContract.contract;
+        QContract qContract1=QContract.contract;
+        QShipment qShipment=QShipment.shipment;
+        QRequest qRequest=QRequest.request;
+
+        BooleanBuilder builder=new BooleanBuilder();
+        if(requestDTO.getSelectedYear()!=null) builder.and(qContract.conDate.year().eq(requestDTO.getSelectedYear()));
+
+        JPAQuery<Contract> subQuery=new JPAQuery<>()
+                .select(qContract1).distinct()
+                .from(qContract1)
+                .leftJoin(qContract1.jodalPlan.material, qMaterial)
+                .where(qMaterial.materCode.eq(requestDTO.getMaterCode()));
+        builder.and(qContract.in(subQuery));
+
+        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
+        List<Tuple> tupleList = queryFactory
+                .select(qContract.conNo.max(), qShipment.shipNum.sum(), qRequest.requestNum.sum())
+                .from(qContract)
+                .leftJoin(qShipment).distinct().on(qShipment.balju.contract.in(subQuery)
+                        .and(qShipment.receiveCheck.eq(1L)))
+                .leftJoin(qRequest).on(qRequest.material.eq(qContract.jodalPlan.material)
+                        .and(qRequest.reqCheck.eq(1L))
+                        .and(qRequest.releaseDate.yearMonth().loe(qContract.conDate.yearMonth())))
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .groupBy(qContract.conDate.yearMonth())
+                .orderBy(qContract.conDate.yearMonth().desc())
+                .fetch();
+
+        long total = queryFactory
+                .select(qContract.conNo.max(), qShipment.shipNum.sum(), qRequest.requestNum.sum())
+                .from(qContract)
+                .leftJoin(qShipment).distinct().on(qShipment.balju.contract.in(subQuery)
+                        .and(qShipment.receiveCheck.eq(1L)))
+                .leftJoin(qRequest).on(qRequest.material.eq(qContract.jodalPlan.material)
+                        .and(qRequest.reqCheck.eq(1L))
+                        .and(qRequest.releaseDate.yearMonth().loe(qContract.conDate.yearMonth())))
+                .where(builder)
+                .groupBy(qContract.conDate.yearMonth())
+                .orderBy(qContract.conDate.yearMonth().desc())
+                .fetchCount();
+
+        List<Object[]> objectList = tupleList.stream()
+                .map(tuple -> new Object[]{
+                        tuple.get(qContract.conNo.max()),
+                        tuple.get(qShipment.shipNum.sum()),
+                        tuple.get(qRequest.requestNum.sum())
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(objectList, pageable, total);
     }
 }

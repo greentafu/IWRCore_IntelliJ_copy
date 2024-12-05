@@ -7,20 +7,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ContractRepository extends JpaRepository<Contract, Long>, ContractRepositoryCustom {
-    @Query("select c from Contract c where c.partner.pno=:pno")
-    Page<Contract> contractListByPartner(Pageable pageable, Long pno);
-
-    @Query("select c from Contract c where c.jodalPlan.joNo=:joNo")
-    Contract getContractByJodalPlan(Long joNo);
-
     @Query("select c, jc from Contract c " +
             "left join Balju b on (c.conNo=b.contract.conNo) " +
             "left join JodalChasu jc on (c.jodalPlan.joNo=jc.jodalPlan.joNo) " +
             "where b.baljuNo is null and c.partner.pno=:pno")
     List<Object[]> newOrderContract(Long pno);
+
+    @Query("select c.conDate from Contract c")
+    List<LocalDateTime> conDateList();
 
     @Query("select m2, c2.money, sum(sh.shipNum), sum(re.requestNum), count(b) from Material m2 " +
             "left join Contract c2 on c2.conNo = (select max(c1.conNo) from Contract c1 " +

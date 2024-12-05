@@ -40,11 +40,14 @@ public class Material extends BaseEntity {
     @JoinColumn(name = "box_code") // 외래 키 설정
     private Box box;
 
-
     @OneToMany(mappedBy = "material")
     @Builder.Default
     private Set<Structure> structures=new HashSet<>();
 
+    @OneToMany(mappedBy = "material")
+    private List<JodalPlan> jodalPlans;
+
     @OneToMany(mappedBy = "material", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileMaterial> files;
+
 }

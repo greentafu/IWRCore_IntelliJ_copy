@@ -24,7 +24,6 @@ public interface BaljuService {
     BaljuDTO getBalju(Long id);
     BaljuDTO getRecentBaljuByMaterial(Long materCode);
     BaljuDTO getBaljuByContract(Long conNo);
-    Long getBaljuCountByContract(Long conNo);
 
     // 계약서> 계약 완료 목록
     PageResultDTO<ContractBaljuDTO, Object[]> finishedContract(PageRequestDTO2 requestDTO);

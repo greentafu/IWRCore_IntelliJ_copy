@@ -22,7 +22,6 @@ import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.*;
 import mit.iwrcore.IWRCore.security.service.*;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -176,11 +175,6 @@ public class SelectboxController {
     @GetMapping("/checkProPlan")
     public Long checkProPlan(@RequestParam(required = false) Long manuCode){
         return proplanService.checkProPlan(manuCode);
-    }
-
-    @PostMapping("/stockDetail")
-    public List<StockDetailDTO> stockDetail(@RequestParam(required = false) Long materCode){
-        return contractService.detailStock(materCode);
     }
 
 
@@ -397,5 +391,17 @@ public class SelectboxController {
     public List<ProPlanSturctureDTO> getOneProPlan(
             @RequestParam(required = false) Long proplanNo){
         return jodalPlanService.getStructureStock(proplanNo);
+    }
+
+    // 재고목록> 재고 상세보기
+    @PostMapping("/stockDetail")
+    public PageResultDTO<StockDetailDTO, Object[]> stockDetail(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) Long materCode, @RequestParam(required = false) Integer selectedYear){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .materCode(materCode).selectedYear(selectedYear)
+                .build();
+        return contractService.stockdetailList(requestDTO);
     }
 }

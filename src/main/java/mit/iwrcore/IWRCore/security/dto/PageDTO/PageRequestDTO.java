@@ -61,4 +61,10 @@ public class PageRequestDTO {
 
     // 반품확인 여부
     private Long returnCheck;
+
+    // 재고
+    private Long stockStatus;
+    private Long baljuStatus;
+    private Long materCode;
+    private Integer selectedYear;
 }

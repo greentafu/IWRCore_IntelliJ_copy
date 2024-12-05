@@ -12,4 +12,8 @@ public interface ContractRepositoryCustom {
     Page<Object[]> findContractByCustomQuery2(PageRequestDTO requestDTO);
     // 협력회사 계약목록
     Page<Contract> partnerContractPage(PageRequestDTO requestDTO);
+    // 재고> 재고 목록
+    Page<Object[]> stockQuantityPage(PageRequestDTO requestDTO);
+    // 재고> 재고 상세목록
+    Page<Object[]> stockDetailPage(PageRequestDTO requestDTO);
 }

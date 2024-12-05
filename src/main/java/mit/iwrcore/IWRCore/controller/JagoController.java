@@ -17,15 +17,13 @@ public class JagoController {
 
     @GetMapping("/list_stock")
     public void list_stock(Model model){
-        model.addAttribute("list", contractService.stockList());
         model.addAttribute("box_list", boxService.getAllBoxlist());
     }
     @GetMapping("/list_stockM")
-    public void list_stockM(Model model){
-        model.addAttribute("list", contractService.stockList());
-    }
+    public void list_stockM(Model model){}
     @GetMapping("/stock")
     public void stock(Long materCode, Model model){
         model.addAttribute("materCode", materCode);
+        model.addAttribute("yearList", contractService.getConDateList());
     }
 }

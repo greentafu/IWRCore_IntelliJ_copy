@@ -1,10 +1,10 @@
 package mit.iwrcore.IWRCore.entity;
 
+import com.querydsl.core.annotations.QueryInit;
 import jakarta.persistence.*;
 import lombok.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity

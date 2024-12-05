@@ -12,10 +12,7 @@ import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/list")
@@ -416,5 +413,23 @@ public class ListController {
                 .pno(authPartnerDTO.getPno()).returnCheck(selectedBox).build();
 
         return returnsService.getReturnPage(requestDTO);
+    }
+
+    // 재고> 수량 목록
+    @PostMapping("/getStockList")
+    public PageResultDTO<StockQuantityDTO, Object[]> getStockList(
+            @RequestParam(required = false) int page, @RequestParam(required = false) Long stockStatus,
+            @RequestParam(required = false) Long orderStatus, @RequestParam(required = false) Long selectedBox,
+            @RequestParam(required = false) Long selectProL, @RequestParam(required = false) Long selectProM,
+            @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch,
+            @RequestParam(required = false) Long selectMaterL, @RequestParam(required = false) Long selectMaterM,
+            @RequestParam(required = false) Long selectMaterS, @RequestParam(required = false) String materialSearch){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
+                .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch)
+                .box(selectedBox).baljuStatus(orderStatus).stockStatus(stockStatus)
+                .build();
+        return  contractService.stockList(requestDTO);
     }
 }

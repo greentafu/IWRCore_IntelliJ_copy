@@ -394,7 +394,7 @@ public class CRUDProPlanToGumsuController {
     @GetMapping("/deleteContract")
     public void deleteContract(@RequestParam(required = false) Long conNo){
         BaljuDTO baljuDTO=baljuService.getBaljuByContract(conNo);
-        if(baljuDTO!=null) baljuService.deleteBalju(baljuDTO.getBaljuNo());
+        if(baljuDTO!=null) deleteBaljuDetail(baljuDTO.getBaljuNo());
         List<FileContractDTO> fileList=fileService.getContractFileList(conNo);
         List<String> deleteFile=new ArrayList<>();
         fileList.forEach(x->deleteFile.add(x.getUuid()));
@@ -503,14 +503,19 @@ public class CRUDProPlanToGumsuController {
     // 발주> 발주 삭제
     @PostMapping("/deleteBalju")
     public Long deleteBalju(@RequestParam(required = false) Long baljuNo){
+        return deleteBaljuDetail(baljuNo);
+    }
+    private Long deleteBaljuDetail(Long baljuNo){
         List<ShipmentDTO> shipmentDTOList=shipmentService.getShipmentByBalju(baljuNo);
-        if(shipmentDTOList==null) {
+        if(shipmentDTOList.size()==0) {
             GumsuDTO gumsuDTO=gumsuService.getGumsuByBalju(baljuNo);
             if(gumsuDTO!=null){
                 List<GumsuChasuDTO> gumsuChasuDTOList=gumsuChasuService.getGumsuChasuByGumsu(gumsuDTO.getGumsuNo());
                 for(GumsuChasuDTO chasuDTO:gumsuChasuDTOList) gumsuChasuService.deleteGumsuChasu(chasuDTO.getGcnum());
                 gumsuService.deleteGumsu(gumsuDTO.getGumsuNo());
             }
+            List<BaljuChasuDTO> baljuChasuDTOList=baljuChasuService.getBaljuChasuListByBaljuNo(baljuNo);
+            for(BaljuChasuDTO chasuDTO:baljuChasuDTOList) baljuChasuService.deleteBaljuChasu(chasuDTO.getBalNo());
             baljuService.deleteBalju(baljuNo);
             return 0L; // 삭제
         }
