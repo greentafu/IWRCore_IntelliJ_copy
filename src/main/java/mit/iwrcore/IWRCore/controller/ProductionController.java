@@ -34,7 +34,6 @@ public class ProductionController {
     @GetMapping("/manufacture")
     public void manufacture(@RequestParam Long manuCode, Model model) {
         model.addAttribute("product", productService.getProduct(manuCode));
-        model.addAttribute("pFiles", fileService.getProductFileList(manuCode));
         model.addAttribute("structures", structureService.getStructureByProduct(manuCode));
     }
     @GetMapping("/structures")

@@ -36,7 +36,4 @@ public interface ContractService {
     PageResultDTO<StockQuantityDTO, Object[]> stockList(PageRequestDTO requestDTO);
     // 재고> 재고상세목록
     PageResultDTO<StockDetailDTO, Object[]> stockdetailList(PageRequestDTO requestDTO);
-
-
-    List<StockDetailDTO> detailStock(Long materCode);
 }

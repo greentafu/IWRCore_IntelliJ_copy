@@ -2,6 +2,7 @@ package mit.iwrcore.IWRCore.repositoryDSL;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -123,15 +124,29 @@ public class JodalPlanRepositoryImpl implements JodalPlanRepositoryCustom {
 
         builder.and( qProPlan.proplanNo.eq(proplanNo) );
 
+        JPAQuery<Contract> subQueryContract=new JPAQuery<>()
+                .select(qContract)
+                .from(qContract)
+                .where(qContract.jodalPlan.material.eq(qMaterial));
+
+        JPAQuery<Long> subQueryShipment=new JPAQuery<>()
+                .select(qShipment.shipNum.sum())
+                .from(qShipment)
+                .where(qShipment.balju.contract.in(subQueryContract)
+                        .and(qShipment.receiveCheck.eq(1L)));
+
+        JPAQuery<Long> subQueryRequest=new JPAQuery<>()
+                .select(qRequest.requestNum.sum()).distinct()
+                .from(qRequest)
+                .where(qRequest.material.eq(qMaterial)
+                        .and(qRequest.releaseDate.isNotNull()));
+
         List<Tuple> tupleList = queryFactory
-                .select(qProPlan, qStructure, qJodalPlan, qShipment.shipNum.sum(), qRequest.requestNum.sum())
+                .select(qProPlan, qStructure, qJodalPlan, subQueryShipment, subQueryRequest)
                 .from(qProPlan)
                 .leftJoin(qStructure).on(qStructure.product.eq(qProPlan.product))
                 .leftJoin(qMaterial).on(qMaterial.structures.contains(qStructure))
-                .leftJoin(qRequest).on(qRequest.material.eq(qMaterial).and(qRequest.reqCheck.eq(1L)))
                 .leftJoin(qJodalPlan).on(qJodalPlan.material.eq(qMaterial))
-                .leftJoin(qContract).on(qContract.jodalPlan.eq(qJodalPlan))
-                .leftJoin(qShipment).on(qShipment.balju.contract.eq(qContract).and(qShipment.receiveCheck.eq(1L)))
                 .where(builder)
                 .groupBy(qMaterial.materCode)
                 .orderBy(qStructure.sno.desc())
@@ -142,8 +157,8 @@ public class JodalPlanRepositoryImpl implements JodalPlanRepositoryCustom {
                         tuple.get(qProPlan),
                         tuple.get(qStructure),
                         tuple.get(qJodalPlan),
-                        tuple.get(qShipment.shipNum.sum()),
-                        tuple.get(qRequest.requestNum.sum())
+                        tuple.get(subQueryShipment),
+                        tuple.get(subQueryRequest)
                 })
                 .collect(Collectors.toList());
 

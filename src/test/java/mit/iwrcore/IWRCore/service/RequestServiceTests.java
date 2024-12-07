@@ -30,5 +30,10 @@ public class RequestServiceTests {
     private RequestRepository requestRepository;
 
 
+    @Test
+    @Transactional
+    public void test(){
+        System.out.println("@@@@@@@@ "+requestService.getStructureStock(2L));
+    }
 
 }

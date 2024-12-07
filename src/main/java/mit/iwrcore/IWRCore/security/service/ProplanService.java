@@ -9,7 +9,6 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanContractNumDTO;
-import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturctureDTO;
 
 import java.util.List;
 

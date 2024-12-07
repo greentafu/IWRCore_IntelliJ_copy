@@ -1,127 +1,129 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
+import mit.iwrcore.IWRCore.entity.PreRequest;
 import mit.iwrcore.IWRCore.entity.Request;
+import mit.iwrcore.IWRCore.entity.Structure;
+import mit.iwrcore.IWRCore.repository.PreRequestRepository;
 import mit.iwrcore.IWRCore.repository.RequestRepository;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.PreRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.RequestDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import mit.iwrcore.IWRCore.security.dto.StructureDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.PreRequestSturctureDTO;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class RequestServiceImpl implements RequestService{
-
     private final RequestRepository requestRepository;
-    private final ProplanService proPlanService;
+    private final PreRequestRepository preRequestRepository;
     private final MaterialService materialService;
-    private final MemberService memberService;
+    private final PreRequestService preRequestService;
+    private final StructureService structureService;
 
-
+    // 저장, 삭제
     @Override
-    public Request convertToEntity(RequestDTO dto) {
+    public RequestDTO saveRequest(RequestDTO requestDTO) {
+        Request request = dtoToEntity(requestDTO);
+        Request savedRequest = requestRepository.save(request);
+        return entityToDTO(savedRequest);
+    }
+    @Override
+    public void deleteRequest(Long id) {
+        requestRepository.deleteById(id);
+    }
+    @Override
+    public void updateReqCheck(Long requestCode){
+        LocalDateTime inputDate=LocalDateTime.now();
+        requestRepository.updateReqCheck(inputDate, requestCode);
+
+        RequestDTO requestDTO=getRequestById(requestCode);
+        if(requestDTO!=null){
+            Long preCode=requestDTO.getPreRequestDTO().getPreReqCode();
+            Long allReqCount=requestRepository.getAllRequestCount(preCode);
+            Long finReqCount=requestRepository.getFinRequestCount(preCode);
+            if(finReqCount.equals(allReqCount)) preRequestService.updateAllCheck(preCode);
+        }
+    }
+
+
+    // 변환
+    @Override
+    public Request dtoToEntity(RequestDTO dto) {
         return Request.builder()
                 .requstCode(dto.getRequestCode())
                 .requestNum(dto.getRequestNum())
                 .eventDate(dto.getEventDate())
                 .releaseDate(dto.getReleaseDate())
-                .text(dto.getText())
-                .reqCheck(dto.getReqCheck())
-                .line(dto.getLine())
-                .proPlan(dto.getProplanDTO() != null ? proPlanService.dtoToEntity(dto.getProplanDTO()) : null) // ProplanDTO를 ProPlan으로 변환
-                .material(dto.getMaterialDTO() != null ? materialService.dtoToEntity(dto.getMaterialDTO()) : null) // MaterialDTO를 Material로 변환
-                .writer(dto.getMemberDTO() != null ? memberService.memberdtoToEntity(dto.getMemberDTO()) : null) // MemberDTO를 Member로 변환
+                .material(dto.getMaterialDTO() != null ? materialService.dtoToEntity(dto.getMaterialDTO()) : null)
+                .preRequest(preRequestService.dtoToEntity(dto.getPreRequestDTO()))
                 .build();
     }
-
     @Override
-    public RequestDTO convertToDTO(Request entity) {
+    public RequestDTO entityToDTO(Request entity) {
         return RequestDTO.builder()
                 .requestCode(entity.getRequstCode())
                 .requestNum(entity.getRequestNum())
                 .eventDate(entity.getEventDate())
                 .releaseDate(entity.getReleaseDate())
-                .text(entity.getText())
-                .reqCheck(entity.getReqCheck())
-                .line(entity.getLine())
-                .proplanDTO(entity.getProPlan() != null ? proPlanService.entityToDTO(entity.getProPlan()) : null) // ProPlan을 ProplanDTO로 변환
                 .materialDTO(entity.getMaterial() != null ? materialService.entityToDto(entity.getMaterial()) : null) // Material을 MaterialDTO로 변환
-                .memberDTO(entity.getWriter() != null ? memberService.memberTodto(entity.getWriter()) : null) // Member를 MemberDTO로 변환
+                .preRequestDTO(preRequestService.entityToDTO(entity.getPreRequest()))
                 .build();
     }
 
-    @Override
-    public RequestDTO createRequest(RequestDTO requestDTO) {
-        Request request = convertToEntity(requestDTO);
-        Request savedRequest = requestRepository.save(request);
-        return convertToDTO(savedRequest);
-    }
-
+    // 조회
     @Override
     public RequestDTO getRequestById(Long id) {
-        return convertToDTO(requestRepository.findById(id).get());
+        return entityToDTO(requestRepository.findById(id).get());
     }
+    @Override
+    public List<RequestDTO> getRequestByPreRequest(Long preCode){
+        List<Request> entityList=requestRepository.getRequestByPreRequest(preCode);
+        return entityList.stream().map(x->entityToDTO(x)).toList();
+    }
+
 
     @Override
     public RequestDTO updateRequest(Long id, RequestDTO requestDTO) {
         if (!requestRepository.existsById(id)) {
             throw new RuntimeException("ID가 " + id + "인 RequestDTO를 찾을 수 없습니다.");
         }
-        Request request = convertToEntity(requestDTO);
+        Request request = dtoToEntity(requestDTO);
         request.setRequstCode(id); // 수정할 때 ID를 설정합니다.
         Request updatedRequest = requestRepository.save(request);
-        return convertToDTO(updatedRequest);
+        return entityToDTO(updatedRequest);
     }
 
-    @Override
-    public void deleteRequest(Long id) {
-        if (!requestRepository.existsById(id)) {
-            throw new RuntimeException("ID가 " + id + "인 RequestDTO를 찾을 수 없습니다.");
-        }
-        requestRepository.deleteById(id);
-    }
 
-    @Override
-    public List<RequestDTO> getAllRequests() {
-        return requestRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
 
+    // 출하요청> 출하요청 수정시 목록
     @Override
-    public PageResultDTO<RequestDTO, Request> requestPage(PageRequestDTO requestDTO) {
-        Pageable pageable=requestDTO.getPageable(Sort.by("requstCode").descending());
-        Page<Request> entityPage=requestRepository.findAll(pageable);
-        Function<Request, RequestDTO> fn=(entity->convertToDTO(entity));
-        return new PageResultDTO<>(entityPage, fn);
+    public List<PreRequestSturctureDTO> getStructureStock(Long preReqCode){
+        List<Object[]> list = preRequestRepository.getStructureStock(preReqCode);
+        return list.stream().map(this::PreRequestSturctureDTOToDTO).toList();
     }
-    @Override
-    public List<RequestDTO> getRequestsByReqCheck(long reqCheck) {
-        return requestRepository.findByReqCheck(reqCheck)
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-    @Override
-    public List<RequestDTO> getRequestsByTextContains(String keyword) {
-        // '부족'이라는 키워드를 포함하는 요청을 필터링하여 반환
-        return requestRepository.findAll().stream()
-                .filter(request -> request.getText() != null && request.getText().contains(keyword)) // '부족'이 포함된 경우 필터링
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
+    private PreRequestSturctureDTO PreRequestSturctureDTOToDTO(Object[] objects) {
+        PreRequest preRequest = (PreRequest) objects[0];
+        Structure structure = (Structure) objects[1];
+        Request request = (Request) objects[2];
+        Long tempSumShip = (Long) objects[3];
+        Long tempSumRequest = (Long) objects[4];
 
+        PreRequestDTO preRequestDTO = (preRequest != null) ? preRequestService.entityToDTO(preRequest) : null;
+        StructureDTO structureDTO = (structure != null) ? structureService.entityToDto(structure) : null;
+        RequestDTO requestDTO = (request !=null) ? entityToDTO(request) : null;
+        Long sumShip = (tempSumShip != null) ? tempSumShip : 0L;
+        Long sumRequest = (tempSumRequest != null) ? tempSumRequest : 0L;
+
+        return new PreRequestSturctureDTO(preRequestDTO, structureDTO, requestDTO, sumRequest, sumShip);
+    }
+    // 메인화면> 출하갯수
     @Override
     public Long mainRequestCount(){
         Long aa=requestRepository.mainRequestCount();
         return (aa!=null)?aa:0L;
     }
-
 }

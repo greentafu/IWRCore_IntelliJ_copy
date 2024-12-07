@@ -49,6 +49,8 @@ public class SelectboxController {
     private final EmergencyService emergencyService;
     private final BaljuChasuService baljuChasuService;
     private final ProductService productService;
+    private final LineStructureService lineStructureService;
+    private final RequestService requestService;
 
     @GetMapping("/getPart")
     public PartCodeListDTO getPart(){
@@ -392,10 +394,23 @@ public class SelectboxController {
             @RequestParam(required = false) Long proplanNo){
         return jodalPlanService.getStructureStock(proplanNo);
     }
+    // 출하요청> 생산계획 수정
+    @PostMapping("/getRequest")
+    public List<PreRequestSturctureDTO> getRequest(
+            @RequestParam(required = false) Long preCode){
+        return requestService.getStructureStock(preCode);
+    }
+    // 출하요청> 생산계획 하나 선택시 라인목록
+    @PostMapping("/getOneProPlanLine")
+    public List<LineStructureDTO> getOneProPlanLine(
+            @RequestParam(required = false) Long proplanNo){
+        return lineStructureService.getLineStructureByProPlanNo(proplanNo);
+    }
+
 
     // 재고목록> 재고 상세보기
-    @PostMapping("/stockDetail")
-    public PageResultDTO<StockDetailDTO, Object[]> stockDetail(
+    @PostMapping("/getStockDetail")
+    public PageResultDTO<StockDetailDTO, Object[]> getStockDetail(
             @RequestParam(required = false) int page,
             @RequestParam(required = false) Long materCode, @RequestParam(required = false) Integer selectedYear){
         PageRequestDTO requestDTO=PageRequestDTO.builder()

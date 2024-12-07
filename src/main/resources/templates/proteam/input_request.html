@@ -29,6 +29,7 @@
         <div class="fullscreen-background">
           <div class="card mb-4">
             <div class="card-body">
+              <input type="number" style="display:none;" id="preCode" value="">
               <h5>제품 정보</h5>
               <label class="form-label">제품명</label>
               <div class="row mb-2">
@@ -55,9 +56,11 @@
             <hr class="m-0">
             <div class="card-body">
               <h5>출하 요청 정보</h5>
+              <input type="number" style="display:none;" id="proPlanNo">
               <div class="row mb-4">
-                <div class="col-md-2">
-                  <select class="form-select form-select-sm" style="width: fit-content;" id="selectLine"></select>
+                <label class="col-sm-1 col-form-label" for="product-quantity">출하라인 :</label>
+                <div class="col-md-1">
+                  <select class="form-select" style="width: 100%;" id="selectLine"></select>
                 </div>
                 <label class="col-sm-1 col-form-label" for="product-quantity">제품수량 :</label>
                 <div class="col-sm-1" style="width: 150px;">
@@ -76,7 +79,15 @@
               </div>
               <div class="table-responsive text-nowrap">
                 <div id="content2">
-                  <table class="table table-hover">
+                  <table class="table table-bordered mb-4">
+                    <thead>
+                      <th>자재번호</th>
+                      <th>자재명</th>
+                      <th>제품 1개당 소요수량</th>
+                      <th>재고수량</th>
+                      <th>출하요청수량</th>
+                      <th>희망출하일자</th>
+                    </thead>
                     <tbody id="secondTbody"></tbody>
                   </table>
                 </div>
@@ -85,7 +96,7 @@
                 <a th:href="@{/proteam/list_request}">
                   <button type="reset" class="btn btn-outline-secondary">뒤로가기</button>
                 </a>
-                <button type="button" class="btn btn-primary" id="submitbutton">출하 요청</button>
+                <button type="button" class="btn btn-primary" onclick="saveRequest()">출하 요청</button>
               </div>
             </div>
           </div>
@@ -150,8 +161,7 @@
     <!--/Modal-->
 
     <!--Script-->
-    <script src="../assets/js/new-request-jago.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../assets/js/new-request.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         content1.addEventListener("scroll", function () {
@@ -167,212 +177,14 @@
         });
 
         loadItems('request');
+
+        document.getElementById('product-quantity').addEventListener("input", function(){
+          autoCount();
+        });
+
       });
     </script>
-    <script>
-
-
-
-$(document).ready(function() {
-    $('#searchButton').on('click', function() {
-        var query = $('input[type="search"]').val().trim();
-        if (!query) {
-            query = 'all';
-        }
-
-        $.ajax({
-            url: '/proteam/search',
-            method: 'GET',
-            data: { query: query },
-            success: function(data) {
-                var resultsContainer = $('#searchResults');
-                resultsContainer.empty();
-                var html = '';
-                if (Array.isArray(data)) {
-                    data.forEach(function(product) {
-                        if (Array.isArray(product.proPlans) && product.proPlans.length > 0) {
-                            product.proPlans.forEach(function(plan) {
-                                html += '<tr>' +
-                                        '<td><input type="radio" name="product" class="form-check-input" data-product=\'' + JSON.stringify(product) + '\' data-line="' + plan.line + '"></td>' +
-                                        '<td>' + product.manuCode + '</td>' +
-                                        '<td>' + product.name + '</td>' +
-                                        '<td>' + (plan.startDate || 'N/A') + '</td>' +
-                                        '<td>' + (plan.endDate || 'N/A') + '</td>' +
-                                        '<td>' + (plan.pronum || 'N/A') + '</td>' +
-                                        '</tr>';
-                            });
-                        } else {
-                            html += '<tr>' +
-                                    '<td><input type="radio" name="product" class="form-check-input" data-product=\'' + JSON.stringify(product) + '\' data-line="N/A"></td>' +
-                                    '<td>' + product.manuCode + '</td>' +
-                                    '<td>' + product.name + '</td>' +
-                                    '<td>N/A</td>' +
-                                    '<td>N/A</td>' +
-                                    '<td>N/A</td>' +
-                                    '</tr>';
-                        }
-                    });
-                } else {
-                    console.error('응답 데이터가 배열이 아닙니다:', data);
-                }
-
-                resultsContainer.html(html);
-            },
-            error: function(xhr, status, error) {
-                console.error('검색 중 오류가 발생했습니다:', error);
-                alert('검색 중 오류가 발생했습니다.');
-            }
-        });
-    });
-    let selectedProduct = null;
-    $('#searchResults').on('click', 'input[name="product"]', function() {
-        selectedProduct = $(this).data('product');
-        selectedLine = $(this).data('line');
-        $('#line-select-button').text(selectedLine + ' 라인');
-    });
-
-    $('#confirmButton').on('click', function() {
-        if (selectedProduct) {
-            selectedPlan = selectedProduct.proPlans.find(plan => plan.line === selectedLine);
-            $('#product-quantity').val(selectedPlan ? selectedPlan.pronum : '');
-            $('#product-name').val(selectedProduct.name);
-
-            var endDate = selectedPlan ? new Date(selectedPlan.endDate) : new Date();
-            var formattedDate = endDate.toISOString().split('T')[0];
-            $('#desired-date').val(formattedDate);
-$.ajax({
-    url: '/proteam/material-structure',
-    method: 'GET',
-    data: { manuCode: selectedProduct.manuCode },
-    success: function(response) {
-        var materials = response.materials || [];  // 자재 정보
-        var structures = response.structures || [];  // 구조 정보
-        var materialStockMap = response.materialStocks || {}; // 자재별 재고 정보
-
-        // 테이블 내용 초기화
-        var tableBody = $('#product-table-body');
-        tableBody.empty();
-
-        // 제품 수량 추출
-        var productQuantity = parseFloat($('#product-quantity').val()) || 0;
-
-        // 자재와 구조 정보를 테이블에 추가
-        structures.forEach(function(structure) {
-            // 구조에서 자재 정보를 찾아서 매칭
-            var material = materials.find(mat => mat.materCode === structure.materialDTO.materCode);
-
-            // material이 없을 경우에 대한 예외 처리
-            if (!material) {
-                console.warn('Material not found for structure:', structure);
-                return;  // 다음 반복으로 넘어감
-            }
-
-            // materialStockMap에서 현재 자재의 재고 수량을 가져옴
-            var stock = materialStockMap[material.materCode] || 0;
-
-            // 출하 요청 수량 계산
-            var shippingRequestQuantity = structure.quantity * productQuantity;
-
-            // 부족 수량 계산
-            var shortage = shippingRequestQuantity - stock; // 재고가 부족한 경우에 부족 수량은 양수로 나타나야 합니다.
-
-            // 부족 수량이 음수일 경우 0으로 설정
-            if (shortage < 0) {
-                shortage = 0;
-            }
-
-            // 각 구조에 대한 테이블 행 생성
-            var tableRow = `<tr data-index="${material.materCode}">
-                <td>${material.materCode || '0'}</td>
-                <td>${material.name || 'N/A'}</td>
-                <td>${structure.quantity || '0'}</td>
-                <td>${stock || '0'}</td>
-                <td>${shippingRequestQuantity || '0'}</td>
-                <td>${shortage || '0'}</td>
-            </tr>`;
-
-            // 테이블에 행 추가
-            tableBody.append(tableRow);
-        });
-    },
-    error: function(xhr, status, error) {
-        console.error('자재 및 구조 정보를 가져오는 중 오류가 발생했습니다:', error);
-        alert('자재 및 구조 정보를 가져오는 중 오류가 발생했습니다.');
-                }
-            });
-        }
-    });
-
-    $('#product-quantity').on('input', function() {
-        var productQuantity = parseFloat($('#product-quantity').val()) || 0;
-        $('#product-table-body tr').each(function() {
-            var $row = $(this);
-            var quantityPerProduct = parseFloat($row.find('td:nth-child(3)').text()) || 0;
-            var stock = parseFloat($row.find('td:nth-child(4)').text()) || 0;
-
-            var shippingRequestQuantity = quantityPerProduct * productQuantity;
-
-            var shortage = stock - shippingRequestQuantity;
-
-            $row.find('td:nth-child(5)').text(shippingRequestQuantity);
-            $row.find('td:nth-child(6)').text(shortage);
-        });
-    });
-$('#submitbutton').on('click', function(event) {
-    event.preventDefault(); // 기본 폼 제출 방지
-
-    const requestData = [];
-
-    // 테이블에서 각 자재 행에 대해 데이터 수집
-    $('#product-table-body tr').each(function() {
-        const $row = $(this);
-        const requestNum = parseFloat($row.find('td:nth-child(5)').text()) || 0;
-        const eventDate = $('#desired-date').val();
-        const shortage = parseFloat($row.find('td:nth-child(6)').text()) || 0;
-       const text = shortage > 0 ? `${Math.abs(shortage)}개 부족` : '';
-
-        const line = $('#line-select-button').text().trim();
-        const materialCode = $row.data('index');
-
-        // selectedPlan이 선택되지 않았을 경우, 알림을 보여줌
-        if (!selectedPlan) {
-            alert('선택된 생산 계획이 없습니다.');
-            return false;  // 루프 중단
-        }
-
-        // 요청 데이터 객체 생성
-        const requestItem = {
-            requestNum: requestNum,
-            eventDate: eventDate,
-            text: text,
-            reqCheck: 0,  // 이 값이 하드코딩되어 있는 이유를 확인해야 합니다
-            line: line,
-            materialDTO: { materCode: materialCode },
-            proplanDTO: { proplanNo: selectedPlan.proplanNo }  // proPlanCode -> proplanNo로 변경 (일치하도록 수정)
-        };
-
-        requestData.push(requestItem);
-    });
-
-    // AJAX 요청 보내기
-    $.ajax({
-        type: 'POST',
-        url: '/proteam/submitRequest',
-        contentType: 'application/json',
-        data: JSON.stringify(requestData),
-        success: function(response) {
-            alert('요청이 성공적으로 처리되었습니다.');
-        },
-        error: function(xhr, status, error) {
-            console.error('요청 처리 중 오류 발생:', error);
-            alert('요청 처리 중 오류가 발생했습니다.');
-            }
-        });
-    });
-});
-
-</script>
-         <!--Script-->
+    <!--Script-->
   </span>
 
 </th:block>

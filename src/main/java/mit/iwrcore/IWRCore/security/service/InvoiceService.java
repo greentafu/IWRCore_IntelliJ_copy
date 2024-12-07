@@ -2,8 +2,6 @@ package mit.iwrcore.IWRCore.security.service;
 
 import mit.iwrcore.IWRCore.entity.Invoice;
 import mit.iwrcore.IWRCore.security.dto.InvoiceDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 
 public interface InvoiceService {
     // 저장, 삭제

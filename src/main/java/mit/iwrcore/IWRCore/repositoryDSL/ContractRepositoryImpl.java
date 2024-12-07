@@ -266,6 +266,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
         QRequest qRequest=QRequest.request;
 
         QContract qContract=QContract.contract;
+        QContract qContract1=QContract.contract;
         QBalju qBalju=QBalju.balju;
 
         QProL qProL=QProL.proL;
@@ -294,25 +295,6 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
         }
         if (requestDTO.getBox()!=null) { builder.and(qMaterial1.box.boxCode.eq(requestDTO.getBox())); }
 
-        BooleanBuilder havingBuilder=new BooleanBuilder();
-        if (requestDTO.getBaljuStatus()!=null){
-            if(requestDTO.getBaljuStatus()==0L) havingBuilder.and(qBalju.countDistinct().eq(0L));
-            else havingBuilder.and(qBalju.countDistinct().ne(0L));
-        }
-        if (requestDTO.getStockStatus()!=null){
-            if(requestDTO.getStockStatus()==0L){
-                havingBuilder.and(qShipment.shipNum.sum().isNull())
-                        .or(qShipment.shipNum.sum().isNotNull().and(qRequest.requestNum.sum().isNotNull())
-                                .and(qShipment.shipNum.sum().eq(qRequest.requestNum.sum()))
-                        );
-            }else{
-                havingBuilder.and(qShipment.shipNum.sum().isNotNull().and(qRequest.requestNum.sum().isNull()))
-                        .or(qShipment.shipNum.sum().isNotNull().and(qRequest.requestNum.sum().isNotNull())
-                                .and(qShipment.shipNum.sum().ne(qRequest.requestNum.sum()))
-                        );
-            }
-        }
-
         JPAQuery<Material> subQuery=new JPAQuery<>()
                 .select(qMaterial1).distinct()
                 .from(qMaterial1)
@@ -326,15 +308,52 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
                 .leftJoin(qProM.proL, qProL)
                 .where(builder);
 
+        JPAQuery<Contract> subQueryContract=new JPAQuery<>()
+                .select(qContract1)
+                .from(qContract1)
+                .where(qContract1.jodalPlan.material.eq(qMaterial));
+
+        JPAQuery<Long> subQueryShipment=new JPAQuery<>()
+                .select(qShipment.shipNum.sum())
+                .from(qShipment)
+                .where(qShipment.balju.contract.in(subQueryContract)
+                        .and(qShipment.receiveCheck.eq(1L)));
+
+        JPAQuery<Long> subQueryRequest=new JPAQuery<>()
+                .select(qRequest.requestNum.sum()).distinct()
+                .from(qRequest)
+                .where(qRequest.material.eq(qMaterial)
+                        .and(qRequest.releaseDate.isNotNull()));
+
+
+        BooleanBuilder builder1=new BooleanBuilder();
+        builder1.and( qMaterial.in(subQuery) );
+        if (requestDTO.getStockStatus()!=null){
+            if(requestDTO.getStockStatus()==0L){
+                builder1.and(subQueryShipment.isNull())
+                        .or(subQueryShipment.isNotNull().and(subQueryRequest.isNotNull())
+                                .and(subQueryShipment.loe(subQueryRequest))
+                        );
+            }else{
+                builder1.and(subQueryShipment.isNotNull().and(subQueryRequest.isNull()))
+                        .or(subQueryShipment.isNotNull().and(subQueryRequest.isNotNull())
+                                .and(subQueryShipment.goe(subQueryRequest))
+                        );
+            }
+        }
+        BooleanBuilder havingBuilder=new BooleanBuilder();
+        if (requestDTO.getBaljuStatus()!=null){
+            if(requestDTO.getBaljuStatus()==0L) havingBuilder.and(qBalju.countDistinct().eq(0L));
+            else havingBuilder.and(qBalju.countDistinct().ne(0L));
+        }
+
         Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
         List<Tuple> tupleList = queryFactory
-                .select(qMaterial, qContract.conNo.max(), qShipment.shipNum.sum(), qRequest.requestNum.sum(), qBalju.countDistinct())
+                .select(qMaterial, qContract.conNo.max(), subQueryShipment, subQueryRequest, qBalju.countDistinct())
                 .from(qMaterial)
-                .leftJoin(qRequest).on(qRequest.material.eq(qMaterial).and(qRequest.reqCheck.eq(1L)))
                 .leftJoin(qContract).on(qContract.jodalPlan.material.eq(qMaterial))
-                .leftJoin(qBalju).on(qBalju.contract.eq(qContract).and(qBalju.finCheck.eq(0L)))
-                .leftJoin(qShipment).on(qShipment.balju.contract.eq(qContract).and(qShipment.receiveCheck.eq(1L)))
-                .where(qMaterial.in(subQuery))
+                .leftJoin(qBalju).on(qBalju.contract.in(subQueryContract))
+                .where(builder1)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .groupBy(qMaterial.materCode)
@@ -343,13 +362,11 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
                 .fetch();
 
         long total = queryFactory
-                .select(qMaterial, qContract.conNo.max(), qShipment.shipNum.sum(), qRequest.requestNum.sum(), qBalju.countDistinct())
+                .select(qMaterial, qContract.conNo.max(), subQueryShipment, subQueryRequest, qBalju.countDistinct())
                 .from(qMaterial)
-                .leftJoin(qRequest).on(qRequest.material.eq(qMaterial).and(qRequest.reqCheck.eq(1L)))
                 .leftJoin(qContract).on(qContract.jodalPlan.material.eq(qMaterial))
-                .leftJoin(qBalju).on(qBalju.contract.eq(qContract).and(qBalju.finCheck.eq(0L)))
-                .leftJoin(qShipment).on(qShipment.balju.contract.eq(qContract).and(qShipment.receiveCheck.eq(1L)))
-                .where(qMaterial.in(subQuery))
+                .leftJoin(qBalju).on(qBalju.contract.in(subQueryContract))
+                .where(builder1)
                 .groupBy(qMaterial.materCode)
                 .having(havingBuilder)
                 .orderBy(qMaterial.materCode.desc())
@@ -359,8 +376,8 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
                 .map(tuple -> new Object[]{
                         tuple.get(qMaterial),
                         tuple.get(qContract.conNo.max()),
-                        tuple.get(qShipment.shipNum.sum()),
-                        tuple.get(qRequest.requestNum.sum()),
+                        tuple.get(subQueryShipment),
+                        tuple.get(subQueryRequest),
                         tuple.get(qBalju.countDistinct())
                 })
                 .collect(Collectors.toList());
@@ -394,7 +411,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
                 .leftJoin(qShipment).distinct().on(qShipment.balju.contract.in(subQuery)
                         .and(qShipment.receiveCheck.eq(1L)))
                 .leftJoin(qRequest).on(qRequest.material.eq(qContract.jodalPlan.material)
-                        .and(qRequest.reqCheck.eq(1L))
+                        .and(qRequest.releaseDate.isNotNull())
                         .and(qRequest.releaseDate.yearMonth().loe(qContract.conDate.yearMonth())))
                 .where(builder)
                 .offset(pageable.getOffset())
@@ -409,7 +426,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
                 .leftJoin(qShipment).distinct().on(qShipment.balju.contract.in(subQuery)
                         .and(qShipment.receiveCheck.eq(1L)))
                 .leftJoin(qRequest).on(qRequest.material.eq(qContract.jodalPlan.material)
-                        .and(qRequest.reqCheck.eq(1L))
+                        .and(qRequest.releaseDate.isNotNull())
                         .and(qRequest.releaseDate.yearMonth().loe(qContract.conDate.yearMonth())))
                 .where(builder)
                 .groupBy(qContract.conDate.yearMonth())

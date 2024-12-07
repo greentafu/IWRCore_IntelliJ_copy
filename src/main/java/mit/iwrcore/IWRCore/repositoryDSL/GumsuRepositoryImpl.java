@@ -7,7 +7,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

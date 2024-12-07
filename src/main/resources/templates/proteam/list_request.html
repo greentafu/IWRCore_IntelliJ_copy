@@ -12,9 +12,14 @@
 
   <span id="head">
     <title>출하 요청 목록</title>
-      <!--Style-->
-
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 700px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
   <span id="content">
@@ -54,12 +59,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -69,76 +72,32 @@
         <!--/검색-->
         <div class="card-body">
           <div class="table-responsive text-nowrap">
-            <table class="table table-bordered mb-4">
-              <thead>
-                <tr>
-                  <th>등록 일자</th>
-                  <th>제품 명칭</th>
-                  <th>자재 명칭</th>
-                  <th>수량</th>
-                  <th>출하 희망 날짜</th>
-                  <th>비고</th>
-                  <th>
-                    <select class="form-select form-select-sm" style="width: fit-content;">
-                      <option>전체 출하상태</option>
-                      <option>출하대기</option>
-                      <option>출하완료</option>
-                    </select>
-                  </th>
-                  <th>수정/삭제</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="list:${list.dtoList}">
-                  <td>--</td>
-                  <td><a th:href="@{/proteam/details_request(proplanNo=${list.proplanDTO.proplanNo})}">[[${list.proplanDTO.productDTO.name}]]</a></td>
-                  <td>[[${list.materialDTO.name}]]</td>
-                  <td>[[${list.requestNum}]]</td>
-                  <td>[[${#temporals.format(list.eventDate, 'yyyy-MM-dd')}]]</td>
-                  <td>[[${list.text}]]</td>
-                  <td>
-                    <th:block th:if="${list.reqCheck}==0">출하대기</th:block>
-                    <th:block th:if="${list.reqCheck}==1">출하완료</th:block>
-                  </td>
-                  <td>
-                    <a th:href="@{/proteam/modify_request(proplanNo=${list.proplanDTO.proplanNo})}">
-                      <button onclick="showCompletionMessage('수정')" class="btn btn-primary">수정</button>
-                    </a>
-                    <button onclick="showCompletionMessage('삭제')" class="btn btn-secondary">삭제</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div id="content1">
+              <table class="table table-bordered mb-4">
+                <thead>
+                  <tr>
+                    <th>등록일자</th>
+                    <th>제품번호</th>
+                    <th>제품명</th>
+                    <th>라인</th>
+                    <th>
+                      <select class="form-select form-select-sm" style="width: fit-content;" id="releaseStatus">
+                        <option value="">전체 출하상태</option>
+                        <option value="0">출하대기</option>
+                        <option value="1">출하완료</option>
+                      </select>
+                    </th>
+                    <th>수정/삭제</th>
+                  </tr>
+                </thead>
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
             <div class="mt-3 text-end mb-4">
               <a th:href="@{/proteam/input_request}">
                 <button type="button" class="btn btn-primary">등록</button>
               </a>
             </div>
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center">
-                <th:block th:if="${list.prev}">
-                  <li class="page-item prev">
-                    <a class="page-link" th:href="@{/proteam/list_request(page=${list.start}-1)}">
-                      <i class="tf-icon bx bx-chevrons-left"></i>
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:each="pagenum:${list.pageList}">
-                  <li class="page-item " th:classappend="${list.page}==${pagenum}? active">
-                    <a class="page-link" th:href="@{/proteam/list_request(page=${pagenum})}">
-                      [[${pagenum}]]
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:if="${list.next}">
-                  <li class="page-item next">
-                    <a class="page-link" th:href="@{/proteam/list_request(page=${list.end}+1)}">
-                      <i class="tf-icon bx bx-chevrons-right"></i>
-                    </a>
-                  </li>
-                </th:block>
-              </ul>
-            </nav>
           </div>
         </div>
         <!--/ Card -->
@@ -146,10 +105,175 @@
     </div>
 
     <!--Modal-->
-
+    <div class="modal fade" id="modalToggle" aria-labelledby="modalToggleLabel"
+         tabindex="-1" style="display: none" aria-hidden="true" >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalToggleLabel">삭제하시겠습니까?</h5>
+          </div>
+          <div class="modal-body" id="deleteText"></div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-target="#modalToggle2" data-bs-dismiss="modal"
+                    id="deleteBtn" onclick="deleteRequest(this)">
+              삭제
+            </button>
+            <button class="btn btn-primary" data-bs-dismiss="modal">
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!--/Modal-->
     <!--Script-->
+    <script>
+      let page = 1;
+      let finPage=false;
+      let selectProL = null;
+      let selectProM = null;
+      let selectProS = null;
+      let productSearch = null;
+      let releaseStatus = null;
 
+      function productSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectProL = (document.getElementById("selectProL").value!=null)?document.getElementById("selectProL").value:null;
+        selectProM = (document.getElementById("selectProM").value!=null)?document.getElementById("selectProM").value:null;
+        selectProS = (document.getElementById("selectProS").value!=null)?document.getElementById("selectProS").value:null;
+        productSearch = (document.getElementById("productSearch").value!=null)?document.getElementById("productSearch").value:null;
+        loadItems();
+      }
+
+      document.getElementById('releaseStatus').addEventListener("change", function(){
+        releaseStatus=document.getElementById('releaseStatus').value;
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        loadItems();
+      });
+
+      function loadItems() {
+        const content1 = document.getElementById("content1");
+        const firstTbody = document.getElementById("firstTbody");
+
+        $.ajax({
+          url:'/list/getRequestList',
+          method:'GET',
+          data:{page:page, selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
+                releaseStatus:releaseStatus},
+          success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+              const preReqCode=x.preRequestDTO.preReqCode;
+              const regDate=x.preRequestDTO.regDate.split('T')[0];
+              const allCheck=x.preRequestDTO.allCheck;
+              const line=x.preRequestDTO.lineDTO.lineName;
+              const proplanDTO=x.preRequestDTO.proplanDTO;
+
+              const allCount=x.allCount;
+              const finCount=x.finCount;
+
+              const productName=proplanDTO.productDTO.name;
+              const productCode=proplanDTO.productDTO.manuCode;
+              const startDate=proplanDTO.startDate.split('T')[0];
+              const endDate=proplanDTO.endDate.split('T')[0];
+              const dateRange=startDate+"-"+endDate;
+
+              const newRow = document.createElement("tr");
+
+              const dateTd = document.createElement("td");
+              dateTd.id = 'regDate'+preReqCode;
+              dateTd.innerHTML=regDate;
+              newRow.appendChild(dateTd);
+
+              const materCodeTd = document.createElement("td");
+              materCodeTd.innerHTML=productCode;
+              newRow.appendChild(materCodeTd);
+
+              const nameTd = document.createElement("td");
+              nameTd.id = 'productName'+preReqCode;
+              nameTd.innerHTML=`
+                <a href="/proteam/details_request?preReqCode=${preReqCode}">${productName}</a>
+              `;
+              newRow.appendChild(nameTd);
+
+              const lineTd = document.createElement("td");
+              lineTd.id = 'line'+preReqCode;
+              lineTd.innerHTML=line;
+              newRow.appendChild(lineTd);
+
+              const statusTd = document.createElement("td");
+              if(allCheck===0) statusTd.innerHTML='출하진행('+finCount+'/'+allCount+')';
+              else statusTd.innerHTML='출하완료';
+              newRow.appendChild(statusTd);
+
+              const btn1Td = document.createElement("td");
+              if(allCheck===0) {
+                btn1Td.innerHTML=`
+                  <a href="/proteam/modify_request?preReqCode=${preReqCode}">
+                    <button class="btn btn-primary">수정</button>
+                  </a>
+                  <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${preReqCode}" onclick="deleteBtn(this)">삭제</button>
+                `;
+              }else {
+                btn1Td.innerHTML=`
+                  <button class="btn btn-outline-primary">수정</button>
+                  <button class="btn btn-outline-secondary">삭제</button>
+                `;
+              }
+              newRow.appendChild(btn1Td);
+
+              firstTbody.appendChild(newRow);
+            });
+          }
+        });
+        page++;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems();
+            }
+          }
+        });
+
+        loadItems();
+      });
+    </script>
+
+    <script>
+      function deleteBtn(button){
+        var preReqCode=button.value;
+
+        const regDate=document.getElementById('regDate'+preReqCode).innerText;
+        const productName=document.getElementById('productName'+preReqCode).innerText;
+        const line=document.getElementById('line'+preReqCode).innerText;
+
+        document.getElementById('deleteText').innerHTML=regDate+"에 등록한 "+productName+"(라인: "+line+")의 출하요청을 삭제합니다.<br/>삭제시 복구가 불가능합니다.";
+        document.getElementById('deleteBtn').value=preReqCode;
+      }
+      function deleteRequest(button){
+        var preReqCode=button.value;
+        $.ajax({
+          url:'/deleteRequest',
+          method:'GET',
+          data:{preReqCode:preReqCode},
+          success:function(response){
+            window.location.reload();
+          }
+        });
+      }
+    </script>
     <!--Script-->
   </span>
 

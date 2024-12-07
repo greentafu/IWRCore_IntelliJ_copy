@@ -38,6 +38,8 @@ public class ListController {
     private ShipmentService shipmentService;
     @Autowired
     private ReturnsService returnsService;
+    @Autowired
+    private PreRequestService preRequestService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -431,5 +433,18 @@ public class ListController {
                 .box(selectedBox).baljuStatus(orderStatus).stockStatus(stockStatus)
                 .build();
         return  contractService.stockList(requestDTO);
+    }
+    // 출하요청> 출하요청 목록
+    @GetMapping("/getRequestList")
+    public PageResultDTO<PreRequestCountDTO, Object[]> getRequestList(
+            @RequestParam(required = false) int page, @RequestParam(required = false) Long releaseStatus,
+            @RequestParam(required = false) Long selectProL, @RequestParam(required = false) Long selectProM,
+            @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch){
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
+                .releaseStatus(releaseStatus)
+                .build();
+        return preRequestService.requestPage(requestDTO);
     }
 }

@@ -13,7 +13,12 @@
   <span id="head">
     <title>출하 요청 목록</title>
     <!--Style-->
-
+    <style>
+      #content1 {
+        height: 700px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
     <!--/Style-->
   </span>
 
@@ -53,12 +58,10 @@
                     </div>
                   </td>
                   <td>
-                    <div class="row">
-                      <div class="col-md-9">
-                        <input type="text" class="form-control" style="height: 32px; font-size: 12px;">
-                      </div>
-                      <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;">검색</button>
-                    </div>
+                    <input type="text" class="form-control" id="productSearch" style="height: 32px; font-size: 12px;" value="">
+                  </td>
+                  <td>
+                    <button type="button" class="col-md-3 btn btn-sm btn-outline-primary" style="width: 70px;" onclick="productSearchBtn()">검색</button>
                   </td>
                 </tr>
               </table>
@@ -68,72 +71,24 @@
         <!--/검색-->
         <div class="card-body">
           <div class="table-responsive text-nowrap">
-            <table class="table table-bordered mb-4">
-              <thead>
-                <tr>
-                  <th>등록 일자</th>
-                  <th>제품 명칭</th>
-                  <th>자재 명칭</th>
-                  <th>수량</th>
-                  <th>출하 희망 날짜</th>
-                  <th>비고</th>
-                  <th>
-                    <select class="form-select form-select-sm" style="width: fit-content;">
-                      <option>전체 출하상태</option>
-                      <option>출하대기</option>
-                      <option>출하완료</option>
-                    </select>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="list:${list.dtoList}">
-                  <td>--</td>
-                  <td><a th:href="@{/goodshandling/view_request(proplanNo=${list.proplanDTO.proplanNo})}">[[${list.proplanDTO.productDTO.name}]]</a></td>
-                  <td>[[${list.materialDTO.name}]]</td>
-                  <td>[[${list.requestNum}]]</td>
-                  <td>[[${#temporals.format(list.eventDate, 'yyyy-MM-dd')}]]</td>
-                  <td>[[${list.text}]]</td>
-                  <td>
-                    <th:block th:if="${list.reqCheck}==0">
-                      <button class="btn btn-primary">출하대기</button>
-                    </th:block>
-                    <th:block th:if="${list.reqCheck}==1">
-                      <a href="javascript:void(0);" class="menu-link" onclick="alert('이미 완료된 작업 입니다.');">
-                        <button  class="btn btn-secondary">완료</button>
-                      </a>
-                    </th:block>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <nav aria-label="Page navigation">
-              <ul class="pagination justify-content-center">
-                <th:block th:if="${list.prev}">
-                  <li class="page-item prev">
-                    <a class="page-link" th:href="@{/goodshandling/list_request(page=${list.start}-1)}">
-                      <i class="tf-icon bx bx-chevrons-left"></i>
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:each="pagenum:${list.pageList}">
-                  <li class="page-item " th:classappend="${list.page}==${pagenum}? active">
-                    <a class="page-link" th:href="@{/goodshandling/list_request(page=${pagenum})}">
-                      [[${pagenum}]]
-                    </a>
-                  </li>
-                </th:block>
-                <th:block th:if="${list.next}">
-                  <li class="page-item next">
-                    <a class="page-link" th:href="@{/goodshandling/list_request(page=${list.end}+1)}">
-                      <i class="tf-icon bx bx-chevrons-right"></i>
-                    </a>
-                  </li>
-                </th:block>
-              </ul>
-            </nav>
+            <div id="content1">
+              <table class="table table-bordered mb-4">
+                <thead>
+                  <tr>
+                    <th>등록일자</th>
+                    <th>제품번호</th>
+                    <th>제품명</th>
+                    <th>라인</th>
+                    <th>진행사항</th>
+                    <th>출하하기</th>
+                  </tr>
+                </thead>
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
+        <!--/ Card -->
       </div>
     </div>
 
@@ -142,7 +97,109 @@
     <!--/Modal-->
 
     <!--Script-->
+    <script>
+      let page = 1;
+      let finPage=false;
+      let selectProL = null;
+      let selectProM = null;
+      let selectProS = null;
+      let productSearch = null;
+      let releaseStatus = 0;
 
+      function productSearchBtn(){
+        page = 1;
+        finPage=false;
+        document.getElementById("firstTbody").innerText='';
+        selectProL = (document.getElementById("selectProL").value!=null)?document.getElementById("selectProL").value:null;
+        selectProM = (document.getElementById("selectProM").value!=null)?document.getElementById("selectProM").value:null;
+        selectProS = (document.getElementById("selectProS").value!=null)?document.getElementById("selectProS").value:null;
+        productSearch = (document.getElementById("productSearch").value!=null)?document.getElementById("productSearch").value:null;
+        loadItems();
+      }
+
+      function loadItems() {
+        const content1 = document.getElementById("content1");
+        const firstTbody = document.getElementById("firstTbody");
+
+        $.ajax({
+          url:'/list/getRequestList',
+          method:'GET',
+          data:{page:page, selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
+                releaseStatus:releaseStatus},
+          success:function(data){
+            if(data.totalPage<page) finPage=true;
+
+            data.dtoList.forEach(x=>{
+              const preReqCode=x.preRequestDTO.preReqCode;
+              const regDate=x.preRequestDTO.regDate.split('T')[0];
+              const allCheck=x.preRequestDTO.allCheck;
+              const line=x.preRequestDTO.lineDTO.lineName;
+              const proplanDTO=x.preRequestDTO.proplanDTO;
+
+              const allCount=x.allCount;
+              const finCount=x.finCount;
+
+              const productName=proplanDTO.productDTO.name;
+              const productCode=proplanDTO.productDTO.manuCode;
+              const startDate=proplanDTO.startDate.split('T')[0];
+              const endDate=proplanDTO.endDate.split('T')[0];
+              const dateRange=startDate+"-"+endDate;
+
+              const newRow = document.createElement("tr");
+
+              const dateTd = document.createElement("td");
+              dateTd.id = 'regDate'+preReqCode;
+              dateTd.innerHTML=regDate;
+              newRow.appendChild(dateTd);
+
+              const materCodeTd = document.createElement("td");
+              materCodeTd.innerHTML=productCode;
+              newRow.appendChild(materCodeTd);
+
+              const nameTd = document.createElement("td");
+              nameTd.id = 'productName'+preReqCode;
+              nameTd.innerHTML= productName;
+              newRow.appendChild(nameTd);
+
+              const lineTd = document.createElement("td");
+              lineTd.id = 'line'+preReqCode;
+              lineTd.innerHTML=line;
+              newRow.appendChild(lineTd);
+
+              const statusTd = document.createElement("td");
+              statusTd.innerHTML=finCount+'/'+allCount;
+              newRow.appendChild(statusTd);
+
+              const btn1Td = document.createElement("td");
+              btn1Td.innerHTML=`
+                <a href="/goodshandling/view_request?preReqCode=${preReqCode}">
+                  <button class="btn btn-primary">출하하기</button>
+                </a>`;
+              newRow.appendChild(btn1Td);
+
+              firstTbody.appendChild(newRow);
+            });
+          }
+        });
+        page++;
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadItems();
+            }
+          }
+        });
+
+        loadItems();
+      });
+    </script>
     <!--Script-->
   </span>
 

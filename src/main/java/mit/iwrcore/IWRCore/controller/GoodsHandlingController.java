@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/goodshandling")
 @RequiredArgsConstructor
 public class GoodsHandlingController {
-    private final RequestService requestService;
     private final ShipmentService shipmentService;
+    private final PreRequestService preRequestService;
 
     @GetMapping("/list_received")
     public void list_received(){}
@@ -20,29 +20,15 @@ public class GoodsHandlingController {
     public void return_received(@RequestParam Long shipNo, Model model){
         model.addAttribute("shipment", shipmentService.findShipment(shipNo));
     }
-
-
-
-
     @GetMapping("/view_received")
     public void view_received(@RequestParam Long shipNO, Model model){
         model.addAttribute("shipment", shipmentService.entityToDto(shipmentService.getShipmentEntity(shipNO)));
     }
 
     @GetMapping("/list_request")
-    public void list_request(PageRequestDTO requestDTO, Model model){
-        model.addAttribute("list", requestService.requestPage(requestDTO));
-    }
+    public void list_request(){}
     @GetMapping("/view_request")
-    public void view_request(){
-
-    }
-
-
-
-
-    @PostMapping("/request_check")
-    public void request_check(){
-
+    public void view_request(@RequestParam Long preReqCode, Model model){
+        model.addAttribute("preRequestDTO", preRequestService.getPreRequest(preReqCode));
     }
 }

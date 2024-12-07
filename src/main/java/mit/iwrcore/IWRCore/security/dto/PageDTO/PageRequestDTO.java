@@ -67,4 +67,7 @@ public class PageRequestDTO {
     private Long baljuStatus;
     private Long materCode;
     private Integer selectedYear;
+
+    // 출하요청
+    private Long releaseStatus;
 }

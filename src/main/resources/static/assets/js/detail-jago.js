@@ -17,7 +17,7 @@ function loadTable(){
     const firstTbody = document.getElementById("firstTbody");
     const materCode=document.getElementById('materCode').value;
     $.ajax({
-        url:'/select/stockDetail',
+        url:'/select/getStockDetail',
         method:'POST',
         data:{page:page, materCode:materCode, selectedYear:selectedYear},
         success:function(data){

@@ -190,28 +190,4 @@ public class ContractServiceImpl implements ContractService {
         return new StockDetailDTO(contractDTO, sumShip, sumReq);
     }
 
-
-
-
-
-
-    @Override
-    public List<StockDetailDTO> detailStock(Long materCode){
-        List<Object[]> entityList=contractRepository.detailStock(materCode);
-        List<StockDetailDTO> dtoList=entityList.stream().map(this::exStockDetailDTO2).toList();
-        return dtoList;
-    }
-    private StockDetailDTO exStockDetailDTO2(Object[] objects){
-        Contract contract=(Contract) objects[0];
-        Long tempSumShip=(Long) objects[1];
-        Long tempSumReq=(Long) objects[2];
-
-        ContractDTO contractDTO=(contract!=null)?entityToDTO(contract):null;
-        Long sumShip=(tempSumShip!=null)?tempSumShip:0L;
-        Long sumReq=(tempSumReq!=null)?tempSumReq:0L;
-        return new StockDetailDTO(contractDTO, sumShip, sumReq);
-    }
-
 }
-
-

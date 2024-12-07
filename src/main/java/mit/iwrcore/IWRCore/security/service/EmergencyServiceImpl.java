@@ -43,7 +43,7 @@ public class EmergencyServiceImpl implements EmergencyService{
 
         // Request 엔티티와의 관계 설정
         if (dto.getRequestDTO() != null) {
-            Request request = requestService.convertToEntity(dto.getRequestDTO());
+            Request request = requestService.dtoToEntity(dto.getRequestDTO());
             emergency.setRequest(request);
         }
 

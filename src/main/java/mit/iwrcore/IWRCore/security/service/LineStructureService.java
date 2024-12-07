@@ -1,8 +1,10 @@
 package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
+import mit.iwrcore.IWRCore.entity.Line;
 import mit.iwrcore.IWRCore.entity.LineStructure;
 import mit.iwrcore.IWRCore.repository.LineStructureRepository;
+import mit.iwrcore.IWRCore.security.dto.LineDTO;
 import mit.iwrcore.IWRCore.security.dto.LineStructureDTO;
 import org.springframework.stereotype.Service;
 

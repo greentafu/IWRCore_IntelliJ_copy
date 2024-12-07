@@ -23,16 +23,6 @@ public class Request extends BaseEntity {
     @NotNull
     private LocalDateTime eventDate;
     private LocalDateTime releaseDate;
-    private String text;
-    @NotNull
-    private Long reqCheck;
-    @NotNull
-    private String line;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proplan_no")
-    @NotNull
-    private ProPlan proPlan;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "materCode")
@@ -40,7 +30,7 @@ public class Request extends BaseEntity {
     private Material material;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer")    // 외래 키 컬럼 이름
+    @JoinColumn(name = "preReqCode")
     @NotNull
-    private Member writer;              // 작성자
+    private PreRequest preRequest;
 }
