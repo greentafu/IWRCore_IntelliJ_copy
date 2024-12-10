@@ -1,16 +1,35 @@
-$(document).ready(function(){
-    let Lcode = $('#selectPartL').val();
-    let Mcode = $('#selectPartM').val();
-    let Scode = $('#selectPartS').val();
+// 변수
+let showPartLCode=null;
+let showPartMCode=null;
+let showPartSCode=null;
+let showPartLCode2=null;
+let showPartMCode2=null;
+let showPartSCode2=null;
 
-    Lcode=(Lcode==="")?null:Lcode;
-    Mcode=(Mcode==="")?null:Mcode;
-    Scode=(Scode==="")?null:Scode;
+let showPartRange=0; // 소속회사 안보기
 
-    if(Lcode===null && Mcode===null && Scode===null) initPart1();
-    else searchPartCode(Lcode, Mcode, Scode);
+document.addEventListener("DOMContentLoaded", function () {
+    const noNoName=document.getElementById('noName'); // 미정, 소속회사 안보기
+    if(noNoName) showPartRange=1;
+    const yesCompany=document.getElementById('yesCompany'); // 모두 보기
+    if(yesCompany) showPartRange=2;
+    const selectedPno=document.getElementById('pno'); // 모두 보기
+    if(selectedPno) {
+        if(selectedPno.value===1 || selectedPno.value==='1') showPartRange=2;
+    }
 
+    initPart1();
     initPart2();
+
+    const inputPartL=document.getElementById('inputPartL');
+    const inputPartM=document.getElementById('inputPartM');
+    if(inputPartL) inputPartL.addEventListener('input', () => refreshPartL());
+    if(inputPartM) inputPartM.addEventListener('input', () => refreshPartM());
+
+    const inputPartL2=document.getElementById('inputPartL2');
+    const inputPartM2=document.getElementById('inputPartM2');
+    if(inputPartL2) inputPartL2.addEventListener('input', () => refreshPartL2());
+    if(inputPartM2) inputPartM2.addEventListener('input', () => refreshPartM2());
 });
 
 // 초기값1
@@ -18,37 +37,67 @@ function initPart1(){
     $.ajax({
         url:'/select/getPart',
         method:'GET',
+        data:{ lcode:showPartLCode, mcode:showPartMCode, scode:showPartSCode, type:showPartRange },
         success:function(data){
-            $('#selectPartL').empty().append("<option value=''>전체보기</option>");
-            $('#selectPartM').empty().append('<option value="">전체보기</option>');
-            $('#selectPartS').empty().append('<option value="">전체보기</option>');
+            const selectPartL = document.getElementById('selectPartL');
+            const selectPartM = document.getElementById('selectPartM');
+            const selectPartS = document.getElementById('selectPartS');
 
-            data.partLDTOs.forEach(function(partL) {
-                $('#selectPartL').append(
-                    $('<option></option>')
-                        .attr('value', partL.partLcode)
-                        .text(partL.lname)
-                        .prop('selected', partL.partLcode == data.l)
-                );
-            });
-            data.partMDTOs.forEach(function(partM) {
-                $('#selectPartM').append(
-                    $('<option></option>')
-                        .attr('value', partM.partMcode)
-                        .text(partM.mname)
-                        .prop('selected', partM.partMcode == data.m)
-                );
-            });
-            data.partSDTOs.forEach(function(partS) {
-                $('#selectPartS').append(
-                    $('<option></option>')
-                        .attr('value', partS.partScode)
-                        .text(partS.sname)
-                        .prop('selected', partS.partScode == data.s)
-                );
-            });
-            const tf=document.getElementById('inputPartL');
-            if(tf) addSelectChangeListeners();
+            const inputPartL=document.getElementById('inputPartL');
+            const inputPartM=document.getElementById('inputPartM');
+            const inputPartS=document.getElementById('inputPartS');
+
+            if(selectPartL){
+                selectPartL.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectPartL.appendChild(allTd);
+                data.partLDTOs.forEach(function(partL) {
+                    const option = document.createElement('option');
+                    option.value = partL.partLcode;
+                    option.textContent = partL.lname;
+                    selectPartL.appendChild(option);
+                    if (partL.partLcode == data.l) {
+                        option.selected = true;
+                        if(inputPartL) inputPartL.value = partL.lname;
+                    }
+                });
+            }
+            if(selectPartM){
+                selectPartM.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectPartM.appendChild(allTd);
+                data.partMDTOs.forEach(function(partM) {
+                    const option = document.createElement('option');
+                    option.value = partM.partMcode;
+                    option.textContent = partM.mname;
+                    selectPartM.appendChild(option);
+                    if (partM.partMcode == data.m) {
+                        option.selected = true;
+                        if(inputPartM) inputPartM.value = partM.mname;
+                    }
+                });
+            }
+            if(selectPartS){
+                selectPartS.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectPartS.appendChild(allTd);
+                data.partSDTOs.forEach(function(partS) {
+                    const option = document.createElement('option');
+                    option.value = partS.partScode;
+                    option.textContent = partS.sname;
+                    selectPartS.appendChild(option);
+                    if (partS.partScode == data.s) {
+                        option.selected = true;
+                        if(inputPartS) inputPartS.value = partS.sname;
+                    }
+                });
+            }
         }
     });
 }
@@ -57,223 +106,145 @@ function initPart2(){
     $.ajax({
         url:'/select/getPart',
         method:'GET',
+        data:{lcode:showPartLCode2, mcode:showPartMCode2, scode:showPartSCode2, type:showPartRange},
         success:function(data){
-            $('#selectPartL2').empty().append("<option value=''>전체보기</option>");
-            $('#selectPartM2').empty().append('<option value="">전체보기</option>');
-            $('#selectPartS2').empty().append('<option value="">전체보기</option>');
+            const selectPartL = document.getElementById('selectPartL2');
+            const selectPartM = document.getElementById('selectPartM2');
+            const selectPartS = document.getElementById('selectPartS2');
 
-            data.partLDTOs.forEach(function(partL) {
-                $('#selectPartL2').append(
-                    $('<option></option>')
-                        .attr('value', partL.partLcode)
-                        .text(partL.lname)
-                        .prop('selected', partL.partLcode == data.l)
-                );
-            });
-            data.partMDTOs.forEach(function(partM) {
-                $('#selectPartM2').append(
-                    $('<option></option>')
-                        .attr('value', partM.partMcode)
-                        .text(partM.mname)
-                        .prop('selected', partM.partMcode == data.m)
-                );
-            });
-            data.partSDTOs.forEach(function(partS) {
-                $('#selectPartS2').append(
-                    $('<option></option>')
-                        .attr('value', partS.partScode)
-                        .text(partS.sname)
-                        .prop('selected', partS.partScode == data.s)
-                );
-            });
+            const inputPartL=document.getElementById('inputPartL2');
+            const inputPartM=document.getElementById('inputPartM2');
+            const inputPartS=document.getElementById('inputPartS2');
+
+            if(selectPartL){
+                selectPartL.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectPartL.appendChild(allTd);
+                data.partLDTOs.forEach(function(partL) {
+                    const option = document.createElement('option');
+                    option.value = partL.partLcode;
+                    option.textContent = partL.lname;
+                    selectPartL.appendChild(option);
+                    if (partL.partLcode == data.l) {
+                        option.selected = true;
+                        if(inputPartL) inputPartL.value = partL.lname;
+                    }
+                });
+            }
+            if(selectPartM){
+                selectPartM.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectPartM.appendChild(allTd);
+                data.partMDTOs.forEach(function(partM) {
+                    const option = document.createElement('option');
+                    option.value = partM.partMcode;
+                    option.textContent = partM.mname;
+                    selectPartM.appendChild(option);
+                    if (partM.partMcode == data.m) {
+                        option.selected = true;
+                        if(inputPartM) inputPartM.value = partM.mname;
+                    }
+                });
+            }
+            if(selectPartS){
+                selectPartS.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectPartS.appendChild(allTd);
+                data.partSDTOs.forEach(function(partS) {
+                    const option = document.createElement('option');
+                    option.value = partS.partScode;
+                    option.textContent = partS.sname;
+                    selectPartS.appendChild(option);
+                    if (partS.partScode == data.s) {
+                        option.selected = true;
+                        if(inputPartS) inputPartS.value = partS.sname;
+                    }
+                });
+            }
         }
     });
 }
 
 // 선택1
 function updatePartCode(changedSelect){
-    let Lcode=$('#selectPartL').val();
-    let Mcode=$('#selectPartM').val();
-    let Scode=$('#selectPartS').val();
+    const selectPartL = document.getElementById('selectPartL');
+    const selectPartM = document.getElementById('selectPartM');
+    const selectPartS = document.getElementById('selectPartS');
 
-    if (changedSelect === 'L') {
-        Mcode=null;
-        Scode=null;
-    } else if (changedSelect === 'M') {
-        Scode=null;
+    if(selectPartL) {
+        const tempL=selectPartL.value;
+        if(tempL==='') showPartLCode=null;
+        else showPartLCode=tempL;
+    }
+    if(selectPartM) {
+        const tempM=selectPartM.value;
+        if(tempM==='') showPartMCode=null;
+        else showPartMCode=tempM;
+    }
+    if(selectPartS) {
+        const tempS=selectPartS.value;
+        if(tempS==='') showPartSCode=null;
+        else showPartSCode=tempS;
     }
 
-    $.ajax({
-        url:'/select/part',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectPartL').empty().append("<option value=''>전체보기</option>");
-            $('#selectPartM').empty().append('<option value="">전체보기</option>');
-            $('#selectPartS').empty().append('<option value="">전체보기</option>');
+    if (changedSelect === 'L') { showPartMCode=null; showPartSCode=null; }
+    else if (changedSelect === 'M') { showPartSCode=null; }
 
-            data.partLDTOs.forEach(function(partL) {
-                $('#selectPartL').append(
-                    $('<option></option>')
-                        .attr('value', partL.partLcode)
-                        .text(partL.lname)
-                        .prop('selected', partL.partLcode == data.l)
-                );
-            });
-            data.partMDTOs.forEach(function(partM) {
-                $('#selectPartM').append(
-                    $('<option></option>')
-                        .attr('value', partM.partMcode)
-                        .text(partM.mname)
-                        .prop('selected', partM.partMcode == data.m)
-                );
-            });
-            data.partSDTOs.forEach(function(partS) {
-                $('#selectPartS').append(
-                    $('<option></option>')
-                        .attr('value', partS.partScode)
-                        .text(partS.sname)
-                        .prop('selected', partS.partScode == data.s)
-                );
-            });
-            const tf=document.getElementById('inputPartL');
-            if(tf) addSelectChangeListeners();
-        }
-    });
+    initPart1();
 }
 // 선택2
 function updatePartCode2(changedSelect){
-    let Lcode=$('#selectPartL2').val();
-    let Mcode=$('#selectPartM2').val();
-    let Scode=$('#selectPartS2').val();
+    const selectPartL = document.getElementById('selectPartL2');
+    const selectPartM = document.getElementById('selectPartM2');
+    const selectPartS = document.getElementById('selectPartS2');
 
-    if (changedSelect === 'L') {
-        Mcode=null;
-        Scode=null;
-    } else if (changedSelect === 'M') {
-        Scode=null;
+    if(selectPartL) {
+        const tempL=selectPartL2.value;
+        if(tempL==='') showPartLCode2=null;
+        else showPartLCode2=tempL;
+    }
+    if(selectPartM) {
+        const tempM=selectPartM.value;
+        if(tempM==='') showPartMCode2=null;
+        else showPartMCode2=tempM;
+    }
+    if(selectPartS) {
+        const tempS=selectPartS.value;
+        if(tempS==='') showPartSCode2=null;
+        else showPartSCode2=tempS;
     }
 
-    $.ajax({
-        url:'/select/part',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectPartL2').empty().append("<option value=''>전체보기</option>");
-            $('#selectPartM2').empty().append('<option value="">전체보기</option>');
-            $('#selectPartS2').empty().append('<option value="">전체보기</option>');
+    if (changedSelect === 'L') { showPartMCode2=null; showPartSCode2=null; }
+    else if (changedSelect === 'M') { showPartSCode2=null; }
 
-            data.partLDTOs.forEach(function(partL) {
-                $('#selectPartL2').append(
-                    $('<option></option>')
-                        .attr('value', partL.partLcode)
-                        .text(partL.lname)
-                        .prop('selected', partL.partLcode == data.l)
-                );
-            });
-            data.partMDTOs.forEach(function(partM) {
-                $('#selectPartM2').append(
-                    $('<option></option>')
-                        .attr('value', partM.partMcode)
-                        .text(partM.mname)
-                        .prop('selected', partM.partMcode == data.m)
-                );
-            });
-            data.partSDTOs.forEach(function(partS) {
-                $('#selectPartS2').append(
-                    $('<option></option>')
-                        .attr('value', partS.partScode)
-                        .text(partS.sname)
-                        .prop('selected', partS.partScode == data.s)
-                );
-            });
-        }
-    });
+    initPart2();
 }
 
-// input
-function addSelectChangeListeners() {
-    $('#selectPartL').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputPartL').val(selectedValue);
-
-        const selectMValue = '';
-        $('#inputPartM').val(selectMValue);
-        const selectSValue = '';
-        $('#inputPartS').val(selectSValue);
-    });
-
-    $('#selectPartM').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputPartM').val(selectedValue);
-
-        const selectedL=document.getElementById('selectPartL');
-        const selectedOptionL = selectedL.options[selectedL.selectedIndex];
-        const selectLText = selectedOptionL.textContent;
-        $('#inputPartL').val(selectLText);
-
-        const selectSValue = '';
-        $('#inputPartS').val(selectSValue);
-    });
-
-    $('#selectPartS').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputPartS').val(selectedValue);
-
-        const selectedL=document.getElementById('selectPartL');
-        const selectedOptionL = selectedL.options[selectedL.selectedIndex];
-        const selectLText = selectedOptionL.textContent;
-        $('#inputPartL').val(selectLText);
-
-        const selectedM=document.getElementById('selectPartM');
-        const selectedOptionM = selectedM.options[selectedM.selectedIndex];
-        const selectMText = selectedOptionM.textContent;
-        $('#inputPartM').val(selectMText);
-    });
+// 입력값 변경1
+function refreshPartL(){
+    showPartLCode=null;
+    showPartMCode=null;
+    initPart1();
 }
-
-// 초기화면1(검색)
-function searchPartCode(partL1, partM1, partS1){
-    let Lcode=partL1;
-    let Mcode=partM1;
-    let Scode=partS1;
-
-    $.ajax({
-        url:'/select/part',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectPartL').empty().append("<option value=''>전체보기</option>");
-            $('#selectPartM').empty().append('<option value="">전체보기</option>');
-            $('#selectPartS').empty().append('<option value="">전체보기</option>');
-
-            data.partLDTOs.forEach(function(partL) {
-                $('#selectPartL').append(
-                    $('<option></option>')
-                        .attr('value', partL.partLcode)
-                        .text(partL.lname)
-                        .prop('selected', partL.partLcode == data.l)
-                );
-            });
-            data.partMDTOs.forEach(function(partM) {
-                $('#selectPartM').append(
-                    $('<option></option>')
-                        .attr('value', partM.partMcode)
-                        .text(partM.mname)
-                        .prop('selected', partM.partMcode == data.m)
-                );
-            });
-            data.partSDTOs.forEach(function(partS) {
-                $('#selectPartS').append(
-                    $('<option></option>')
-                        .attr('value', partS.partScode)
-                        .text(partS.sname)
-                        .prop('selected', partS.partScode == data.s)
-                );
-            });
-        }
-    });
+function refreshPartM(){
+    showPartLCode=document.getElementById('selectPartL').value;
+    showPartMCode=null;
+    initPart1();
+}
+// 입력값 변경2
+function refreshPartL2(){
+    showPartLCode2=null;
+    showPartMCode2=null;
+    initPart2();
+}
+function refreshPartM2(){
+    showPartLCode2=document.getElementById('selectPartL2').value;
+    showPartMCode2=null;
+    initPart2();
 }

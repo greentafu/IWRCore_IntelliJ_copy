@@ -26,76 +26,51 @@
             <!-- Account -->
             <hr class="my-0"/>
             <div class="card-body">
-              <form th:action="@{/manager/save_member}" id="saveMemberForm" method="POST">
-                <div class="row">
-                  <div class="mb-3 col-md-6">
-                    <label class="form-label">성명</label>
-                    <input
-                            autofocus
-                            class="form-control"
-                            name="name"
-                            id="name"
-                            placeholder="실명 입력"
-                            type="text"
-                    />
-                  </div>
-                  <div class="mb-3 col-md-6">
-                    <label class="form-label">전화번호</label>
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              name="phonenumber"
-                              id="phonenumber"
-                              placeholder="000-0000-0000"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="mb-3 col-md-6">
-                    <label class="form-label">소속부서</label>
-                    <select class="select2 form-select" name="department">
-                      <option value="자재부서">자재부서</option>
-                      <option value="개발부서">개발부서</option>
-                      <option value="생산부서">생산부서</option>
-                    </select>
-                  </div>
-                  <div class="mb-3 col-md-6">
-                    <label class="form-label">접근권한</label>
-                    <select class="select2 form-select" name="role">
-                      <option value=0>관리자</option>
-                      <option value=1>자재사원</option>
-                      <option value=2>생산/개발사원</option>
-                    </select>
-                  </div>
-                  <div class="mb-3 col-md-6">
-                    <label class="form-label">아이디</label>
-                    <input
-                            class="form-control"
-                            name="id"
-                            id="id"
-                            placeholder="ert845dg"
-                            type="text"
-                    />
-                  </div>
-                  <div class="mb-3 col-md-6">
-                    <label class="form-label">비밀번호</label>
-                    <input
-                            class="form-control"
-                            name="pw"
-                            placeholder="awe#g32sdf*"
-                            type="text"
-                    />
-                  </div>
-                  <div id="idCheck" class="mb-2"></div>
+              <div class="row">
+                <div class="mb-3 col-md-6">
+                  <label class="form-label">성명</label>
+                  <input class="form-control" id="name" placeholder="실명 입력" type="text" autofocus/>
                 </div>
-                <!--뒤로가기,등록 버튼 세트-->
-                <div class="d-flex justify-content-between w-100">
-                  <a th:href="@{/manager/list_member}">
-                    <button class="btn btn-outline-secondary" type="button">취소</button>
-                  </a>
-                  <button type="button" class="btn btn-primary" onclick="saveMember()">등록</button>
+                <input class="form-control" type="text" style="display:none;" id="mno"/>
+                <div class="mb-3 col-md-6">
+                  <label class="form-label">전화번호</label>
+                  <div class="input-group input-group-merge">
+                    <input class="form-control" id="phonenumber" placeholder="000-0000-0000" type="text"/>
+                  </div>
                 </div>
-              </form>
+                <div class="mb-3 col-md-6">
+                  <label class="form-label">소속부서</label>
+                  <select class="select2 form-select" id="department">
+                    <option value="자재부서">자재부서</option>
+                    <option value="개발부서">개발부서</option>
+                    <option value="생산부서">생산부서</option>
+                  </select>
+                </div>
+                <div class="mb-3 col-md-6">
+                  <label class="form-label">접근권한</label>
+                  <select class="select2 form-select" id="role">
+                    <option value=0>관리자</option>
+                    <option value=1>자재사원</option>
+                    <option value=2>생산/개발사원</option>
+                  </select>
+                </div>
+                <div class="mb-3 col-md-6">
+                  <label class="form-label">아이디</label>
+                  <input class="form-control" id="id" placeholder="ert845dg" type="text"/>
+                </div>
+                <div class="mb-3 col-md-6">
+                  <label class="form-label">비밀번호</label>
+                  <input class="form-control" id="pw" placeholder="awe#g32sdf*" type="text"/>
+                </div>
+                <div id="idCheck" class="mb-2"></div>
+              </div>
+              <!--뒤로가기,등록 버튼 세트-->
+              <div class="d-flex justify-content-between w-100">
+                <a th:href="@{/manager/list_member}">
+                  <button class="btn btn-outline-secondary" type="button">취소</button>
+                </a>
+                <button type="button" class="btn btn-primary" onclick="setSaveMember()">등록</button>
+              </div>
             </div>
             <!-- /Account -->
           </div>
@@ -107,31 +82,8 @@
     <!--/Modal-->
 
     <!--Script-->
+    <script src="../assets/js/manager-crud.js"></script>
     <script>
-      let checkID=false;
-
-      function saveMember(){
-        var name=document.getElementById('name').value;
-        var phonenumber=document.getElementById('phonenumber').value;
-        if(checkID==true){
-          alert('존재하는 아이디입니다. 아이디를 변경해 주세요.');
-        }else if(name.trim()===''){
-          alert('이름을 입력해 주세요.');
-        }else if(phonenumber.trim()===''){
-          alert('핸드폰 번호를 입력해 주세요.');
-        }else if(phonenumber.trim()!=''){
-          const parts=phonenumber.split('-');
-          const size = parts.length;
-          if(size!=3 || parts[0].length!=3 || parts[1].length!=4 || parts[2].length!=4){
-            alert('핸드폰 번호를 지정된 형식으로 입력해 주세요.');
-          }else if(isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])){
-            alert('핸드폰 번호에 숫자만 입력해 주세요.');
-          }else{
-            document.getElementById('saveMemberForm').submit();
-          }
-        }
-      }
-
       document.getElementById('id').addEventListener("input", function(){
         let mno = null;
         let pno = null;

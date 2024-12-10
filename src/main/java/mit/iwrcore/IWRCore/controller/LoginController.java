@@ -168,16 +168,17 @@ public class LoginController {
         model.addAttribute("newRequest", requestService.mainRequestCount());
 
         model.addAttribute("baljuProductList", baljuService.baljuProduct());
+        model.addAttribute("requestProductList", productService.getRequestProduct());
 
         model.addAttribute("shipment_list", shipmentService.mainShipment(requestDTO));
     }
     @GetMapping("/category")
     public void category(Model model){
-        PartCodeListDTO lists=partCodeService.findListPartAll(null, null,null);
+        PartCodeListDTO lists=partCodeService.findListPartAll(null, null,null, 0L);
         model.addAttribute("partCodeList", lists);
-        MaterCodeListDTO lists2=materService.findListMaterAll(null, null, null);
+        MaterCodeListDTO lists2=materService.findListMaterAll(null, null, null, 0L);
         model.addAttribute("materCodeList", lists2);
-        ProCodeListDTO list3=proCodeService.findListProAll(null, null, null);
+        ProCodeListDTO list3=proCodeService.findListProAll(null, null, null, 0L);
         model.addAttribute("proCodeList", list3);
     }
 

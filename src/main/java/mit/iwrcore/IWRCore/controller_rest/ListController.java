@@ -10,6 +10,8 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.*;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +42,16 @@ public class ListController {
     private ReturnsService returnsService;
     @Autowired
     private PreRequestService preRequestService;
+    @Autowired
+    private PartCodeService partCodeService;
+    @Autowired
+    private ProCodeService proCodeService;
+    @Autowired
+    private MaterService materService;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private PartnerService partnerService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -446,5 +458,59 @@ public class ListController {
                 .releaseStatus(releaseStatus)
                 .build();
         return preRequestService.requestPage(requestDTO);
+    }
+
+
+
+    // 카테고리 관리> 협력회사 카테고리 목록
+    @GetMapping("/getPagePart")
+    public PageResultDTO<CategoryPartDTO, Object[]> getPagePart(
+            @RequestParam(required = false) int page, @RequestParam(required = false) Long code){
+        Pageable pageable= PageRequest.of(page-1, 12);
+        return partCodeService.getPagePart(pageable, code);
+    }
+    // 카테고리 관리> 제품 카테고리 목록
+    @GetMapping("/getPagePro")
+    public PageResultDTO<CategoryProDTO, Object[]> getPagePro(
+            @RequestParam(required = false) int page, @RequestParam(required = false) Long code){
+        Pageable pageable= PageRequest.of(page-1, 12);
+        return proCodeService.getPagePro(pageable, code);
+    }
+    // 카테고리 관리> 자재 카테고리 목록
+    @GetMapping("/getPageMater")
+    public PageResultDTO<CategoryMaterDTO, Object[]> getPageMater(
+            @RequestParam(required = false) int page, @RequestParam(required = false) Long code){
+        Pageable pageable= PageRequest.of(page-1, 12);
+        return materService.getPageMater(pageable, code);
+    }
+
+    // 관리자> 직원목록
+    @GetMapping("/getMemberPage")
+    public PageResultDTO<MemberDTO, Member> getMemberPage(
+            @RequestParam(required = false) int page, @RequestParam(required = false) String department,
+            @RequestParam(required = false) String role, @RequestParam(required = false) String memberSearch){
+        if (department != null && department.trim().isEmpty()) { department = null; }
+        if (role != null && role.trim().isEmpty()) { role = null; }
+        if (memberSearch != null && memberSearch.trim().isEmpty()) { memberSearch = null; }
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .department(department).role(role).memberSearch(memberSearch)
+                .build();
+        return memberService.findMemberList(requestDTO);
+    }
+    // 관리자> 회사목록
+    @GetMapping("/getPartnerPage")
+    public PageResultDTO<PartnerDTO, Partner> getPartnerPage(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) Long selectPartL, @RequestParam(required = false) Long selectPartM,
+            @RequestParam(required = false) Long selectPartS, @RequestParam(required = false) String partnerSearch){
+        if (partnerSearch != null && partnerSearch.trim().isEmpty()) { partnerSearch = null; }
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .partL(selectPartL).partM(selectPartM).partS(selectPartS).partnerSearch(partnerSearch)
+                .build();
+        return partnerService.findPartnerList(requestDTO);
     }
 }

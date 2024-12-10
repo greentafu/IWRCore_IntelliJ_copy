@@ -10,6 +10,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -70,6 +71,21 @@ public class MaterialServiceImpl implements MaterialService {
     public MaterialDTO getMaterial(Long materCode) {
         Material material=materialRepository.findById(materCode).get();
         return entityToDto(material);
+    }
+    @Override
+    public List<MaterialDTO> getMaterialByCategory(Long type, Long code){
+        List<MaterialDTO> dtoList=new ArrayList<>();
+        if(type==0){
+            List<Material> entityList=materialRepository.getMaterialByCategoryL(code);
+            if(entityList.size()!=0) entityList.forEach(x->dtoList.add(entityToDto(x)));
+        }else if(type==1){
+            List<Material> entityList=materialRepository.getMaterialByCategoryM(code);
+            if(entityList.size()!=0) entityList.forEach(x->dtoList.add(entityToDto(x)));
+        }else if(type==2){
+            List<Material> entityList=materialRepository.getMaterialByCategoryS(code);
+            if(entityList.size()!=0) entityList.forEach(x->dtoList.add(entityToDto(x)));
+        }
+        return dtoList;
     }
 
 

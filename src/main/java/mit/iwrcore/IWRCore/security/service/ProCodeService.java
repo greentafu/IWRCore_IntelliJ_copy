@@ -7,6 +7,10 @@ import mit.iwrcore.IWRCore.entity.ProS;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProLDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CategoryPartDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CategoryProDTO;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -30,12 +34,12 @@ public interface ProCodeService {
     ProSDTO findProS(Long scode);
 
     // 회사 분류 리스트 가져오기
-    List<ProLDTO> findListProL();
-    List<ProMDTO> findListProM(ProLDTO proLDTO, ProMDTO proMDTO, ProSDTO proSDTO);
-    List<ProSDTO> findListProS(ProLDTO proLDTO, ProMDTO proMDTO, ProSDTO proSDTO);
-    ProCodeListDTO findListProAll(ProLDTO proLDTO, ProMDTO proMDTO, ProSDTO proSDTO);
+    List<ProLDTO> findListProL(Long code);
+    List<ProMDTO> findListProM(ProLDTO proLDTO, ProMDTO proMDTO, ProSDTO proSDTO, Long code);
+    List<ProSDTO> findListProS(ProLDTO proLDTO, ProMDTO proMDTO, ProSDTO proSDTO, Long code);
+    ProCodeListDTO findListProAll(ProLDTO proLDTO, ProMDTO proMDTO, ProSDTO proSDTO, Long code);
 
-
+    PageResultDTO<CategoryProDTO, Object[]> getPagePro(Pageable pageable, Long code);
 
 
 

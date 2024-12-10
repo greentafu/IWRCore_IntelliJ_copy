@@ -37,15 +37,8 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public PageResultDTO<MemberDTO, Member> findMemberList(PageRequestDTO requestDTO) {
         Page<Member> entityList=memberRepository.findMemberByCustomQuery(requestDTO);
-
         Function<Member, MemberDTO> fn = (entity -> memberTodto(entity));
-        PageResultDTO<MemberDTO, Member> resultDTO = new PageResultDTO<>(entityList, fn);
-
-        resultDTO.setDepartment(requestDTO.getDepartment());
-        resultDTO.setRole(requestDTO.getRole());
-        resultDTO.setMemberSearch(requestDTO.getMemberSearch());
-
-        return resultDTO;
+        return new PageResultDTO<>(entityList, fn);
     }
     // 직원 삽입(아이디 중복의 경우 0, 성공시 1)
     @Override

@@ -5,6 +5,10 @@ import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterLDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterSDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CategoryMaterDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CategoryProDTO;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -25,10 +29,13 @@ public interface MaterService {
     MaterMDTO findMaterM(Long mcode);
     MaterSDTO findMaterS(Long scode);
     // 회사 분류 리스트 가져오기
-    List<MaterLDTO> findListMaterL();
-    List<MaterMDTO> findListMaterM(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO);
-    List<MaterSDTO> findListMaterS(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO);
-    MaterCodeListDTO findListMaterAll(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO);
+    List<MaterLDTO> findListMaterL(Long type);
+    List<MaterMDTO> findListMaterM(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO, Long type);
+    List<MaterSDTO> findListMaterS(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO, Long type);
+    MaterCodeListDTO findListMaterAll(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO, Long type);
+
+
+    PageResultDTO<CategoryMaterDTO, Object[]> getPageMater(Pageable pageable, Long code);
 
 
     // dto를 entity로

@@ -2,7 +2,6 @@ package mit.iwrcore.IWRCore.security.service;
 
 import mit.iwrcore.IWRCore.entity.FileMaterial;
 import mit.iwrcore.IWRCore.entity.Material;
-
 import mit.iwrcore.IWRCore.security.dto.MaterialDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
@@ -20,6 +19,7 @@ public interface MaterialService {
 
     // 조회
     MaterialDTO getMaterial(Long matercode);
+    List<MaterialDTO> getMaterialByCategory(Long type, Long code);
 
 
     // 자재관리> 모든 자재 목록

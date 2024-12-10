@@ -1,16 +1,31 @@
-$(document).ready(function(){
-    let Lcode = $('#selectMaterL').val();
-    let Mcode = $('#selectMaterM').val();
-    let Scode = $('#selectMaterS').val();
+// 변수
+let showMaterLCode=null;
+let showMaterMCode=null;
+let showMaterSCode=null;
+let showMaterLCode2=null;
+let showMaterMCode2=null;
+let showMaterSCode2=null;
 
-    Lcode=(Lcode==="")?null:Lcode;
-    Mcode=(Mcode==="")?null:Mcode;
-    Scode=(Scode==="")?null:Scode;
+let showMaterRange=0;
 
-    if(Lcode===null && Mcode===null && Scode===null) initMater1();
-    else searchMaterCode(Lcode, Mcode, Scode);
+document.addEventListener("DOMContentLoaded", function () {
+    const noNoName=document.getElementById('noName'); // 미정 안보기
+    if(noNoName) showMaterRange=1;
+    const yesCompany=document.getElementById('yesCompany');
+    if(yesCompany) showMaterRange=2;
 
+    initMater1();
     initMater2();
+
+    const inputMaterL=document.getElementById('inputMaterL');
+    const inputMaterM=document.getElementById('inputMaterM');
+    if(inputMaterL) inputMaterL.addEventListener('input', () => refreshMaterL());
+    if(inputMaterM) inputMaterM.addEventListener('input', () => refreshMaterM());
+
+    const inputMaterL2=document.getElementById('inputMaterL2');
+    const inputMaterM2=document.getElementById('inputMaterM2');
+    if(inputMaterL2) inputMaterL2.addEventListener('input', () => refreshMaterL2());
+    if(inputMaterM2) inputMaterM2.addEventListener('input', () => refreshMaterM2());
 });
 
 // 초기값1
@@ -18,37 +33,67 @@ function initMater1(){
     $.ajax({
         url:'/select/getMater',
         method:'GET',
+        data:{ lcode:showMaterLCode, mcode:showMaterMCode, scode:showMaterSCode, type:showMaterRange },
         success:function(data){
-            $('#selectMaterL').empty().append("<option value=''>전체보기</option>");
-            $('#selectMaterM').empty().append('<option value="">전체보기</option>');
-            $('#selectMaterS').empty().append('<option value="">전체보기</option>');
+            const selectMaterL = document.getElementById('selectMaterL');
+            const selectMaterM = document.getElementById('selectMaterM');
+            const selectMaterS = document.getElementById('selectMaterS');
 
-            data.materLDTOs.forEach(function(materL) {
-                $('#selectMaterL').append(
-                    $('<option></option>')
-                        .attr('value', materL.materLcode)
-                        .text(materL.lname)
-                        .prop('selected', materL.materLcode == data.l)
-                );
-            });
-            data.materMDTOs.forEach(function(materM) {
-                $('#selectMaterM').append(
-                    $('<option></option>')
-                        .attr('value', materM.materMcode)
-                        .text(materM.mname)
-                        .prop('selected', materM.materMcode == data.m)
-                );
-            });
-            data.materSDTOs.forEach(function(materS) {
-                $('#selectMaterS').append(
-                    $('<option></option>')
-                        .attr('value', materS.materScode)
-                        .text(materS.sname)
-                        .prop('selected', materS.materScode == data.s)
-                );
-            });
-            const tf=document.getElementById('inputMaterL');
-            if(tf) addSelectChangeListenersM();
+            const inputMaterL=document.getElementById('inputMaterL');
+            const inputMaterM=document.getElementById('inputMaterM');
+            const inputMaterS=document.getElementById('inputMaterS');
+
+            if(selectMaterL){
+                selectMaterL.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectMaterL.appendChild(allTd);
+                data.materLDTOs.forEach(function(materL) {
+                    const option = document.createElement('option');
+                    option.value = materL.materLcode;
+                    option.textContent = materL.lname;
+                    selectMaterL.appendChild(option);
+                    if (materL.materLcode == data.l) {
+                        option.selected = true;
+                        if(inputMaterL) inputMaterL.value = materL.lname;
+                    }
+                });
+            }
+            if(selectMaterM){
+                selectMaterM.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectMaterM.appendChild(allTd);
+                data.materMDTOs.forEach(function(materM) {
+                    const option = document.createElement('option');
+                    option.value = materM.materMcode;
+                    option.textContent = materM.mname;
+                    selectMaterM.appendChild(option);
+                    if (materM.materMcode == data.m) {
+                        option.selected = true;
+                        if(inputMaterM) inputMaterM.value = materM.mname;
+                    }
+                });
+            }
+            if(selectMaterS){
+                selectMaterS.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectMaterS.appendChild(allTd);
+                data.materSDTOs.forEach(function(materS) {
+                    const option = document.createElement('option');
+                    option.value = materS.materScode;
+                    option.textContent = materS.sname;
+                    selectMaterS.appendChild(option);
+                    if (materS.materScode == data.s) {
+                        option.selected = true;
+                        if(inputMaterS) inputMaterS.value = materS.sname;
+                    }
+                });
+            }
         }
     });
 }
@@ -57,223 +102,145 @@ function initMater2(){
     $.ajax({
         url:'/select/getMater',
         method:'GET',
+        data:{lcode:showMaterLCode2, mcode:showMaterMCode2, scode:showMaterSCode2, type:showMaterRange},
         success:function(data){
-            $('#selectMaterL2').empty().append("<option value=''>전체보기</option>");
-            $('#selectMaterM2').empty().append('<option value="">전체보기</option>');
-            $('#selectMaterS2').empty().append('<option value="">전체보기</option>');
+            const selectMaterL = document.getElementById('selectMaterL2');
+            const selectMaterM = document.getElementById('selectMaterM2');
+            const selectMaterS = document.getElementById('selectMaterS2');
 
-            data.materLDTOs.forEach(function(materL) {
-                $('#selectMaterL2').append(
-                    $('<option></option>')
-                        .attr('value', materL.materLcode)
-                        .text(materL.lname)
-                        .prop('selected', materL.materLcode == data.l)
-                );
-            });
-            data.materMDTOs.forEach(function(materM) {
-                $('#selectMaterM2').append(
-                    $('<option></option>')
-                        .attr('value', materM.materMcode)
-                        .text(materM.mname)
-                        .prop('selected', materM.materMcode == data.m)
-                );
-            });
-            data.materSDTOs.forEach(function(materS) {
-                $('#selectMaterS2').append(
-                    $('<option></option>')
-                        .attr('value', materS.materScode)
-                        .text(materS.sname)
-                        .prop('selected', materS.materScode == data.s)
-                );
-            });
+            const inputMaterL=document.getElementById('inputMaterL2');
+            const inputMaterM=document.getElementById('inputMaterM2');
+            const inputMaterS=document.getElementById('inputMaterS2');
+
+            if(selectMaterL){
+                selectMaterL.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectMaterL.appendChild(allTd);
+                data.materLDTOs.forEach(function(materL) {
+                    const option = document.createElement('option');
+                    option.value = materL.materLcode;
+                    option.textContent = materL.lname;
+                    selectMaterL.appendChild(option);
+                    if (materL.materLcode == data.l) {
+                        option.selected = true;
+                        if(inputMaterL) inputMaterL.value = materL.lname;
+                    }
+                });
+            }
+            if(selectMaterM){
+                selectMaterM.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectMaterM.appendChild(allTd);
+                data.materMDTOs.forEach(function(materM) {
+                    const option = document.createElement('option');
+                    option.value = materM.materMcode;
+                    option.textContent = materM.mname;
+                    selectMaterM.appendChild(option);
+                    if (materM.materMcode == data.m) {
+                        option.selected = true;
+                        if(inputMaterM) inputMaterM.value = materM.mname;
+                    }
+                });
+            }
+            if(selectMaterS){
+                selectMaterS.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectMaterS.appendChild(allTd);
+                data.materSDTOs.forEach(function(materS) {
+                    const option = document.createElement('option');
+                    option.value = materS.materScode;
+                    option.textContent = materS.sname;
+                    selectMaterS.appendChild(option);
+                    if (materS.materScode == data.s) {
+                        option.selected = true;
+                        if(inputMaterS) inputMaterS.value = materS.sname;
+                    }
+                });
+            }
         }
     });
 }
 
 // 선택1
 function updateMaterCode(changedSelect){
-    let Lcode=$('#selectMaterL').val();
-    let Mcode=$('#selectMaterM').val();
-    let Scode=$('#selectMaterS').val();
+    const selectMaterL = document.getElementById('selectMaterL');
+    const selectMaterM = document.getElementById('selectMaterM');
+    const selectMaterS = document.getElementById('selectMaterS');
 
-    if (changedSelect === 'L') {
-        Mcode=null;
-        Scode=null;
-    } else if (changedSelect === 'M') {
-        Scode=null;
+    if(selectMaterL) {
+        const tempL=selectMaterL.value;
+        if(tempL==='') showMaterLCode=null;
+        else showMaterLCode=tempL;
+    }
+    if(selectMaterM) {
+        const tempM=selectMaterM.value;
+        if(tempM==='') showMaterMCode=null;
+        else showMaterMCode=tempM;
+    }
+    if(selectMaterS) {
+        const tempS=selectMaterS.value;
+        if(tempS==='') showMaterSCode=null;
+        else showMaterSCode=tempS;
     }
 
-    $.ajax({
-        url:'/select/mater',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectMaterL').empty().append("<option value=''>전체보기</option>");
-            $('#selectMaterM').empty().append('<option value="">전체보기</option>');
-            $('#selectMaterS').empty().append('<option value="">전체보기</option>');
+    if (changedSelect === 'L') { showMaterMCode=null; showMaterSCode=null; }
+    else if (changedSelect === 'M') { showMaterSCode=null; }
 
-            data.materLDTOs.forEach(function(materL) {
-                $('#selectMaterL').append(
-                    $('<option></option>')
-                        .attr('value', materL.materLcode)
-                        .text(materL.lname)
-                        .prop('selected', materL.materLcode == data.l)
-                );
-            });
-            data.materMDTOs.forEach(function(materM) {
-                $('#selectMaterM').append(
-                    $('<option></option>')
-                        .attr('value', materM.materMcode)
-                        .text(materM.mname)
-                        .prop('selected', materM.materMcode == data.m)
-                );
-            });
-            data.materSDTOs.forEach(function(materS) {
-                $('#selectMaterS').append(
-                    $('<option></option>')
-                        .attr('value', materS.materScode)
-                        .text(materS.sname)
-                        .prop('selected', materS.materScode == data.s)
-                );
-            });
-            const tf=document.getElementById('inputMaterL');
-            if(tf) addSelectChangeListenersM();
-        }
-    });
+    initMater1();
 }
 // 선택2
 function updateMaterCode2(changedSelect){
-    let Lcode=$('#selectMaterL2').val();
-    let Mcode=$('#selectMaterM2').val();
-    let Scode=$('#selectMaterS2').val();
+    const selectMaterL = document.getElementById('selectMaterL2');
+    const selectMaterM = document.getElementById('selectMaterM2');
+    const selectMaterS = document.getElementById('selectMaterS2');
 
-    if (changedSelect === 'L') {
-        Mcode=null;
-        Scode=null;
-    } else if (changedSelect === 'M') {
-        Scode=null;
+    if(selectMaterL) {
+        const tempL=selectMaterL2.value;
+        if(tempL==='') showMaterLCode2=null;
+        else showMaterLCode2=tempL;
+    }
+    if(selectMaterM) {
+        const tempM=selectMaterM.value;
+        if(tempM==='') showMaterMCode2=null;
+        else showMaterMCode2=tempM;
+    }
+    if(selectMaterS) {
+        const tempS=selectMaterS.value;
+        if(tempS==='') showMaterSCode2=null;
+        else showMaterSCode2=tempS;
     }
 
-    $.ajax({
-        url:'/select/mater',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectMaterL2').empty().append("<option value=''>전체보기</option>");
-            $('#selectMaterM2').empty().append('<option value="">전체보기</option>');
-            $('#selectMaterS2').empty().append('<option value="">전체보기</option>');
+    if (changedSelect === 'L') { showMaterMCode2=null; showMaterSCode2=null; }
+    else if (changedSelect === 'M') { showMaterSCode2=null; }
 
-            data.materLDTOs.forEach(function(materL) {
-                $('#selectMaterL2').append(
-                    $('<option></option>')
-                        .attr('value', materL.materLcode)
-                        .text(materL.lname)
-                        .prop('selected', materL.materLcode == data.l)
-                );
-            });
-            data.materMDTOs.forEach(function(materM) {
-                $('#selectMaterM2').append(
-                    $('<option></option>')
-                        .attr('value', materM.materMcode)
-                        .text(materM.mname)
-                        .prop('selected', materM.materMcode == data.m)
-                );
-            });
-            data.materSDTOs.forEach(function(materS) {
-                $('#selectMaterS2').append(
-                    $('<option></option>')
-                        .attr('value', materS.materScode)
-                        .text(materS.sname)
-                        .prop('selected', materS.materScode == data.s)
-                );
-            });
-        }
-    });
+    initMater2();
 }
 
-// input
-function addSelectChangeListenersM() {
-    $('#selectMaterL').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputMaterL').val(selectedValue);
-
-        const selectMValue = '';
-        $('#inputMaterM').val(selectMValue);
-        const selectSValue = '';
-        $('#inputMaterS').val(selectSValue);
-    });
-
-    $('#selectMaterM').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputMaterM').val(selectedValue);
-
-        const selectedL=document.getElementById('selectMaterL');
-        const selectedOptionL = selectedL.options[selectedL.selectedIndex];
-        const selectLText = selectedOptionL.textContent;
-        console.log("selectL:", selectLText);
-        $('#inputMaterL').val(selectLText);
-
-        const selectSValue = '';
-        $('#inputMaterS').val(selectSValue);
-    });
-
-    $('#selectMaterS').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputMaterS').val(selectedValue);
-
-        const selectedL=document.getElementById('selectMaterL');
-        const selectedOptionL = selectedL.options[selectedL.selectedIndex];
-        const selectLText = selectedOptionL.textContent;
-        $('#inputMaterL').val(selectLText);
-
-        const selectedM=document.getElementById('selectMaterM');
-        const selectedOptionM = selectedM.options[selectedM.selectedIndex];
-        const selectMText = selectedOptionM.textContent;
-        $('#inputMaterM').val(selectMText);
-    });
+// 입력값 변경1
+function refreshMaterL(){
+    showMaterLCode=null;
+    showMaterMCode=null;
+    initMater1();
 }
-// 초기화면1(검색)
-function searchMaterCode(materL1, materM1, materS1){
-    let Lcode=materL1;
-    let Mcode=materM1;
-    let Scode=materS1;
-
-    $.ajax({
-        url:'/select/mater',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectMaterL').empty().append("<option value=''>전체보기</option>");
-            $('#selectMaterM').empty().append('<option value="">전체보기</option>');
-            $('#selectMaterS').empty().append('<option value="">전체보기</option>');
-
-            data.materLDTOs.forEach(function(materL) {
-                $('#selectMaterL').append(
-                    $('<option></option>')
-                        .attr('value', materL.materLcode)
-                        .text(materL.lname)
-                        .prop('selected', materL.materLcode == data.l)
-                );
-            });
-            data.materMDTOs.forEach(function(materM) {
-                $('#selectMaterM').append(
-                    $('<option></option>')
-                        .attr('value', materM.materMcode)
-                        .text(materM.mname)
-                        .prop('selected', materM.materMcode == data.m)
-                );
-            });
-            data.materSDTOs.forEach(function(materS) {
-                $('#selectMaterS').append(
-                    $('<option></option>')
-                        .attr('value', materS.materScode)
-                        .text(materS.sname)
-                        .prop('selected', materS.materScode == data.s)
-                );
-            });
-        }
-    });
+function refreshMaterM(){
+    showMaterLCode=document.getElementById('selectMaterL').value;
+    showMaterMCode=null;
+    initMater1();
+}
+// 입력값 변경2
+function refreshMaterL2(){
+    showMaterLCode2=null;
+    showMaterMCode2=null;
+    initMater2();
+}
+function refreshMaterM2(){
+    showMaterLCode2=document.getElementById('selectMaterL2').value;
+    showMaterMCode2=null;
+    initMater2();
 }

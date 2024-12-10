@@ -1,7 +1,6 @@
 package mit.iwrcore.IWRCore.repository;
 
 import mit.iwrcore.IWRCore.entity.JodalPlan;
-import mit.iwrcore.IWRCore.entity.Structure;
 import mit.iwrcore.IWRCore.repositoryDSL.JodalPlanRepositoryCustom;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -18,9 +18,8 @@
   </span>
 
   <span id="content">
-    <div style="display:none;" id="yesCompany"></div>
     <div class="container-xxl flex-grow-1 container-p-y">
-      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">협력회사 계정 /</span> 협력회사 정보 수정</h4>
+      <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">협력회사 계정 /</span> 협력회사 정보</h4>
       <div class="col-md-12">
         <div class="card mb-4">
           <!-- Account -->
@@ -33,55 +32,55 @@
             <div class="row">
               <div class="mb-3 col-md-6">
                 <label class="form-label">상호</label>
-                <input class="form-control" type="text" id="name" placeholder="협력업체 상호 입력" th:value="${partner.name}"/>
+                <input class="form-control" type="text" id="name" placeholder="협력업체 상호 입력" th:value="${partner.name}" readonly/>
               </div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">사업자 등록번호</label>
                 <div class="input-group input-group-merge">
-                  <input type="text" id="registerNum" class="form-control" placeholder="000-00-00000" th:value="${partner.registrationNumber}"/>
+                  <input type="text" id="registerNum" class="form-control" placeholder="000-00-00000" th:value="${partner.registrationNumber}" readonly/>
                 </div>
               </div>
               <div id="regCheck" class="mb-2 text-end"></div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">대표</label>
                 <div class="input-group input-group-merge">
-                  <input type="text" id="ceo" class="form-control" placeholder="홍길동" th:value="${partner.ceo}"/>
+                  <input type="text" id="ceo" class="form-control" placeholder="홍길동" th:value="${partner.ceo}" readonly/>
                 </div>
               </div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">사업장 소재지</label>
                 <div class="input-group input-group-merge">
-                  <input type="text" id="location" class="form-control" placeholder="협력업체 사업장 소재지" th:value="${partner.location}"/>
+                  <input type="text" id="location" class="form-control" placeholder="협력업체 사업장 소재지" th:value="${partner.location}" readonly/>
                 </div>
               </div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">업태</label>
                 <div class="input-group input-group-merge">
-                  <input type="text" id="type" class="form-control" placeholder="제조업" th:value="${partner.type}"/>
+                  <input type="text" id="type" class="form-control" placeholder="제조업" th:value="${partner.type}" readonly/>
                 </div>
               </div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">종목</label>
                 <div class="input-group input-group-merge">
-                  <input type="text" id="sector" class="form-control" placeholder="금속사출부품" th:value="${partner.sector}"/>
+                  <input type="text" id="sector" class="form-control" placeholder="금속사출부품" th:value="${partner.sector}" readonly/>
                 </div>
               </div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">전화번호</label>
                 <div class="input-group input-group-merge">
-                  <input type="text" id="phonenumber" class="form-control" placeholder="000-000-0000" th:value="${partner.telNumber}"/>
+                  <input type="text" id="phonenumber" class="form-control" placeholder="000-000-0000" th:value="${partner.telNumber}" readonly/>
                 </div>
               </div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">팩스번호</label>
                 <div class="input-group input-group-merge">
-                  <input type="text" id="faxnumber" class="form-control" placeholder="000-000-0000" th:value="${partner.faxNumber}"/>
+                  <input type="text" id="faxnumber" class="form-control" placeholder="000-000-0000" th:value="${partner.faxNumber}" readonly/>
                 </div>
               </div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">메일주소</label>
                 <div class="input-group input-group-merge">
-                  <input type="text" id="email" class="form-control" placeholder="aaa1111@mail.com" th:value="${partner.email}"/>
+                  <input type="text" id="email" class="form-control" placeholder="aaa1111@mail.com" th:value="${partner.email}" readonly/>
                 </div>
               </div>
             </div>
@@ -94,19 +93,19 @@
               <div class="mb-3 col-md-4">
                 <label class="form-label">대분류</label>
                 <div class="input-group input-group-merge">
-                  <select class="select2 form-select" id="selectPartL" onchange="updatePartCode('L')"></select>
+                  <select class="select2 form-select" id="selectPartL" onchange="updatePartCode('L')" disabled></select>
                 </div>
               </div>
               <div class="mb-3 col-md-4">
                 <label class="form-label">중분류</label>
                 <div class="input-group input-group-merge">
-                  <select class="select2 form-select" id="selectPartM" onchange="updatePartCode('M')"></select>
+                  <select class="select2 form-select" id="selectPartM" onchange="updatePartCode('M')" disabled></select>
                 </div>
               </div>
               <div class="mb-3 col-md-4">
                 <label class="form-label">소분류</label>
                 <div class="input-group input-group-merge">
-                  <select class="select2 form-select" id="selectPartS" onchange="updatePartCode('S')">
+                  <select class="select2 form-select" id="selectPartS" onchange="updatePartCode('S')" disabled>
                     <option th:value="${partner.partSDTO.partScode}" selected></option>
                   </select>
                 </div>
@@ -119,15 +118,15 @@
             <div class="row">
               <div class="mb-3 col-md-4">
                 <label class="form-label">담당자 이름</label>
-                <input type="text" class="form-control" id="cname" placeholder="박담당" th:value="${partner.contacter}"/>
+                <input type="text" class="form-control" id="cname" placeholder="박담당" th:value="${partner.contacter}" readonly/>
               </div>
               <div class="mb-3 col-md-4">
                 <label class="form-label">담당자 전화번호</label>
-                <input type="text" class="form-control" id="cnumber" placeholder="000-0000-0000" th:value="${partner.contacterNumber}"/>
+                <input type="text" class="form-control" id="cnumber" placeholder="000-0000-0000" th:value="${partner.contacterNumber}" readonly/>
               </div>
               <div class="mb-3 col-md-4">
                 <label class="form-label">담당자 이메일</label>
-                <input type="text" class="form-control" id="cmail" placeholder="ljj@mail.com" th:value="${partner.contacterEmail}"/>
+                <input type="text" class="form-control" id="cmail" placeholder="ljj@mail.com" th:value="${partner.contacterEmail}" readonly/>
               </div>
             </div>
           </div>
@@ -137,11 +136,11 @@
             <div class="row">
               <div class="mb-3 col-md-6">
                 <label class="form-label">아이디</label>
-                <input type="text" class="form-control" id="id" placeholder="efs1234" th:value="${partner.id}"/>
+                <input type="text" class="form-control" id="id" placeholder="efs1234" th:value="${partner.id}" readonly/>
               </div>
               <div class="mb-3 col-md-6">
                 <label class="form-label">비밀번호</label>
-                <input type="text" class="form-control" id="pw" placeholder="qe@df243z" th:value="${partner.pw}"/>
+                <input type="text" class="form-control" id="pw" placeholder="qe@df243z" th:value="${partner.pw}" readonly/>
               </div>
             </div>
             <div id="idCheck" class="mb-2"></div>
@@ -149,13 +148,10 @@
             <div class="d-flex justify-content-between w-100">
               <div>
                 <a href="/manager/list_partner">
-                  <button type="button" class="btn btn-outline-secondary">취소</button>
+                  <button type="button" class="btn btn-outline-secondary">뒤로가기</button>
                 </a>
               </div>
-              <div class="mt-2">
-                <button type="button" class="btn btn-primary" onclick="setSavePartner()">수정</button>
-                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" onclick="setDeletePartner()">삭제</button>
-              </div>
+              <div></div>
               <!--/-->
             </div>
             <!-- /Account -->
@@ -193,13 +189,6 @@
         const scode=document.getElementById('scode').value;
         showPartSCode=scode;
         initPart1();
-
-        const pno=document.getElementById('pno').value;
-        if(pno===1 || pno==='1'){
-          document.getElementById('selectPartL').disabled = true;
-          document.getElementById('selectPartM').disabled = true;
-          document.getElementById('selectPartS').disabled = true;
-        }
       });
 
       document.getElementById('id').addEventListener("input", function(){

@@ -12,692 +12,405 @@
 
   <span id="head">
     <title>분류 관리</title>
-      <!--Style-->
-
-      <!--/Style-->
+    <!--Style-->
+    <style>
+      #content1 {
+        height: 500px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content2 {
+        height: 500px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content3 {
+        height: 500px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
+    <!--/Style-->
   </span>
 
-    <span id="content">
+  <span id="content">
+    <div style="display:none;" id="noName"></div>
     <div class="container-xxl flex-grow-4 container-p-y">
-      <div class="row">
-        <!-- Order Statistics -->
+      <div class="row mb-4">
+        <!--협력회사-->
         <div class="col-md-6 order-0 mb-4" style="height: 750px;">
           <div class="card">
-            <div class="card-header d-flex align-items-center justify-content-between pb-0 mb-3">
-              <div class="card-title mb-0">
-                <h5 class="m-0 me-2">협력회사 카테고리 관리</h5>
+            <div class="card-header">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5 class="m-0 me-2">협력회사 카테고리 관리</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                  <input type="radio" class="form-check-input" name="showPart" id="showPartL" value="0">
+                  <label class="form-check-label"> 대분류 </label>
+                  <input type="radio" class="form-check-input" name="showPart" id="showPartM" value="1">
+                  <label class="form-check-label"> 중분류 </label>
+                  <input type="radio" class="form-check-input" name="showPart" id="showPartS" value="2" checked>
+                  <label class="form-check-label"> 소분류 </label>
+                </div>
               </div>
             </div>
             <hr class="m-0">
-            <div class="card shadow-none" style="height: 750px">
-              <div class="card-body mb-3" id="vertical-example" style="height: 550px;">
+            <div class="card-body mb-3" style="height: 500px;">
+              <div id="content1">
                 <table class="table table-hover text-center">
-                  <tbody id="tablePart">
-                    <tr th:each="partdto:${partCodeList.partSDTOs}">
-                      <td th:text="${partdto.partMDTO.partLDTO.Lname}"></td>
-                      <td th:text="${partdto.partMDTO.Mname}"></td>
-                      <td th:text="${partdto.Sname}"></td>
-                      <td>
-                        <button
-                                class="btn btn-outline-primary btn-sm"
-                                data-bs-target="#modalModifyCompany"
-                                data-bs-toggle="modal"
-                                data-scode="${partdto.partScode}"
-                                type="button"
-                        >
-                          수정
-                        </button>
-                        <button
-                                class="btn btn-outline-primary btn-sm"
-                                data-bs-target="#modalDelete"
-                                data-bs-toggle="modal"
-                                th:data-Lname="${partdto.partMDTO.partLDTO.Lname}"
-                                th:data-Mname="${partdto.partMDTO.Mname}"
-                                th:data-Sname="${partdto.Sname}"
-                                th:data-Scode="${partdto.partScode}"
-                                data-btn="Part"
-                                type="button"
-                                onclick="setDeleteCategory(this)"
-                        >
-                          삭제
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
+                  <tbody id="firstTbody"></tbody>
                 </table>
               </div>
-              <hr class="m-0">
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <select class="select2 form-select" id="selectPartL" onchange="updatePartCode('L')"></select>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              id="inputPartL"
-                              name="phoneNumber"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <select class="select2 form-select" id="selectPartM" onchange="updatePartCode('M')"></select>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              id="inputPartM"
-                              name="phoneNumber"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-10">
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              id="inputPartS"
-                              name="phoneNumber"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-1">
-                    <button class="btn btn-primary" style="width: 80px;" onclick="savePart(1)" type="button">추가</button>
-                  </div>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-1">
+                  <input class="form-control" id="inputPartL" type="text"/>
+                </div>
+                <div class="col-md-6 mb-1">
+                  <select class="select2 form-select" id="selectPartL" onchange="updatePartCode('L')"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-1">
+                  <input class="form-control" id="inputPartM"  type="text"/>
+                </div>
+                <div class="col-md-6 mb-1">
+                  <select class="select2 form-select" id="selectPartM" onchange="updatePartCode('M')"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <input class="form-control" id="inputPartS" type="text"/>
+                </div>
+                <div class="col-md-6 text-end">
+                  <button class="btn btn-primary" onclick="saveCategory('part')" type="button">추가</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-          <!--/ Order Statistics -->
-          <!-- Expense Overview -->
-        <div class="col-md-6 order-1 mb-4">
+        <!--/협력회사-->
+        <!--제품-->
+        <div class="col-md-6 order-0 mb-4" style="height: 750px;">
           <div class="card">
-            <div class="card-header d-flex align-items-center justify-content-between pb-0 mb-3">
-              <div class="card-title mb-0">
-                <h5 class="m-0 me-2">제품 카테고리 관리</h5>
+            <div class="card-header">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5 class="m-0 me-2">제품 카테고리 관리</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                  <input type="radio" class="form-check-input" name="showPro" id="showProL" value="0">
+                  <label class="form-check-label"> 대분류 </label>
+                  <input type="radio" class="form-check-input" name="showPro" id="showProM" value="1">
+                  <label class="form-check-label"> 중분류 </label>
+                  <input type="radio" class="form-check-input" name="showPro" id="showProS" value="2" checked>
+                  <label class="form-check-label"> 소분류 </label>
+                </div>
               </div>
             </div>
             <hr class="m-0">
-            <div class="card shadow-none" style="height: 750px">
-              <div class="card-body mb-3" id="vertical-example2" style="height: 550px;">
+            <div class="card-body mb-3" style="height: 500px;">
+              <div id="content2">
                 <table class="table table-hover text-center">
-                  <tbody id="tablePro">
-                    <tr th:each="prodto:${proCodeList.proSDTOs}">
-                      <td th:text="${prodto.proMDTO.proLDTO.Lname}"></td>
-                      <td th:text="${prodto.proMDTO.Mname}"></td>
-                      <td th:text="${prodto.Sname}"></td>
-                      <td>
-                        <button
-                                class="btn btn-outline-primary btn-sm"
-                                data-bs-target="#modalModifyProduct"
-                                data-bs-toggle="modal"
-                                type="button"
-                        >
-                          수정
-                        </button>
-                        <button
-                                class="btn btn-outline-primary btn-sm"
-                                data-bs-target="#modalDelete"
-                                data-bs-toggle="modal"
-                                th:data-Lname="${prodto.proMDTO.proLDTO.Lname}"
-                                th:data-Mname="${prodto.proMDTO.Mname}"
-                                th:data-Sname="${prodto.Sname}"
-                                th:data-Scode="${prodto.proScode}"
-                                data-btn="Pro"
-                                type="button"
-                                onclick="setDeleteCategory(this)"
-                        >
-                          삭제
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
+                  <tbody id="secondTbody"></tbody>
                 </table>
               </div>
-              <hr class="m-0">
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <select class="select2 form-select" id="selectProL" onchange="updateProCode('L')"></select>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              id="inputProL"
-                              name="phoneNumber"
-                              placeholder="대분류 직접입력"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <select class="select2 form-select" id="selectProM" onchange="updateProCode('M')"></select>
-                    </div>
-                          </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              id="inputProM"
-                              name="phoneNumber"
-                              placeholder="중분류 직접입력"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-10"><div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            id="inputProS"
-                            name="phoneNumber"
-                            placeholder="소분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                  </div>
-                  <div class="col-md-1">
-                    <button class="btn btn-primary" style="width: 80px;" onclick="savePart(2)" type="button">추가</button>
-                  </div>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-1">
+                  <input class="form-control" id="inputProL" type="text"/>
+                </div>
+                <div class="col-md-6 mb-1">
+                  <select class="select2 form-select" id="selectProL" onchange="updateProCode('L')"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-1">
+                  <input class="form-control" id="inputProM"  type="text"/>
+                </div>
+                <div class="col-md-6 mb-1">
+                  <select class="select2 form-select" id="selectProM" onchange="updateProCode('M')"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <input class="form-control" id="inputProS" type="text"/>
+                </div>
+                <div class="col-md-6 text-end">
+                  <button class="btn btn-primary" onclick="saveCategory('pro')" type="button">추가</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-          <!--/ Expense Overview -->
+        <!--/제품-->
       </div>
       <div class="row">
-        <!-- Transactions -->
-        <div class=" order-2 mb-4">
+        <!--자재-->
+        <div class="order-2 mb-4">
           <div class="card">
-            <div class="card-header d-flex align-items-center justify-content-between pb-0 mb-3">
-              <div class="card-title mb-0">
-                <h5 class="m-0 me-2">자재 카테고리 관리</h5>
+            <div class="card-header">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5 class="m-0 me-2">제품 카테고리 관리</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                  <input type="radio" class="form-check-input" name="showMater" id="showMaterL" value="0">
+                  <label class="form-check-label"> 대분류 </label>
+                  <input type="radio" class="form-check-input" name="showMater" id="showMaterM" value="1">
+                  <label class="form-check-label"> 중분류 </label>
+                  <input type="radio" class="form-check-input" name="showMater" id="showMaterS" value="2" checked>
+                  <label class="form-check-label"> 소분류 </label>
+                </div>
               </div>
             </div>
             <hr class="m-0">
-            <div class="card shadow-none" style="height: 750px">
-              <div class="card-body mb-3" id="vertical-example3" style="height: 550px;">
+            <div class="card-body mb-3" style="height: 500px;">
+              <div id="content3">
                 <table class="table table-hover text-center">
-                  <tbody id="tableMater">
-                    <tr th:each="materdto:${materCodeList.materSDTOs}">
-                      <td th:text="${materdto.materMDTO.materLDTO.lname}"></td>
-                      <td th:text="${materdto.materMDTO.Mname}"></td>
-                      <td th:text="${materdto.Sname}"></td>
-                      <td>
-                        <button
-                                class="btn btn-outline-primary btn-sm"
-                                data-bs-target="#modalModifyMaterial"
-                                data-bs-toggle="modal"
-                                type="button"
-                        >
-                          수정
-                        </button>
-                        <button
-                                class="btn btn-outline-primary btn-sm"
-                                data-bs-target="#modalDelete"
-                                data-bs-toggle="modal"
-                                th:data-Lname="${materdto.materMDTO.materLDTO.lname}"
-                                th:data-Mname="${materdto.materMDTO.Mname}"
-                                th:data-Sname="${materdto.Sname}"
-                                th:data-Scode="${materdto.materScode}"
-                                data-btn="Mater"
-                                type="button"
-                                onclick="setDeleteCategory(this)"
-                        >
-                          삭제
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
+                  <tbody id="thirdTbody"></tbody>
                 </table>
               </div>
-              <hr class="m-0">
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <select class="select2 form-select" id="selectMaterL" onchange="updateMaterCode('L')"></select>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              id="inputMaterL"
-                              placeholder="대분류 직접입력"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <select class="select2 form-select" id="selectMaterM" onchange="updateMaterCode('M')"></select>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mb-1">
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              id="inputMaterM"
-                              placeholder="중분류 직접입력"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-11">
-                    <div class="input-group input-group-merge">
-                      <input
-                              class="form-control"
-                              id="inputMaterS"
-                              placeholder="소분류 직접입력"
-                              type="text"
-                      />
-                    </div>
-                  </div>
-                  <div class="col-md-1">
-                    <button class="btn btn-primary" style="width: 80px;" onclick="savePart(3)" type="button">추가</button>
-                  </div>
+            </div>
+            <hr class="m-0">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-1">
+                  <input class="form-control" id="inputMaterL" type="text"/>
+                </div>
+                <div class="col-md-6 mb-1">
+                  <select class="select2 form-select" id="selectMaterL" onchange="updateMaterCode('L')"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-1">
+                  <input class="form-control" id="inputMaterM"  type="text"/>
+                </div>
+                <div class="col-md-6 mb-1">
+                  <select class="select2 form-select" id="selectMaterM" onchange="updateMaterCode('M')"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <input class="form-control" id="inputMaterS" type="text"/>
+                </div>
+                <div class="col-md-6 text-end">
+                  <button class="btn btn-primary" onclick="saveCategory('mater')" type="button">추가</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <!--/ Transactions -->
+        <!--/자재-->
       </div>
     </div>
 
-      <!--Modal-->
-      <!-- Modal(modifycompany) -->
-      <div aria-hidden="true" class="modal fade" id="modalModifyCompany" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
-              <h5 class="modal-title mb-4">협력회사 카테고리 수정</h5>
+    <!--Modal-->
+    <!--Modal1-->
+    <div class="modal fade" id="modalToggle" aria-labelledby="modalToggleLabel"
+         tabindex="-1" style="display: none" aria-hidden="true" >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalToggleLabel">삭제하시겠습니까?</h5>
+          </div>
+          <div class="modal-body" id="deleteText"></div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-target="#modalToggle" data-bs-dismiss="modal"
+                    id="deleteBtn" onclick="deleteCategory(this)">
+              삭제
+            </button>
+            <button class="btn btn-primary" data-bs-dismiss="modal">
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--/Modal1-->
+    <!--Modal2-->
+    <div class="modal fade" id="modalToggle2" aria-labelledby="modalToggleLabel"
+         tabindex="-1" style="display: none" aria-hidden="true" >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">협력회사 카테고리 수정</h5>
+          </div>
+          <div class="modal-body text-center">
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <select class="select2 form-select" id="selectPartL2" onchange="updatePartCode2('L')"></select>
+              </div>
+              <div class="col-md-4">
+                <select class="select2 form-select" id="selectPartM2" onchange="updatePartCode2('M')"></select>
+              </div>
+              <div class="col-md-4"></div>
             </div>
-            <hr class="m-0">
-            <div class="modal-body" style="height: 350px;">
-              <div class="row">
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">대분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select">
-                      <option value="">선택</option>
-                      <option selected value="Australia">기계부품</option>
-                      <option value="Bangladesh">전기부품</option>
-                      <option value="Belarus">화학제품</option>
-                      <option value="Belarus">직접입력</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">대분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="대분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">중분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select">
-                      <option value="">선택</option>
-                      <option selected value="Australia">프레임 및 관련 부품</option>
-                      <option value="Bangladesh">브레이크 시스템</option>
-                      <option value="Belarus">변속 시스템</option>
-                      <option value="Belarus">직접입력</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">중분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="중분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">소분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select">
-                      <option value="">선택</option>
-                      <option selected value="Australia">프레임</option>
-                      <option value="Bangladesh">핸들바 및 그립</option>
-                      <option value="Belarus">서스펜션 및 충격흡수기</option>
-                      <option value="Belarus">직접입력</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">소분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="소분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <input class="form-control" id="inputPartL2" type="text"/>
+              </div>
+              <div class="col-md-4">
+                <input class="form-control" id="inputPartM2" type="text"/>
+              </div>
+              <div class="col-md-4">
+                <input class="form-control" id="inputPartS2" type="text"/>
               </div>
             </div>
-            <div class="modal-footer">
-              <button class="btn btn-primary" data-bs-dismiss="modal" type="button">
-                수정
-              </button>
-              <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">
-                닫기
-              </button>
-            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-target="#modalToggle2" data-bs-dismiss="modal"
+                    id="modifyPart" onclick="modifyCategory(this)">
+              수정
+            </button>
+            <button class="btn btn-primary" data-bs-dismiss="modal">
+              취소
+            </button>
           </div>
         </div>
       </div>
-      <!--/ Modal(modifycompany)-->
-      <!-- Modal(modifyproduct) -->
-      <div aria-hidden="true" class="modal fade" id="modalModifyProduct" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
-              <h5 class="modal-title mb-4">제품 카테고리 수정</h5>
+    </div>
+    <!--/Modal2-->
+    <!--Modal3-->
+    <div class="modal fade" id="modalToggle3" aria-labelledby="modalToggleLabel"
+         tabindex="-1" style="display: none" aria-hidden="true" >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">제품 카테고리 수정</h5>
+          </div>
+          <div class="modal-body text-center">
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <select class="select2 form-select" id="selectProL2" onchange="updateProCode2('L')"></select>
+              </div>
+              <div class="col-md-4">
+                <select class="select2 form-select" id="selectProM2" onchange="updateProCode2('M')"></select>
+              </div>
+              <div class="col-md-4"></div>
             </div>
-            <hr class="m-0">
-            <div class="modal-body" style="height: 350px;">
-              <div class="row">
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">대분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select">
-                      <option value="">선택</option>
-                      <option selected value="Australia">자전거</option>
-                      <option value="Bangladesh">킥보드</option>
-                      <option value="Belarus">직접입력</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">대분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="대분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">중분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select">
-                      <option value="">선택</option>
-                      <option selected value="Australia">전기자전거</option>
-                      <option value="Bangladesh">일반자전거</option>
-                      <option value="Belarus">전기킥보드</option>
-                      <option value="Belarus">일반킥보드</option>
-                      <option value="Belarus">직접입력</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">중분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="중분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">소분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select">
-                      <option value="">선택</option>
-                      <option selected value="Australia">전기자전거</option>
-                      <option value="Bangladesh">도로자전거</option>
-                      <option value="Belarus">산악자전거</option>
-                      <option value="Belarus">전기킥보드</option>
-                      <option value="Belarus">성인용킥보드</option>
-                      <option value="Belarus">아동용킥보드</option>
-                      <option value="Belarus">직접입력</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">소분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="소분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <input class="form-control" id="inputProL2" type="text"/>
+              </div>
+              <div class="col-md-4">
+                <input class="form-control" id="inputProM2" type="text"/>
+              </div>
+              <div class="col-md-4">
+                <input class="form-control" id="inputProS2" type="text"/>
               </div>
             </div>
-            <div class="modal-footer">
-              <button class="btn btn-primary" data-bs-dismiss="modal" type="button">
-                수정
-              </button>
-              <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">
-                닫기
-              </button>
-            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-target="#modalToggle3" data-bs-dismiss="modal"
+                    id="modifyPro" onclick="modifyCategory(this)">
+              수정
+            </button>
+            <button class="btn btn-primary" data-bs-dismiss="modal">
+              취소
+            </button>
           </div>
         </div>
       </div>
-      <!--/ Modal(modifyproduct)-->
-      <!-- Modal(modifymaterial) -->
-      <div aria-hidden="true" class="modal fade" id="modalModifyMaterial" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
-              <h5 class="modal-title mb-4" id="modalScrollableTitle">자재 카테고리 수정</h5>
+    </div>
+    <!--/Modal3-->
+    <!--Modal4-->
+    <div class="modal fade" id="modalToggle4" aria-labelledby="modalToggleLabel"
+         tabindex="-1" style="display: none" aria-hidden="true" >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">자재 카테고리 수정</h5>
+          </div>
+          <div class="modal-body text-center">
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <select class="select2 form-select" id="selectMaterL2" onchange="updateMaterCode2('L')"></select>
+              </div>
+              <div class="col-md-4">
+                <select class="select2 form-select" id="selectMaterM2" onchange="updateMaterCode2('M')"></select>
+              </div>
+              <div class="col-md-4"></div>
             </div>
-            <hr class="m-0">
-            <div class="modal-body" style="height: 350px;">
-              <div class="row">
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">대분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select">
-                      <option value="">선택</option>
-                      <option selected value="Australia">프레임</option>
-                      <option value="Bangladesh">서스펜션시스템</option>
-                      <option value="Belarus">브레이크 시스템</option>
-                      <option value="Belarus">직접입력</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">대분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="대분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">중분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select"></select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">중분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="중분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">소분류</label>
-                  <div class="input-group input-group-merge">
-                    <select class="select2 form-select" id="country"></select>
-                  </div>
-                </div>
-                <div class="mb-3 col-md-6">
-                  <label class="form-label" for="phoneNumber">소분류 직접입력</label>
-                  <div class="input-group input-group-merge">
-                    <input
-                            class="form-control"
-                            name="phoneNumber"
-                            placeholder="소분류 직접입력"
-                            type="text"
-                    />
-                  </div>
-                </div>
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <input class="form-control" id="inputMaterL2" type="text"/>
+              </div>
+              <div class="col-md-4">
+                <input class="form-control" id="inputMaterM2" type="text"/>
+              </div>
+              <div class="col-md-4">
+                <input class="form-control" id="inputMaterS2" type="text"/>
               </div>
             </div>
-            <div class="modal-footer">
-              <button class="btn btn-primary" data-bs-dismiss="modal" type="button">
-                수정
-              </button>
-              <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">
-                닫기
-              </button>
-            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-primary" data-bs-target="#modalToggle4" data-bs-dismiss="modal"
+                    id="modifyMater" onclick="modifyCategory(this)">
+              수정
+            </button>
+            <button class="btn btn-primary" data-bs-dismiss="modal">
+              취소
+            </button>
           </div>
         </div>
       </div>
-      <!--/ Modal(modifymaterial)-->
-      <!-- Modal(modifydelete) -->
-      <div aria-hidden="true" class="modal fade" id="modalDelete" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable" role="document">
-          <div class="modal-content">
-            <div class="modal-body">
-              <h5 class="modal-title">카테고리 삭제</h5>
-            </div>
-            <hr class="m-0">
-            <div class="modal-body text-center" id="modalDeleteText"></div>
-            <div class="modal-footer">
-              <button class="btn btn-primary" data-bs-dismiss="modal" type="button" id="modalDeleteBtn" onclick="deleteCategory(this)">
-                삭제
-              </button>
-              <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">
-                닫기
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!--/ Modal(modifydelete)-->
-      <!--/Modal-->
+    </div>
+    <!--/Modal4-->
+    <!--/Modal-->
 
     <!--Script-->
     <script src="../assets/js/category-crud.js"></script>
-      <script>
-        function savePart(sel){
-          const selNum=parseFloat(sel);
-          console.log("##",selNum);
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
 
-          if(selNum===1){
-            const selectPartL=parseFloat(document.getElementById('selectPartL').value);
-            const selectL=(isNaN(parseFloat(selectPartL)) || selectPartL === '')?'':selectPartL;
-            const inputPartL=document.getElementById('inputPartL').value;
-            const selectPartM=parseFloat(document.getElementById('selectPartM').value);
-            const selectM=(isNaN(parseFloat(selectPartM)) || selectPartM === '')?'':selectPartM;
-            const inputPartM=document.getElementById('inputPartM').value;
-            const inputPartS=document.getElementById('inputPartS').value;
-
-            $.ajax({
-              url:'/addCategory',
-              method:'GET',
-              data:{sel:selNum, selectL:selectL, inputL:inputPartL, selectM:selectM, inputM:inputPartM, inputS:inputPartS},
-              success:function(){location.reload();}
-            });
-          }
-          if(selNum===2){
-            const selectProL=parseFloat(document.getElementById('selectProL').value);
-            const selectL=(isNaN(parseFloat(selectProL)) || selectProL === '')?'':selectProL;
-            const inputProL=document.getElementById('inputProL').value;
-            const selectProM=parseFloat(document.getElementById('selectProM').value);
-            const selectM=(isNaN(parseFloat(selectProM)) || selectProM === '')?'':selectProM;
-            const inputProM=document.getElementById('inputProM').value;
-            const inputProS=document.getElementById('inputProS').value;
-
-            $.ajax({
-              url:'/addCategory',
-              method:'GET',
-              data:{sel:selNum, selectL:selectL, inputL:inputProL, selectM:selectM, inputM:inputProM, inputS:inputProS},
-              success:function(){location.reload();}
-            });
-          }
-          if(selNum===3){
-            const selectMaterL=parseFloat(document.getElementById('selectMaterL').value);
-            const selectL=(isNaN(parseFloat(selectMaterL)) || selectMaterL === '')?'':selectMaterL;
-            const inputMaterL=document.getElementById('inputMaterL').value;
-            const selectMaterM=parseFloat(document.getElementById('selectMaterM').value);
-            const selectM=(isNaN(parseFloat(selectMaterM)) || selectMaterM === '')?'':selectMaterM;
-            const inputMaterM=document.getElementById('inputMaterM').value;
-            const inputMaterS=document.getElementById('inputMaterS').value;
-
-            $.ajax({
-              url:'/addCategory',
-              method:'GET',
-              data:{sel:selNum, selectL:selectL, inputL:inputMaterL, selectM:selectM, inputM:inputMaterM, inputS:inputMaterS},
-              success:function(){location.reload();}
-            });
-          }
-        }
-      </script>
-      <!--
-      <script>
-        function savePartCode(){
-          const selectBoxes=document.querySelectorAll('select');
-          selectBoxes.forEach(sel=>{
-            localStorage.setItem(sel.id, sel.value);
-          });
-        }
-        function loadPartCode(){
-          const selectBoxes=document.querySelectorAll('select');
-          selectBoxes.forEach(sel=>{
-            const saved=localStorage.getItem(sel.id);
-            if(saved!=null){
-              sel.value=saved;
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadCategory('part');
             }
-          });
-        }
-        initPart1().then(()=>{
-          loadPartCode();
+          }
+        });
+        content2.addEventListener("scroll", function () {
+          if(finPage2==false){
+            const scrollTop = content2.scrollTop;
+            const scrollHeight = content2.scrollHeight;
+            const clientHeight = content2.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadCategory('pro');
+            }
+          }
+        });
+        content3.addEventListener("scroll", function () {
+          if(finPage3==false){
+            const scrollTop = content2.scrollTop;
+            const scrollHeight = content2.scrollHeight;
+            const clientHeight = content2.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadCategory('mater');
+            }
+          }
         });
 
+        loadCategory('part');
+        loadCategory('pro');
+        loadCategory('mater');
 
-        document.querySelectorAll('select').forEach(sel=>{
-          sel.addEventListner('change', savePartCode);
-        });
-
-      </script>-->
-    <!--Script-->
+        const radioButtons0 = document.querySelectorAll('input[type="radio"][name="showPart"]');
+        radioButtons0.forEach(radio => { radio.addEventListener('change', () => refreshPartCategory()); });
+        const radioButtons1 = document.querySelectorAll('input[type="radio"][name="showPro"]');
+        radioButtons1.forEach(radio => { radio.addEventListener('change', () => refreshProCategory()); });
+        const radioButtons2 = document.querySelectorAll('input[type="radio"][name="showMater"]');
+        radioButtons2.forEach(radio => { radio.addEventListener('change', () => refreshMaterCategory()); });
+      });
+    </script>
   </span>
 
 </th:block>

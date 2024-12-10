@@ -2,16 +2,22 @@ package mit.iwrcore.IWRCore.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mit.iwrcore.IWRCore.entity.*;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterCodeListDTO;
-import mit.iwrcore.IWRCore.entity.MaterL;
-import mit.iwrcore.IWRCore.entity.MaterM;
-import mit.iwrcore.IWRCore.entity.MaterS;
 import mit.iwrcore.IWRCore.repository.Category.Mater.MaterLRepository;
 import mit.iwrcore.IWRCore.repository.Category.Mater.MaterMRepository;
 import mit.iwrcore.IWRCore.repository.Category.Mater.MaterSRepository;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterLDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.MaterDTO.MaterSDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProLDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
+import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CategoryMaterDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CategoryProDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -58,57 +64,99 @@ public class MaterServiceImpl implements MaterService{
     public MaterSDTO findMaterS(Long scode){return materSTodto(materSRepository.getById(scode));}
 
     @Override
-    public List<MaterLDTO> findListMaterL() {
+    public List<MaterLDTO> findListMaterL(Long type) {
         List<MaterLDTO> list=new ArrayList<>();
-        materLRepository.findAll().stream().forEach(x->list.add(materLTodto(x)));
+        if(type==0L) materLRepository.findAll().forEach(x->list.add(materLTodto(x)));
+        else materLRepository.getListMaterL1().forEach(x->list.add(materLTodto(x)));
         return list;
     }
     @Override
-    public List<MaterMDTO> findListMaterM(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO) {
+    public List<MaterMDTO> findListMaterM(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO, Long type) {
         List<MaterMDTO> list=new ArrayList<>();
-        if(materSDTO!=null){
-            Long temp=materSDTO.getMaterMDTO().getMaterLDTO().getMaterLcode();
-            materMRepository.findAll().stream().filter(x->x.getMaterL().getMaterLcode()==temp).forEach(x->list.add(materMTodto(x)));
-            return list;
-        }else if(materMDTO!=null){
-            Long temp=materMDTO.getMaterLDTO().getMaterLcode();
-            materMRepository.findAll().stream().filter(x->x.getMaterL().getMaterLcode()==temp).forEach(x->list.add(materMTodto(x)));
-            return list;
-        }else if(materLDTO!=null){
-            Long temp=materLDTO.getMaterLcode();
-            materMRepository.findAll().stream().filter(x->x.getMaterL().getMaterLcode()==temp).forEach(x->list.add(materMTodto(x)));
-            return list;
+        Long temp=null;
+
+        if(materSDTO!=null) temp=materSDTO.getMaterMDTO().getMaterLDTO().getMaterLcode();
+        else if(materMDTO!=null) temp=materMDTO.getMaterLDTO().getMaterLcode();
+        else if(materLDTO!=null) temp=materLDTO.getMaterLcode();
+
+        if(temp==null){
+            if(type==0L) materMRepository.findAll().forEach(x->list.add(materMTodto(x)));
+            else materMRepository.getListMaterM1().forEach(x->list.add(materMTodto(x)));
+        }else{
+            materMRepository.getListMaterMByMaterL(temp).forEach(x->list.add(materMTodto(x)));
         }
-        materMRepository.findAll().stream().forEach(x->list.add(materMTodto(x)));
+
         return list;
     }
     @Override
-    public List<MaterSDTO> findListMaterS(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO) {
+    public List<MaterSDTO> findListMaterS(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO, Long type) {
         List<MaterSDTO> list=new ArrayList<>();
-        if(materSDTO!=null){
-            Long temp=materSDTO.getMaterMDTO().getMaterMcode();
-            materSRepository.findAll().stream().filter(x->x.getMaterM().getMaterMcode()==temp).forEach(x->list.add(materSTodto(x)));
-            return list;
-        }else if(materMDTO!=null){
-            Long temp=materMDTO.getMaterMcode();
-            materSRepository.findAll().stream().filter(x->x.getMaterM().getMaterMcode()==temp).forEach(x->list.add(materSTodto(x)));
-            return list;
-        }else if(materLDTO!=null){
-            Long temp=materLDTO.getMaterLcode();
-            materSRepository.findAll().stream().filter(x->x.getMaterM().getMaterL().getMaterLcode()==temp).forEach(x->list.add(materSTodto(x)));
-            return list;
+        Long temp=null;
+        Long tempL=null;
+
+        if(materLDTO!=null) tempL=materLDTO.getMaterLcode();
+        if(materMDTO!=null) temp=materMDTO.getMaterMcode();
+        if(materSDTO!=null) temp=materSDTO.getMaterMDTO().getMaterMcode();
+
+        if(temp==null){
+            if(tempL!=null) materSRepository.getListMaterByMaterL(tempL).forEach(x->list.add(materSTodto(x)));
+            else{
+                if(type==0L) materSRepository.findAll().forEach(x->list.add(materSTodto(x)));
+                else materSRepository.getListMaterS1().forEach(x->list.add(materSTodto(x)));
+            }
+        }else{
+            materSRepository.getListMaterSByMaterM(temp).forEach(x->list.add(materSTodto(x)));
         }
-        materSRepository.findAll().stream().forEach(x->list.add(materSTodto(x)));
         return list;
     }
     @Override
-    public MaterCodeListDTO findListMaterAll(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO) {
+    public MaterCodeListDTO findListMaterAll(MaterLDTO materLDTO, MaterMDTO materMDTO, MaterSDTO materSDTO, Long type) {
         MaterCodeListDTO list=MaterCodeListDTO.builder()
-                .materLDTOs(findListMaterL())
-                .materMDTOs(findListMaterM(materLDTO, materMDTO, materSDTO))
-                .materSDTOs(findListMaterS(materLDTO, materMDTO, materSDTO))
+                .materLDTOs(findListMaterL(type))
+                .materMDTOs(findListMaterM(materLDTO, materMDTO, materSDTO, type))
+                .materSDTOs(findListMaterS(materLDTO, materMDTO, materSDTO, type))
                 .build();
         return list;
+    }
+
+
+    // 자재분류 페이지 가져오기
+    @Override
+    public PageResultDTO<CategoryMaterDTO, Object[]> getPageMater(Pageable pageable, Long code){
+        if(code==0L){
+            Page<Object[]> entityPage=materLRepository.getPageMaterL(pageable);
+            return new PageResultDTO<>(entityPage, this::exMaterLToCategoryDTO);
+        }else if(code==1L){
+            Page<Object[]> entityPage=materMRepository.getPageMaterM(pageable);
+            return new PageResultDTO<>(entityPage, this::exMaterMToCategoryDTO);
+        }else{
+            Page<Object[]> entityPage=materSRepository.getPageMaterS(pageable);
+            return new PageResultDTO<>(entityPage, this::exMaterSToCategoryDTO);
+        }
+    }
+    private CategoryMaterDTO exMaterLToCategoryDTO(Object[] objects){
+        MaterL materL=(MaterL) objects[0];
+
+        MaterLDTO materLDTO=(materL!=null)? materLTodto(materL) : null;
+        return new CategoryMaterDTO(materLDTO, null, null);
+    }
+    private CategoryMaterDTO exMaterMToCategoryDTO(Object[] objects){
+        MaterM materM=(MaterM) objects[0];
+        MaterL materL=(MaterL) objects[1];
+
+        MaterMDTO materMDTO=(materM!=null)? materMTodto(materM) : null;
+        MaterLDTO materLDTO=(materL!=null)? materLTodto(materL) : null;
+        return new CategoryMaterDTO(materLDTO, materMDTO, null);
+    }
+    private CategoryMaterDTO exMaterSToCategoryDTO(Object[] objects){
+        MaterS materS=(MaterS) objects[0];
+        MaterM materM=(MaterM) objects[1];
+        MaterL materL=(MaterL) objects[2];
+
+        MaterSDTO materSDTO=(materS!=null)? materSTodto(materS) : null;
+        MaterMDTO materMDTO=(materM!=null)? materMTodto(materM) : null;
+        MaterLDTO materLDTO=(materL!=null)? materLTodto(materL) : null;
+        return new CategoryMaterDTO(materLDTO, materMDTO, materSDTO);
     }
 
 

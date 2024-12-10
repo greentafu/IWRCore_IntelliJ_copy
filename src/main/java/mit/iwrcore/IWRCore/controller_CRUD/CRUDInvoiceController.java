@@ -5,7 +5,6 @@ import mit.iwrcore.IWRCore.entity.Invoice;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.InvoiceTextDTO;
 import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveInvoiceDTO;
 import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
-import mit.iwrcore.IWRCore.security.dto.FileDTO.FileContractDTO;
 import mit.iwrcore.IWRCore.security.dto.InvoiceDTO;
 import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.ShipmentDTO;

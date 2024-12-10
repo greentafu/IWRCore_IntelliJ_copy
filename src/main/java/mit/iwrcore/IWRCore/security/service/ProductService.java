@@ -5,7 +5,6 @@ import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
-import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
 
 import java.util.List;
 
@@ -21,6 +20,7 @@ public interface ProductService {
     // 조회
     ProductDTO getProduct(Long productID);
     Long newProductCount();
+    List<ProductDTO> getProductByCategory(Long type, Long code);
 
 
     // 생산부서> 모든 제품 목록
@@ -31,13 +31,7 @@ public interface ProductService {
     PageResultDTO<ProductDTO, Product> getNonCheckProducts(PageRequestDTO requestDTO);
     // 제품관리> 최종확인까지 완료한 제품 리스트
     PageResultDTO<ProductDTO, Product> getCheckProducts(PageRequestDTO requestDTO);
-
-
-
-
-
-
-    List<ProductDTO> searchProducts(String query);
-    List<ProplanDTO> convertProPlans(Product entity);
+    // 메인화면> 출하요청 중인 제품 목록
+    List<ProductDTO> getRequestProduct();
 
 }

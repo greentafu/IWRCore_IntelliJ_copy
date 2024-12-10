@@ -7,6 +7,10 @@ import mit.iwrcore.IWRCore.entity.PartS;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartLDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartSDTO;
+import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CategoryPartDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -30,13 +34,12 @@ public interface PartCodeService {
     PartSDTO findPartS(Long scode);
 
     // 회사 분류 리스트 가져오기
-    List<PartLDTO> findListPartL();
-    List<PartMDTO> findListPartM(PartLDTO partLDTO, PartMDTO partMDTO, PartSDTO partSDTO);
-    List<PartSDTO> findListPartS(PartLDTO partLDTO, PartMDTO partMDTO, PartSDTO partSDTO);
-    PartCodeListDTO findListPartAll(PartLDTO partLDTO, PartMDTO partMDTO, PartSDTO partSDTO);
+    List<PartLDTO> findListPartL(Long type);
+    List<PartMDTO> findListPartM(PartLDTO partLDTO, PartMDTO partMDTO, PartSDTO partSDTO, Long type);
+    List<PartSDTO> findListPartS(PartLDTO partLDTO, PartMDTO partMDTO, PartSDTO partSDTO, Long type);
+    PartCodeListDTO findListPartAll(PartLDTO partLDTO, PartMDTO partMDTO, PartSDTO partSDTO, Long type);
 
-
-
+    PageResultDTO<CategoryPartDTO, Object[]> getPagePart(Pageable pageable, Long code);
 
 
     // dto를 entity로

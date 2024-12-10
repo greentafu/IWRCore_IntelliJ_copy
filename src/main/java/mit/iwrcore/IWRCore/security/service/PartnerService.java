@@ -9,9 +9,20 @@ import java.util.List;
 
 public interface PartnerService {
 
-    // 협력회사 검색
+    // 추가, 삭제
+    Integer insertPartner(PartnerDTO dto);
+    void deletePartner(Long pno);
+
+    // 변환
+    PartnerDTO partnerTodto(Partner entity);
+    Partner partnerDtoToEntity(PartnerDTO dto);
+
+    // 조회
     Partner findPartnerEntity(Long pno, String id, String reg_number);
     PartnerDTO findPartnerDto(Long pno, String id, String reg_number);
+    List<PartnerDTO> partnerList();
+    List<PartnerDTO> getPartnerByCategory(Long type, Long code);
+
 
     // 협력회사관리> 회사 모두 보기
     PageResultDTO<PartnerDTO, Partner> findPartnerList(PageRequestDTO pageRequestDTO);
@@ -23,15 +34,4 @@ public interface PartnerService {
     PageResultDTO<PartnerDTO, Partner> getGumsuPartner(PageRequestDTO pageRequestDTO);
     // 거래명세서> 소속회사 외 거래명세서 발급가능한 협력회사 모두 보기
     PageResultDTO<PartnerDTO, Partner> getInvoicePartner(PageRequestDTO pageRequestDTO);
-
-
-    // 회사 추가, 삭제
-    Integer insertPartner(PartnerDTO dto);
-    void deletePartner(Long pno);
-
-    // entity-dto 변환
-    PartnerDTO partnerTodto(Partner entity);
-    Partner partnerDtoToEntity(PartnerDTO dto);
-
-    List<PartnerDTO> partnerList();
 }

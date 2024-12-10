@@ -1,104 +1,186 @@
 <!DOCTYPE html>
 
 <html
-  lang="ko" xmlns:th="http://www.thymeleaf.org"
-  class="light-style layout-menu-fixed"
-  dir="ltr"
-  data-theme="theme-default"
-  data-assets-path="../assets/"
-  data-template="vertical-menu-template-free"
+        class="light-style layout-menu-fixed" data-assets-path="../assets/"
+        data-template="vertical-menu-template-free"
+        data-theme="theme-default"
+        dir="ltr"
+        lang="ko"
+        xmlns:th="http://www.thymeleaf.org"
 >
 <th:block th:replace="~{layout/mainlayout::all(~{this::#head} ,~{this::#content})}">
 
   <span id="head">
     <title>카테고리</title>
     <!--Style-->
-
+    <style>
+      #content1 {
+        height: 500px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content2 {
+        height: 500px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+      #content3 {
+        height: 500px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
     <!--/Style-->
   </span>
 
   <span id="content">
+    <div style="display:none;" id="noName"></div>
+    <div style="display:none;" id="noCategoryBtn"></div>
     <div class="container-xxl flex-grow-4 container-p-y">
-      <div class="row">
-        <div class="col-md-6 order-0 mb-4" style="height: 750px;">
+      <div class="row mb-4">
+        <!--협력회사-->
+        <div class="col-md-6 order-0 mb-4" style="height: 570px;">
           <div class="card">
-            <div class="card-header d-flex align-items-center justify-content-between pb-0 mb-3">
-              <div class="card-title mb-0">
-                <h5 class="m-0 me-2">협력회사 카테고리</h5>
+            <div class="card-header">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5 class="m-0 me-2">협력회사 카테고리 관리</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                  <input type="radio" class="form-check-input" name="showPart" id="showPartL" value="0">
+                  <label class="form-check-label"> 대분류 </label>
+                  <input type="radio" class="form-check-input" name="showPart" id="showPartM" value="1">
+                  <label class="form-check-label"> 중분류 </label>
+                  <input type="radio" class="form-check-input" name="showPart" id="showPartS" value="2" checked>
+                  <label class="form-check-label"> 소분류 </label>
+                </div>
               </div>
             </div>
             <hr class="m-0">
-            <div class="card shadow-none" style="height: 750px">
-              <div class="card-body mb-3" id="vertical-example" style="height: 550px;">
+            <div class="card-body mb-3" style="height: 500px;">
+              <div id="content1">
                 <table class="table table-hover text-center">
-                  <tr th:each="partdto:${partCodeList.partSDTOs}">
-                    <td th:text="${partdto.partMDTO.partLDTO.Lname}"></td>
-                    <td th:text="${partdto.partMDTO.Mname}"></td>
-                    <td th:text="${partdto.Sname}"></td>
-                  </tr>
+                  <tbody id="firstTbody"></tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-        <!--/ Order Statistics -->
-        <!-- Expense Overview -->
-        <div class="col-md-6 order-1 mb-4">
+        <!--/협력회사-->
+        <!--제품-->
+        <div class="col-md-6 order-0 mb-4" style="height: 570px;">
           <div class="card">
-            <div class="card-header d-flex align-items-center justify-content-between pb-0 mb-3">
-              <div class="card-title mb-0">
-                <h5 class="m-0 me-2">제품 카테고리 관리</h5>
+            <div class="card-header">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5 class="m-0 me-2">제품 카테고리 관리</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                  <input type="radio" class="form-check-input" name="showPro" id="showProL" value="0">
+                  <label class="form-check-label"> 대분류 </label>
+                  <input type="radio" class="form-check-input" name="showPro" id="showProM" value="1">
+                  <label class="form-check-label"> 중분류 </label>
+                  <input type="radio" class="form-check-input" name="showPro" id="showProS" value="2" checked>
+                  <label class="form-check-label"> 소분류 </label>
+                </div>
               </div>
             </div>
             <hr class="m-0">
-            <div class="card shadow-none" style="height: 750px">
-              <div class="card-body mb-3" id="vertical-example2" style="height: 550px;">
+            <div class="card-body mb-3" style="height: 500px;">
+              <div id="content2">
                 <table class="table table-hover text-center">
-                  <tr th:each="prodto:${proCodeList.proSDTOs}">
-                    <td th:text="${prodto.proMDTO.proLDTO.Lname}"></td>
-                    <td th:text="${prodto.proMDTO.Mname}"></td>
-                    <td th:text="${prodto.Sname}"></td>
-                  </tr>
+                  <tbody id="secondTbody"></tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-        <!--/ Expense Overview -->
+        <!--/제품-->
       </div>
       <div class="row">
-        <!-- Transactions -->
-        <div class=" order-2 mb-4">
+        <!--자재-->
+        <div class="order-2 mb-4">
           <div class="card">
-            <div class="card-header d-flex align-items-center justify-content-between pb-0 mb-3">
-              <div class="card-title mb-0">
-                <h5 class="m-0 me-2">자재 카테고리 관리</h5>
+            <div class="card-header">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5 class="m-0 me-2">제품 카테고리 관리</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                  <input type="radio" class="form-check-input" name="showMater" id="showMaterL" value="0">
+                  <label class="form-check-label"> 대분류 </label>
+                  <input type="radio" class="form-check-input" name="showMater" id="showMaterM" value="1">
+                  <label class="form-check-label"> 중분류 </label>
+                  <input type="radio" class="form-check-input" name="showMater" id="showMaterS" value="2" checked>
+                  <label class="form-check-label"> 소분류 </label>
+                </div>
               </div>
             </div>
             <hr class="m-0">
-            <div class="card shadow-none" style="height: 750px">
-              <div class="card-body mb-3" id="vertical-example3" style="height: 550px;">
+            <div class="card-body mb-3" style="height: 500px;">
+              <div id="content3">
                 <table class="table table-hover text-center">
-                  <tr th:each="materdto:${materCodeList.materSDTOs}">
-                    <td th:text="${materdto.materMDTO.materLDTO.lname}"></td>
-                    <td th:text="${materdto.materMDTO.Mname}"></td>
-                    <td th:text="${materdto.Sname}"></td>
-                  </tr>
+                  <tbody id="thirdTbody"></tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-        <!--/ Transactions -->
+        <!--/자재-->
       </div>
     </div>
 
     <!--Modal-->
 
     <!--/Modal-->
-    <!--Script-->
 
     <!--Script-->
+    <script src="../assets/js/category-crud.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        content1.addEventListener("scroll", function () {
+          if(finPage==false){
+            const scrollTop = content1.scrollTop;
+            const scrollHeight = content1.scrollHeight;
+            const clientHeight = content1.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadCategory('part');
+            }
+          }
+        });
+        content2.addEventListener("scroll", function () {
+          if(finPage2==false){
+            const scrollTop = content2.scrollTop;
+            const scrollHeight = content2.scrollHeight;
+            const clientHeight = content2.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadCategory('pro');
+            }
+          }
+        });
+        content3.addEventListener("scroll", function () {
+          if(finPage3==false){
+            const scrollTop = content2.scrollTop;
+            const scrollHeight = content2.scrollHeight;
+            const clientHeight = content2.clientHeight;
+
+            if (scrollTop + clientHeight >= scrollHeight - 10) {
+              loadCategory('mater');
+            }
+          }
+        });
+
+        loadCategory('part');
+        loadCategory('pro');
+        loadCategory('mater');
+
+        const radioButtons0 = document.querySelectorAll('input[type="radio"][name="showPart"]');
+        radioButtons0.forEach(radio => { radio.addEventListener('change', () => refreshPartCategory()); });
+        const radioButtons1 = document.querySelectorAll('input[type="radio"][name="showPro"]');
+        radioButtons1.forEach(radio => { radio.addEventListener('change', () => refreshProCategory()); });
+        const radioButtons2 = document.querySelectorAll('input[type="radio"][name="showMater"]');
+        radioButtons2.forEach(radio => { radio.addEventListener('change', () => refreshMaterCategory()); });
+      });
+    </script>
   </span>
 
 </th:block>

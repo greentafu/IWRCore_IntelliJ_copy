@@ -1,16 +1,31 @@
-$(document).ready(function(){
-    let Lcode=$('#selectProL').val();
-    let Mcode=$('#selectProM').val();
-    let Scode=$('#selectProS').val();
+// 변수
+let showProLCode=null;
+let showProMCode=null;
+let showProSCode=null;
+let showProLCode2=null;
+let showProMCode2=null;
+let showProSCode2=null;
 
-    Lcode=(Lcode==="")?null:Lcode;
-    Mcode=(Mcode==="")?null:Mcode;
-    Scode=(Scode==="")?null:Scode;
+let showProRange=0;
 
-    if(Lcode===null && Mcode===null && Scode===null) initPro1();
-    else searchProCode(Lcode, Mcode, Scode);
+document.addEventListener("DOMContentLoaded", function () {
+    const noNoName=document.getElementById('noName'); // 미정 안보기
+    if(noNoName) showProRange=1;
+    const yesCompany=document.getElementById('yesCompany');
+    if(yesCompany) showProRange=2;
 
+    initPro1();
     initPro2();
+
+    const inputProL=document.getElementById('inputProL');
+    const inputProM=document.getElementById('inputProM');
+    if(inputProL) inputProL.addEventListener('input', () => refreshProL());
+    if(inputProM) inputProM.addEventListener('input', () => refreshProM());
+
+    const inputProL2=document.getElementById('inputProL2');
+    const inputProM2=document.getElementById('inputProM2');
+    if(inputProL2) inputProL2.addEventListener('input', () => refreshProL2());
+    if(inputProM2) inputProM2.addEventListener('input', () => refreshProM2());
 });
 
 // 초기값1
@@ -18,37 +33,67 @@ function initPro1(){
     $.ajax({
         url:'/select/getPro',
         method:'GET',
+        data:{ lcode:showProLCode, mcode:showProMCode, scode:showProSCode, type:showProRange },
         success:function(data){
-            $('#selectProL').empty().append("<option value=''>전체보기</option>");
-            $('#selectProM').empty().append('<option value="">전체보기</option>');
-            $('#selectProS').empty().append('<option value="">전체보기</option>');
+            const selectProL = document.getElementById('selectProL');
+            const selectProM = document.getElementById('selectProM');
+            const selectProS = document.getElementById('selectProS');
 
-            data.proLDTOs.forEach(function(proL) {
-                $('#selectProL').append(
-                    $('<option></option>')
-                        .attr('value', proL.proLcode)
-                        .text(proL.lname)
-                        .prop('selected', proL.proLcode == data.l)
-                );
-            });
-            data.proMDTOs.forEach(function(proM) {
-                $('#selectProM').append(
-                    $('<option></option>')
-                        .attr('value', proM.proMcode)
-                        .text(proM.mname)
-                        .prop('selected', proM.proMcode == data.m)
-                );
-            });
-            data.proSDTOs.forEach(function(proS) {
-                $('#selectProS').append(
-                    $('<option></option>')
-                        .attr('value', proS.proScode)
-                        .text(proS.sname)
-                        .prop('selected', proS.proScode == data.s)
-                );
-            });
-            const tf=document.getElementById('inputProL');
-            if(tf) addSelectChangeListenersP();
+            const inputProL=document.getElementById('inputProL');
+            const inputProM=document.getElementById('inputProM');
+            const inputProS=document.getElementById('inputProS');
+
+            if(selectProL){
+                selectProL.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectProL.appendChild(allTd);
+                data.proLDTOs.forEach(function(proL) {
+                    const option = document.createElement('option');
+                    option.value = proL.proLcode;
+                    option.textContent = proL.lname;
+                    selectProL.appendChild(option);
+                    if (proL.proLcode == data.l) {
+                        option.selected = true;
+                        if(inputProL) inputProL.value = proL.lname;
+                    }
+                });
+            }
+            if(selectProM){
+                selectProM.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectProM.appendChild(allTd);
+                data.proMDTOs.forEach(function(proM) {
+                    const option = document.createElement('option');
+                    option.value = proM.proMcode;
+                    option.textContent = proM.mname;
+                    selectProM.appendChild(option);
+                    if (proM.proMcode == data.m) {
+                        option.selected = true;
+                        if(inputProM) inputProM.value = proM.mname;
+                    }
+                });
+            }
+            if(selectProS){
+                selectProS.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectProS.appendChild(allTd);
+                data.proSDTOs.forEach(function(proS) {
+                    const option = document.createElement('option');
+                    option.value = proS.proScode;
+                    option.textContent = proS.sname;
+                    selectProS.appendChild(option);
+                    if (proS.proScode == data.s) {
+                        option.selected = true;
+                        if(inputProS) inputProS.value = proS.sname;
+                    }
+                });
+            }
         }
     });
 }
@@ -57,223 +102,145 @@ function initPro2(){
     $.ajax({
         url:'/select/getPro',
         method:'GET',
+        data:{lcode:showProLCode2, mcode:showProMCode2, scode:showProSCode2, type:showProRange},
         success:function(data){
-            $('#selectProL2').empty().append("<option value=''>전체보기</option>");
-            $('#selectProM2').empty().append('<option value="">전체보기</option>');
-            $('#selectProS2').empty().append('<option value="">전체보기</option>');
+            const selectProL = document.getElementById('selectProL2');
+            const selectProM = document.getElementById('selectProM2');
+            const selectProS = document.getElementById('selectProS2');
 
-            data.proLDTOs.forEach(function(proL) {
-                $('#selectProL2').append(
-                    $('<option></option>')
-                        .attr('value', proL.proLcode)
-                        .text(proL.lname)
-                        .prop('selected', proL.proLcode == data.l)
-                );
-            });
-            data.proMDTOs.forEach(function(proM) {
-                $('#selectProM2').append(
-                    $('<option></option>')
-                        .attr('value', proM.proMcode)
-                        .text(proM.mname)
-                        .prop('selected', proM.proMcode == data.m)
-                );
-            });
-            data.proSDTOs.forEach(function(proS) {
-                $('#selectProS2').append(
-                    $('<option></option>')
-                        .attr('value', proS.proScode)
-                        .text(proS.sname)
-                        .prop('selected', proS.proScode == data.s)
-                );
-            });
+            const inputProL=document.getElementById('inputProL2');
+            const inputProM=document.getElementById('inputProM2');
+            const inputProS=document.getElementById('inputProS2');
+
+            if(selectProL){
+                selectProL.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectProL.appendChild(allTd);
+                data.proLDTOs.forEach(function(proL) {
+                    const option = document.createElement('option');
+                    option.value = proL.proLcode;
+                    option.textContent = proL.lname;
+                    selectProL.appendChild(option);
+                    if (proL.proLcode == data.l) {
+                        option.selected = true;
+                        if(inputProL) inputProL.value = proL.lname;
+                    }
+                });
+            }
+            if(selectProM){
+                selectProM.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectProM.appendChild(allTd);
+                data.proMDTOs.forEach(function(proM) {
+                    const option = document.createElement('option');
+                    option.value = proM.proMcode;
+                    option.textContent = proM.mname;
+                    selectProM.appendChild(option);
+                    if (proM.proMcode == data.m) {
+                        option.selected = true;
+                        if(inputProM) inputProM.value = proM.mname;
+                    }
+                });
+            }
+            if(selectProS){
+                selectProS.innerHTML = '';
+                const allTd = document.createElement('option');
+                allTd.value = '';
+                allTd.textContent = '전체보기';
+                selectProS.appendChild(allTd);
+                data.proSDTOs.forEach(function(proS) {
+                    const option = document.createElement('option');
+                    option.value = proS.proScode;
+                    option.textContent = proS.sname;
+                    selectProS.appendChild(option);
+                    if (proS.proScode == data.s) {
+                        option.selected = true;
+                        if(inputProS) inputProS.value = proS.sname;
+                    }
+                });
+            }
         }
     });
 }
 
 // 선택1
 function updateProCode(changedSelect){
-    let Lcode=$('#selectProL').val();
-    let Mcode=$('#selectProM').val();
-    let Scode=$('#selectProS').val();
+    const selectProL = document.getElementById('selectProL');
+    const selectProM = document.getElementById('selectProM');
+    const selectProS = document.getElementById('selectProS');
 
-    if (changedSelect === 'L') {
-        Mcode=null;
-        Scode=null;
-    } else if (changedSelect === 'M') {
-        Scode=null;
+    if(selectProL) {
+        const tempL=selectProL.value;
+        if(tempL==='') showProLCode=null;
+        else showProLCode=tempL;
+    }
+    if(selectProM) {
+        const tempM=selectProM.value;
+        if(tempM==='') showProMCode=null;
+        else showProMCode=tempM;
+    }
+    if(selectProS) {
+        const tempS=selectProS.value;
+        if(tempS==='') showProSCode=null;
+        else showProSCode=tempS;
     }
 
-    $.ajax({
-        url:'/select/pro',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectProL').empty().append("<option value=''>전체보기</option>");
-            $('#selectProM').empty().append('<option value="">전체보기</option>');
-            $('#selectProS').empty().append('<option value="">전체보기</option>');
+    if (changedSelect === 'L') { showProMCode=null; showProSCode=null; }
+    else if (changedSelect === 'M') { showProSCode=null; }
 
-            data.proLDTOs.forEach(function(proL) {
-                $('#selectProL').append(
-                    $('<option></option>')
-                        .attr('value', proL.proLcode)
-                        .text(proL.lname)
-                        .prop('selected', proL.proLcode == data.l)
-                );
-            });
-            data.proMDTOs.forEach(function(proM) {
-                $('#selectProM').append(
-                    $('<option></option>')
-                        .attr('value', proM.proMcode)
-                        .text(proM.mname)
-                        .prop('selected', proM.proMcode == data.m)
-                );
-            });
-            data.proSDTOs.forEach(function(proS) {
-                $('#selectProS').append(
-                    $('<option></option>')
-                        .attr('value', proS.proScode)
-                        .text(proS.sname)
-                        .prop('selected', proS.proScode == data.s)
-                );
-            });
-            const tf=document.getElementById('inputProL');
-            if(tf) addSelectChangeListenersP();
-        }
-    });
+    initPro1();
 }
 // 선택2
 function updateProCode2(changedSelect){
-    let Lcode=$('#selectProL2').val();
-    let Mcode=$('#selectProM2').val();
-    let Scode=$('#selectProS2').val();
+    const selectProL = document.getElementById('selectProL2');
+    const selectProM = document.getElementById('selectProM2');
+    const selectProS = document.getElementById('selectProS2');
 
-    if (changedSelect === 'L') {
-        Mcode=null;
-        Scode=null;
-    } else if (changedSelect === 'M') {
-        Scode=null;
+    if(selectProL) {
+        const tempL=selectProL2.value;
+        if(tempL==='') showProLCode2=null;
+        else showProLCode2=tempL;
+    }
+    if(selectProM) {
+        const tempM=selectProM.value;
+        if(tempM==='') showProMCode2=null;
+        else showProMCode2=tempM;
+    }
+    if(selectProS) {
+        const tempS=selectProS.value;
+        if(tempS==='') showProSCode2=null;
+        else showProSCode2=tempS;
     }
 
-    $.ajax({
-        url:'/select/pro',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectProL2').empty().append("<option value=''>전체보기</option>");
-            $('#selectProM2').empty().append('<option value="">전체보기</option>');
-            $('#selectProS2').empty().append('<option value="">전체보기</option>');
+    if (changedSelect === 'L') { showProMCode2=null; showProSCode2=null; }
+    else if (changedSelect === 'M') { showProSCode2=null; }
 
-            data.proLDTOs.forEach(function(proL) {
-                $('#selectProL2').append(
-                    $('<option></option>')
-                        .attr('value', proL.proLcode)
-                        .text(proL.lname)
-                        .prop('selected', proL.proLcode == data.l)
-                );
-            });
-            data.proMDTOs.forEach(function(proM) {
-                $('#selectProM2').append(
-                    $('<option></option>')
-                        .attr('value', proM.proMcode)
-                        .text(proM.mname)
-                        .prop('selected', proM.proMcode == data.m)
-                );
-            });
-            data.proSDTOs.forEach(function(proS) {
-                $('#selectProS2').append(
-                    $('<option></option>')
-                        .attr('value', proS.proScode)
-                        .text(proS.sname)
-                        .prop('selected', proS.proScode == data.s)
-                );
-            });
-        }
-    });
+    initPro2();
 }
 
-// input
-function addSelectChangeListenersP() {
-    $('#selectProL').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputProL').val(selectedValue);
-
-        const selectMValue = '';
-        $('#inputProM').val(selectMValue);
-        const selectSValue = '';
-        $('#inputProS').val(selectSValue);
-    });
-
-    $('#selectProM').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputProM').val(selectedValue);
-
-        const selectedL=document.getElementById('selectProL');
-        const selectedOptionL = selectedL.options[selectedL.selectedIndex];
-        const selectLText = selectedOptionL.textContent;
-        $('#inputProL').val(selectLText);
-
-        const selectSValue = '';
-        $('#inputProS').val(selectSValue);
-    });
-
-    $('#selectProS').off('change').on('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const selectedValue = selectedOption.textContent;
-        $('#inputProS').val(selectedValue);
-
-        const selectedL=document.getElementById('selectProL');
-        const selectedOptionL = selectedL.options[selectedL.selectedIndex];
-        const selectLText = selectedOptionL.textContent;
-        $('#inputProL').val(selectLText);
-
-        const selectedM=document.getElementById('selectProM');
-        const selectedOptionM = selectedM.options[selectedM.selectedIndex];
-        const selectMText = selectedOptionM.textContent;
-        $('#inputProM').val(selectMText);
-    });
+// 입력값 변경1
+function refreshProL(){
+    showProLCode=null;
+    showProMCode=null;
+    initPro1();
 }
-
-// 초기화면1(검색)
-function searchProCode(proL1, proM1, proS1){
-    let Lcode=proL1;
-    let Mcode=proM1;
-    let Scode=proS1;
-
-    $.ajax({
-        url:'/select/pro',
-        method:'GET',
-        data:{lcode:Lcode, mcode:Mcode, scode:Scode},
-        success:function(data){
-            $('#selectProL').empty().append("<option value=''>전체보기</option>");
-            $('#selectProM').empty().append('<option value="">전체보기</option>');
-            $('#selectProS').empty().append('<option value="">전체보기</option>');
-
-            data.proLDTOs.forEach(function(proL) {
-                $('#selectProL').append(
-                    $('<option></option>')
-                        .attr('value', proL.proLcode)
-                        .text(proL.lname)
-                        .prop('selected', proL.proLcode == data.l)
-                );
-            });
-            data.proMDTOs.forEach(function(proM) {
-                $('#selectProM').append(
-                    $('<option></option>')
-                        .attr('value', proM.proMcode)
-                        .text(proM.mname)
-                        .prop('selected', proM.proMcode == data.m)
-                );
-            });
-            data.proSDTOs.forEach(function(proS) {
-                $('#selectProS').append(
-                    $('<option></option>')
-                        .attr('value', proS.proScode)
-                        .text(proS.sname)
-                        .prop('selected', proS.proScode == data.s)
-                );
-            });
-        }
-    });
+function refreshProM(){
+    showProLCode=document.getElementById('selectProL').value;
+    showProMCode=null;
+    initPro1();
+}
+// 입력값 변경2
+function refreshProL2(){
+    showProLCode2=null;
+    showProMCode2=null;
+    initPro2();
+}
+function refreshProM2(){
+    showProLCode2=document.getElementById('selectProL2').value;
+    showProMCode2=null;
+    initPro2();
 }

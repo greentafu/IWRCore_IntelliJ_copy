@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RequestRepository extends JpaRepository<Request , Long> {
-    @Query("select r from Request r where r.preRequest.preReqCode=:preCode order by r.material.materCode desc")
+    @Query("select r from Request r " +
+            "where r.preRequest.preReqCode=:preCode " +
+            "order by r.material.materCode desc")
     List<Request> getRequestByPreRequest(Long preCode);
 
     @Modifying
@@ -21,7 +23,8 @@ public interface RequestRepository extends JpaRepository<Request , Long> {
     @Query("select count(r) from Request r where r.preRequest.preReqCode=:preCode")
     Long getAllRequestCount(Long preCode);
 
-    @Query("select count(r) from Request r where r.preRequest.preReqCode=:preCode and r.releaseDate is not null")
+    @Query("select count(r) from Request r " +
+            "where r.preRequest.preReqCode=:preCode and r.releaseDate is not null")
     Long getFinRequestCount(Long preCode);
 
     @Query("select count(r) from Request r where r.releaseDate is null")

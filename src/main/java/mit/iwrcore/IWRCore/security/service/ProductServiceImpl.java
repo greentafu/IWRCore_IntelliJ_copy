@@ -8,10 +8,10 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
 import mit.iwrcore.IWRCore.repository.ProductRepository;
-import mit.iwrcore.IWRCore.security.dto.ProplanDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -79,6 +79,21 @@ public class ProductServiceImpl implements ProductService {
         Long count=productRepository.newProductCount();
         return (count!=null)?count:0L;
     }
+    @Override
+    public List<ProductDTO> getProductByCategory(Long type, Long code){
+        List<ProductDTO> dtoList=new ArrayList<>();
+        if(type==0){
+            List<Product> entityList=productRepository.getProductByCategoryL(code);
+            if(entityList.size()!=0) entityList.forEach(x->dtoList.add(entityToDto(x)));
+        }else if(type==1){
+            List<Product> entityList=productRepository.getProductByCategoryM(code);
+            if(entityList.size()!=0) entityList.forEach(x->dtoList.add(entityToDto(x)));
+        }else if(type==2){
+            List<Product> entityList=productRepository.getProductByCategoryS(code);
+            if(entityList.size()!=0) entityList.forEach(x->dtoList.add(entityToDto(x)));
+        }
+        return dtoList;
+    }
 
 
     // 생산부서> 모든 제품 목록
@@ -109,52 +124,14 @@ public class ProductServiceImpl implements ProductService {
         Function<Product, ProductDTO> fn=(entity->entityToDto(entity));
         return new PageResultDTO<>(entityPage, fn);
     }
-
-
-
-
-
-
-
-
+    // 메인화면> 출하요청 중인 제품 목록
     @Override
-    public List<ProplanDTO> convertProPlans(Product entity) {
-//        if (entity == null || entity.getProPlans() == null) {
-//            return Collections.emptyList(); // proPlans가 null일 경우 빈 리스트 반환
-//        }
-//        return entity.getProPlans().stream()
-//                .map(proPlan -> ProplanDTO.builder()
-//                        .proplanNo(proPlan.getProplanNo())
-//                        .pronum(proPlan.getPronum())
-//                        .filename(proPlan.getFilename())
-//                        .startDate(proPlan.getStartDate())
-//                        .endDate(proPlan.getEndDate())
-//                        .line(proPlan.getLine())
-//                        .details(proPlan.getDetails())
-//                        .build())
-//                .collect(Collectors.toList());
-        return null;
-    }
-    @Override
-    public List<ProductDTO> searchProducts(String query) {
-//        List<Product> products;
-//        if (query == null || query.trim().isEmpty()) {
-//            products = productRepository.findAll(); // 모든 제품 가져오기
-//        } else {
-//            products = productRepository.searchProducts(query); // 검색 결과 가져오기
-//        }
-//
-//        // Product 리스트를 ProductDTO 리스트로 변환
-//        return products.stream()
-//                .map(productEntity -> {
-//                    ProductDTO productDTO = entityToDto(productEntity);
-//                    // ProPlans 추가
-//                    List<ProplanDTO> proPlans = convertProPlans(productEntity);
-//                    productDTO.setProPlans(proPlans);
-//                    return productDTO;
-//                })
-//                .collect(Collectors.toList());
-        return null;
+    public List<ProductDTO> getRequestProduct(){
+        List<Product> entityList=productRepository.getRequestProduct();
+        if(entityList.size()==0) return null;
+        List<ProductDTO> dtoList=new ArrayList<>();
+        entityList.forEach(x->dtoList.add(entityToDto(x)));
+        return dtoList;
     }
 }
 

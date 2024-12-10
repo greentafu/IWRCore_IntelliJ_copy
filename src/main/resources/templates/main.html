@@ -55,10 +55,6 @@
         height: 350px;
         overflow-y: auto; /* 내부 스크롤 활성화 */
       }
-      #content2 {
-        height: 350px;
-        overflow-y: auto; /* 내부 스크롤 활성화 */
-      }
     </style>
     <!--/Style-->
   </span>
@@ -141,15 +137,15 @@
               <small class="text-success fw-semibold" style="font-size: 2.2em;"><i class="bx bx-up-arrow-alt"></i> [[${newRequest}]]</small>
             </div>
           </div>
+          <!--/Card-->
         </div>
       </div>
       <!-- first row end -->
       <!-- Total Revenue -->
       <div class="row justify-content-center">
         <!-- Existing Card -->
-        <!-- Card 5 -->
         <div class="col-lg-12 col-md-6 mb-4">
-          <!-- Card 6 -->
+          <!-- Card 5 -->
           <div class="card" style="height: 446px;">
             <div class="card-body">
               <div class="mb-2"><strong>입고 관리</strong></div>
@@ -177,59 +173,28 @@
                 </div>
               </div>
             </div>
-            <!-- Add navigation links here -->
           </div>
+          <!--/Card-->
         </div>
-        <!--/Card-->
         <div class="col-lg-12 col-md-6 mb-4">
           <!-- Card 6 -->
           <div class="card" style="height: 446px;">
-          <div class="card-body">
-            <div class="mb-2"><strong>긴급 납품 지시</strong></div>
-               <div class="btn-group">
-                   <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        수량 순
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="javascript:void(0);" onclick="fetchEmergencyDeliveryRequests('high')">수량 높은순</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0);" onclick="fetchEmergencyDeliveryRequests('low')">수량 낮은순</a></li>
-                    </ul>
-                </div>
-             <div class="btn-group">
-                    <!-- 검수일 정렬 드롭다운 -->
-                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        검수일 순
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="javascript:void(0);" onclick="fetchEmergencyDeliveryRequests('early')">검수일 빠른순</a></li>
-                        <li><a class="dropdown-item" href="javascript:void(0);" onclick="fetchEmergencyDeliveryRequests('late')">검수일 늦은순</a></li>
-                    </ul>
-                </div>
-                <table id="emergency-requests-table" class="table table-bordered mb-2">
-                    <thead>
-                        <tr>
-                            <th>제품</th>
-                            <th>자재</th>
-                          <th>부족 수량</th>
-                            <th>검수일</th>
-                            <th>요청</th>
-                        </tr>
-                    </thead>
-                    <tbody id="emergency-table-body">
-                        <!-- JavaScript로 데이터를 여기에 동적으로 삽입합니다. -->
-
-
-                </tbody>
-              </table>
+            <div class="card-body">
+              <div class="mb-2"><strong>일정</strong></div>
+              <select class="form-select form-select-sm" style="width: fit-content;" id="requestProductName">
+                <option value="">전체 제품</option>
+                <option th:each="list:${requestProductList}" th:value="${list.manuCode}">[[${list.name}]]</option>
+              </select>
+              <div id="calendar"></div>
             </div>
           </div>
+          <!--/Card6-->
         </div>
-        <!-- New Card -->
-        <!--/Card-->
       </div>
     </div>
 
     <!--Modal-->
+    <!--Modal1-->
     <div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -277,6 +242,7 @@
         </div>
       </div>
     </div>
+    <!--/Modal1-->
     <!--Modal2-->
     <div class="modal fade" id="modalCenter2" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -391,119 +357,6 @@
         document.getElementById('receiveNo').value=shipNo;
       }
     </script>
-
-    <script>
-  // Function to show the modal with the updated shortage amount
-function showOptions(shortage) {
-  // Set the shortage amount in the modal
-  document.getElementById('shortageAmount').textContent = shortage || 0;
-  document.getElementById('deliveryQuantity').value = shortage || 0;
-
-  // Show the modal
-  var myModal = new bootstrap.Modal(document.getElementById('modalCenter'), {
-    keyboard: false
-  });
-  myModal.show();
-}
-
-// Event listener for the request button
-document.addEventListener('DOMContentLoaded', function () {
-  fetchEmergencyDeliveryRequests('high'); // 기본적으로 수량 높은순으로 정렬하여 데이터 로드
-
-  // Attach click event to request buttons
-  document.getElementById('emergency-table-body').addEventListener('click', function (event) {
-    if (event.target && event.target.matches('button.request-btn')) {
-      var shortage = event.target.getAttribute('data-shortage'); // Get shortage value from button attribute
-      showOptions(shortage); // Show modal with shortage value
-    }
-  });
-
-  // Attach click event to the delivery confirmation button
-  document.getElementById('deliveryConfirmButton').addEventListener('click', function () {
-    // Collect input values from the modal
-    const emerNum = document.getElementById('deliveryQuantity').value;
-    const emerDate = document.querySelector('input[type="date"]').value;
-    const who = document.getElementById('emailWithTitle').value;
-
-    // Convert date format to LocalDateTime compatible string
-    const emerDateTime = emerDate ? emerDate + 'T00:00:00' : null; // YYYY-MM-DDT00:00:00 format
-
-    // Create DTO object
-    const emergencyDTO = {
-      emerNum: emerNum,
-      emerDate: emerDateTime,
-      who: who,
-      emcheck: 0 // Default value 0
-    };
-
-    // Send data to the server
-    fetch('/order/createEmergency', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(emergencyDTO)
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data) {
-          alert('납품 지시가 성공적으로 저장되었습니다.');
-          location.reload(); // Reload the page to update the list or table
-        } else {
-          alert('납품 지시 저장에 실패했습니다.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('납품 지시 저장 중 오류가 발생했습니다.');
-      });
-  });
-});
-
-// Function to fetch emergency delivery requests and update the table
-function fetchEmergencyDeliveryRequests(orderBy) {
-  fetch('/proteam/login/emergency-delivery-requests?orderBy=' + orderBy)
-    .then(response => response.json())
-    .then(data => {
-      updateEmergencyTable(data);
-    })
-    .catch(error => {
-      console.error('Error fetching emergency delivery requests:', error);
-    });
-}
-
-// Function to update the table with fetched data
-function updateEmergencyTable(data) {
-  var tableBody = document.getElementById('emergency-table-body');
-  tableBody.innerHTML = ''; // Clear existing table content
-
-  data.forEach(function (item) {
-    var shortage = 0; // Initialize shortage to 0
-
-    // Extract shortage amount from the text if available
-    if (item.text && item.text.includes('부족')) {
-      var matches = item.text.match(/\d+/); // Extract number from text
-      if (matches) {
-        shortage = parseInt(matches[0], 10); // Convert to integer
-      }
-    }
-
-    var row = `<tr>
-
-                  <td>${item.proplanDTO ? item.proplanDTO.productDTO.name : ''}</td>
-                  <td><strong>${item.materialDTO ? item.materialDTO.name : ''}</strong></td>
-                  <td>${shortage || 0}</td> <!-- Show shortage amount -->
-                  <td>${item.eventDate || ''}</td>
-                  <td><button type="button" class="btn btn-primary request-btn" data-shortage="${shortage}">요청</button></td>
-              </tr>`;
-    tableBody.insertAdjacentHTML('beforeend', row);
-  });
-}
-
-    </script>
-
-
-
 
     <!--Script-->
   </span>
