@@ -13,7 +13,12 @@
   <span id="head">
     <title>출하요청 상세보기</title>
     <!--Style-->
-
+    <style>
+      #content1 {
+        height: 400px;
+        overflow-y: auto; /* 내부 스크롤 활성화 */
+      }
+    </style>
     <!--/Style-->
   </span>
 
@@ -25,6 +30,7 @@
           <div class="card mb-4">
             <div class="card-body">
               <input type="number" style="display:none;" id="preCode" th:value="${preRequestDTO.preReqCode}">
+              <input type="number" style="display:none;" id="proNo" th:value="${preRequestDTO.proplanDTO.proplanNo}">
               <h5>제품 정보</h5>
               <label class="form-label">제품명</label>
               <div class="row mb-2">
@@ -43,7 +49,7 @@
               <h5>출하 요청 정보</h5>
               <input type="number" style="display:none;" id="proPlanNo">
               <div class="row mb-4">
-                <label class="col-sm-1 col-form-label" for="product-quantity">출하라인 :</label>
+                <label class="col-sm-1 col-form-label" >출하라인 :</label>
                 <div class="col-md-1">
                   <select class="form-select" style="width: 100%;" id="selectLine" disabled>
                     <option th:value="${preRequestDTO.lineDTO.lineCode}" selected>[[${preRequestDTO.lineDTO.lineName}]]</option>
@@ -77,8 +83,70 @@
         </div>
       </div>
     </div>
-    <!--Modal-->
 
+    <!--Modal-->
+    <div class="modal fade" id="exLargeModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel4">납품 요청</h5>
+            <input type="number" style="display:none;" id="urgencyMaterialCode">
+          </div>
+          <div class="modal-body">
+            <table>
+              <tr>
+                <td style="width:120px">계약정보</td>
+                <td id="urgencyContract" style="width:300px"></td>
+                <td id="urgencyMaterial" style="width:300px"></td>
+                <td id="urgencyStock"></td>
+              </tr>
+              <tr>
+                <td>출하요청 정보</td>
+                <td id="urgencyRequestNum"></td>
+                <td id="urgencyRequestDate"></td>
+                <td></td>
+              </tr>
+            </table>
+          </div>
+          <hr class="m-0">
+          <div class="modal-body">
+            <div id="content1">
+              <table class="table table-bordered mb-4">
+                <thead>
+                  <tr>
+                    <th>요청일</th>
+                    <th>수량</th>
+                    <th>희망일</th>
+                  </tr>
+                </thead>
+                <tbody id="firstTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <hr class="m-0">
+          <div class="modal-body">
+            <table>
+              <tr>
+                <td style="width:120px">납품요청</td>
+                <td>납품요청 수량:</td>
+                <td style="width:200px">
+                  <input type="number" class="form-control" id="urgencyQuantity">
+                </td>
+                <td style="width:50px"></td>
+                <td>납품요청 일자:</td>
+                <td style="width:200px">
+                  <input type="date" class="form-control" id="urgencyDate">
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
+            <button type="button" class="btn btn-primary" onclick="saveUrgency()">등록</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!--/Modal-->
     <!--Script-->
     <script src="../assets/js/new-request.js"></script>

@@ -1,6 +1,7 @@
 package mit.iwrcore.IWRCore.security.dto.PageDTO;
 
 import lombok.Data;
+import mit.iwrcore.IWRCore.security.dto.ContractDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -81,5 +82,13 @@ public class PageResultDTO<DTO, EN> {
     private Long receiveReturn;
     // 발주중 제품
     private Long baljuProductName;
+
+    // 수량
+    private Long allShipNum;
+    private Long allReturnNum;
+    private Long allMakeNum;
+
+    // 계약
+    private ContractDTO contractDTO;
 
 }

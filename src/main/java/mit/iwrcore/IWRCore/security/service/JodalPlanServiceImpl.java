@@ -10,6 +10,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.JodalPlanJodalChsuDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.LLLSDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturctureDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -155,4 +156,5 @@ public class JodalPlanServiceImpl implements JodalPlanService {
         Long allNum=(allJodalChasuNum!=null)?allJodalChasuNum:0L;
         return new JodalPlanJodalChsuDTO(jodalPlanDTO, allNum);
     }
+
 }

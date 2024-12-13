@@ -367,10 +367,12 @@ function viewRequest(){
                 const newRow = document.createElement('tr');
 
                 const codeTd = document.createElement('td');
+                codeTd.id = 'materialCode'+materialCode;
                 codeTd.innerText = materialCode;
                 newRow.appendChild(codeTd);
 
                 const nameTd = document.createElement('td');
+                nameTd.id = 'materialName'+materialCode;
                 nameTd.innerText = materialName;
                 newRow.appendChild(nameTd);
 
@@ -379,14 +381,17 @@ function viewRequest(){
                 newRow.appendChild(structureTd);
 
                 const remainTd = document.createElement('td');
+                remainTd.id = 'remain'+materialCode;
                 remainTd.innerText = remainNum;
                 newRow.appendChild(remainTd);
 
                 const reqNumTd = document.createElement('td');
+                reqNumTd.id = 'reqNum'+materialCode;
                 reqNumTd.innerText = reqNum;
                 newRow.appendChild(reqNumTd);
 
                 const dateTd = document.createElement('td');
+                dateTd.id = 'reqDate'+materialCode;
                 dateTd.innerText = reqDate;
                 newRow.appendChild(dateTd);
 
@@ -395,8 +400,12 @@ function viewRequest(){
                     btn1Td.innerHTML='출하완료';
                     btn1Td.style.color = 'green';
                 }else if(remainNum<reqNum){
-                    btn1Td.innerHTML='수량부족';
-                    btn1Td.style.color = 'red';
+                    btn1Td.innerHTML=`
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exLargeModal"
+                            onclick="refreshContract(${materialCode})">
+                            납품 요청
+                        </button>
+                    `;
                 }else{
                     btn1Td.innerHTML=`<button class="btn btn-primary btn-sm" onclick=checkRequest(${reqCode})>출하하기</button>`;
                 }
@@ -491,4 +500,111 @@ function checkRequest(button){
             viewRequest();
         }
     });
+}
+// 긴급납품> 회사정보 가져오기
+function getContract(materialCode){
+    const content1 = document.getElementById("content1");
+    const firstTbody = document.getElementById("firstTbody");
+
+    const reqRemain=document.getElementById('remain'+materialCode).textContent;
+    const reqNum=document.getElementById('reqNum'+materialCode).textContent;
+    const reqDate=document.getElementById('reqDate'+materialCode).textContent;
+    document.getElementById('urgencyRequestNum').textContent='출하요청 수량: '+reqNum;
+    document.getElementById('urgencyRequestDate').textContent='출하요청 일자: '+reqDate;
+    document.getElementById('urgencyMaterialCode').value=materialCode;
+
+    document.getElementById('urgencyQuantity').value=Number(reqNum)-Number(reqRemain);
+    if (reqDate) {
+        const date = new Date(reqDate);
+        date.setDate(date.getDate() - 2);
+        const newDate = date.toISOString().split('T')[0];
+        document.getElementById('urgencyDate').value=newDate;
+    }
+
+    const proNo=document.getElementById('proNo').value;
+    $.ajax({
+        url:'/select/getUrgencyContract',
+        method:'POST',
+        data: {page:page, proNo:proNo, materCode:materialCode},
+        success: function(data) {
+            if(data.totalPage<page) finPage=true;
+
+            const contract=data.contractDTO;
+            if(contract!=null){
+                const materialName=document.getElementById('materialName'+materialCode).textContent;
+
+                const partner=contract.partnerDTO;
+                const allMake=(data.allMakeNum!==null)?Number(data.allMakeNum):0;
+                const allShipNum=(data.allShipNum!==null)?Number(data.allShipNum):0;
+                const allReturnNum=(data.allReturnNum!==null)?Number(data.allReturnNum):0;
+                const allSend=allShipNum-allReturnNum;
+                const allGet=allMake-allShipNum;
+
+                document.getElementById('urgencyContract').textContent='협력회사: '+partner.name;
+                document.getElementById('urgencyMaterial').textContent='자재: '+materialName+'('+materialCode+')';
+                document.getElementById('urgencyStock').textContent='(계약수량: '+contract.conNum+', 납품수량: '+allSend+', 보유수량: '+allGet+')';
+            }
+
+            data.dtoList.forEach(x=>{
+                const regDate=x.regDate.split('T')[0];
+                const urNum=x.emerNum;
+                const urDate=x.emerDate.split('T')[0];
+
+                const newRow = document.createElement("tr");
+
+                [regDate, urNum, urDate].forEach(text => {
+                    const item = document.createElement("td");
+                    item.textContent = text;
+                    newRow.appendChild(item);
+                });
+                firstTbody.appendChild(newRow);
+            });
+        }
+    });
+    page++;
+}
+// 긴급납품> 모달창 새로고침
+function refreshContract(materialCode){
+    page = 1;
+    finPage=false;
+    document.getElementById("firstTbody").innerText='';
+    getContract(materialCode);
+}
+// 긴급납품> 저장
+function saveUrgency(){
+    const urgencyNum=Number(document.getElementById('urgencyQuantity').value);
+    const urgencyDate=document.getElementById('urgencyDate').value;
+    const proplanNo=Number(document.getElementById('proNo').value);
+    const materialCode=Number(document.getElementById('urgencyMaterialCode').value);
+
+    let trueNum=false;
+    let trueDate=false;
+    let trueForm=false;
+
+    if(urgencyNum<0 || urgencyNum===null || urgencyNum=='') trueNum=true;
+    if(!Number.isInteger(urgencyNum)) trueNum=true;
+    if(urgencyDate===null) trueDate=true;
+    if(proPlanNo===null || proPlanNo==='') trueForm=true;
+    if(materialCode===null || materialCode==='') trueForm=true;
+
+    if(trueNum){
+        alert('수량에 0이상의 정수를 입력해 주세요.');
+    }else if(trueDate){
+        alert('알맞은 요청일을 입력해 주세요.')
+    }else if(trueForm){
+        alert('형식이 잘못되었습니다.');
+    }else{
+        $.ajax({
+            url:'/saveUrgency',
+            method:'POST',
+            data:{urgencyNum:urgencyNum, urgencyDate:urgencyDate, proplanNo:proplanNo, materialCode:materialCode},
+            success: function(data) {
+                if(data===0 || data==='0') alert('현재 진행중인 발주목록이 존재하지 않습니다.');
+                else refreshContract(materialCode);
+            },
+            error: function(xhr, status, error) {
+                $('#exLargeModal').modal('hide');
+            }
+        });
+    }
 }

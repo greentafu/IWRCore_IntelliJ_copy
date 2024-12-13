@@ -51,44 +51,4 @@ public class OrderController {
         model.addAttribute("partner", partnerDTO);
         model.addAttribute("baljuList", baljuChasuService.modifyBalju(partnerDTO.getPno()));
     }
-
-
-
-
-//    @PostMapping ("/delete_order")
-//    public String delete_order(@RequestParam(required = false) Long baljuNo){
-//        baljuService.deleteBalju(baljuNo);
-//        return "redirect:/order/list_order";
-//    }
-    @PostMapping("/urgent")
-    public void urgent(){
-
-    }
-    @PostMapping("/createEmergency")
-    public ResponseEntity<Void> createEmergency(@RequestBody EmergencyDTO emergencyDTO) {
-        log.info("Received EmergencyDTO: {}", emergencyDTO);
-
-        // 인증된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
-        MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
-        Member writer = memberService.memberdtoToEntity(memberDTO);
-
-        try {
-            // Emergency 엔티티 생성 및 필수 정보 설정
-            emergencyDTO.setMemberDTO(memberDTO);
-
-            // Emergency 엔티티를 서비스 레이어를 통해 저장
-            emergencyService.createEmergency(emergencyDTO);
-
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Error processing EmergencyDTO: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
-
-
 }

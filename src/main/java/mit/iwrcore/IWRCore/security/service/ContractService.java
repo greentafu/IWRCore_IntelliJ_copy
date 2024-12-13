@@ -36,4 +36,6 @@ public interface ContractService {
     PageResultDTO<StockQuantityDTO, Object[]> stockList(PageRequestDTO requestDTO);
     // 재고> 재고상세목록
     PageResultDTO<StockDetailDTO, Object[]> stockdetailList(PageRequestDTO requestDTO);
+    // 긴급요청> 계약(생산계획, 자재코드)
+    ContractDTO getContractByProMater(Long proplanNo, Long materCode);
 }

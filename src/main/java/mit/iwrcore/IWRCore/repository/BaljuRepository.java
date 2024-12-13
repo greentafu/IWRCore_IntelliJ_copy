@@ -32,4 +32,14 @@ public interface BaljuRepository extends JpaRepository<Balju, Long>, BaljuReposi
     @Query("select b from Balju b " +
             "where b.baljuNo=(select max(bb.baljuNo) from Balju bb where bb.contract.jodalPlan.material.materCode=:materCode)")
     Balju recentBaljuByMaterial(Long materCode);
+
+    @Transactional
+    @EntityGraph(attributePaths = {"contract"})
+    @Query("select b, sum(s.shipNum), sum(r.shipment.shipNum) from Balju b " +
+            "left join Shipment s on (s.balju.baljuNo=b.baljuNo) " +
+            "left join Returns r on (r.shipment.shipNO=s.shipNO) " +
+            "where b.contract.jodalPlan.proPlan.proplanNo=:proplanNo and b.contract.jodalPlan.material.materCode=:materCode " +
+            "and b.finCheck!=1 " +
+            "group by b")
+    List<Object[]> notFinBaljuByProMater(Long proplanNo, Long materCode);
 }

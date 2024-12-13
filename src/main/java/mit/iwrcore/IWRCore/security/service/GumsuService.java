@@ -6,6 +6,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuBaljuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuGumsuDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.LLLSDTO;
 
 import java.util.List;
 
@@ -28,4 +29,6 @@ public interface GumsuService {
     PageResultDTO<BaljuGumsuDTO, Object[]> couldGumsu(PageRequestDTO requestDTO);
     // 검수차수> 회사별 검수차수 설정 가능 발주 목록
     List<BaljuBaljuChasuDTO> getNoneGumsuBalju(Long pno);
+    // 긴급납품> 생산계획, 자재에 따른 수량들
+    LLLSDTO getEveryQuantity(Long proplanNo, Long materCode);
 }

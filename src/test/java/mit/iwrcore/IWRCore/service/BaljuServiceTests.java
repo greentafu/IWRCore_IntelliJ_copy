@@ -33,11 +33,4 @@ public class BaljuServiceTests {
     @Autowired
     private BaljuRepository baljuRepository;
 
-    @Autowired
-    private MemberService memberService;
-    @Autowired
-    private ContractService contractService;
-
-
-
 }

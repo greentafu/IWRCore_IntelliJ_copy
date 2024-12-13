@@ -4,10 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.GumsuDTO;
 import mit.iwrcore.IWRCore.security.dto.ShipmentDTO;
-import mit.iwrcore.IWRCore.security.service.BaljuService;
-import mit.iwrcore.IWRCore.security.service.GumsuService;
-import mit.iwrcore.IWRCore.security.service.ReturnsService;
-import mit.iwrcore.IWRCore.security.service.ShipmentService;
+import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +21,8 @@ public class CRUDPartnerController {
     private ShipmentService shipmentService;
     @Autowired
     private ReturnsService returnsService;
+    @Autowired
+    private EmergencyService emergencyService;
 
     @PostMapping("/saveMakeQuantity")
     public void saveMakeQuantity(@RequestParam(required = false) Long baljuNo,
@@ -48,5 +47,9 @@ public class CRUDPartnerController {
     @PostMapping("/saveReturnCheck")
     public void returnCheck(@RequestParam Long reNo){
         returnsService.modifyReturnCheck(reNo);
+    }
+    @PostMapping("/saveEmergencyCheck")
+    public void emergencyCheck(@RequestParam Long emerNo){
+        emergencyService.updateEmergencyCheck(emerNo);
     }
 }

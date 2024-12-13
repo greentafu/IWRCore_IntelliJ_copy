@@ -70,4 +70,9 @@ public class PageRequestDTO {
 
     // 출하요청
     private Long releaseStatus;
+
+    // 긴급납품
+    private Long proplanNo;
+    private Long urgencyCheck;
+
 }

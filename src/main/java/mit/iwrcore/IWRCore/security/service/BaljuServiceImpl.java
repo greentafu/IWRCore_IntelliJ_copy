@@ -8,6 +8,7 @@ import mit.iwrcore.IWRCore.security.dto.*;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuLLDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -144,5 +145,23 @@ public class BaljuServiceImpl implements BaljuService {
         List<ProductDTO> dtoList=new ArrayList<>();
         entityList.stream().forEach(x->dtoList.add(productService.entityToDto(x)));
         return dtoList;
+    }
+    // 긴급납품> 생산계획, 자재코드에 따른 마무리되지 않은 발주목록
+    @Override
+    public List<BaljuLLDTO> notFinBaljuByProMater(Long proplanNo, Long materCode){
+        List<BaljuLLDTO> dtoList=new ArrayList<>();
+        List<Object[]> entityList=baljuRepository.notFinBaljuByProMater(proplanNo, materCode);
+        if(entityList.size()!=0) entityList.forEach(x->dtoList.add(baljuLLToDTO(x)));
+        return dtoList;
+    }
+    private BaljuLLDTO baljuLLToDTO(Object[] objects){
+        Balju balju=(Balju) objects[0];
+        Long tempAllShipNum=(Long) objects[1];
+        Long tempAllReturn=(Long) objects[2];
+
+        BaljuDTO baljuDTO=(balju!=null)? entityToDTO(balju):null;
+        Long allShipNum=(tempAllShipNum!=null)? tempAllShipNum:0L;
+        Long allReturn=(tempAllReturn!=null)? tempAllReturn:0L;
+        return new BaljuLLDTO(baljuDTO, allShipNum, allReturn);
     }
 }

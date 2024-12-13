@@ -17,4 +17,8 @@ public interface ContractRepository extends JpaRepository<Contract, Long>, Contr
 
     @Query("select c.conDate from Contract c")
     List<LocalDateTime> conDateList();
+
+    @Query("select c from Contract c " +
+            "where c.jodalPlan.proPlan.proplanNo=:proplanNo and c.jodalPlan.material.materCode=:materCode")
+    List<Contract> getContractByProMater(Long proplanNo, Long materCode);
 }

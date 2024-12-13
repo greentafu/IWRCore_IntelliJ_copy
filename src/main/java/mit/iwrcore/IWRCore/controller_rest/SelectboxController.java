@@ -22,6 +22,9 @@ import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProMDTO;
 import mit.iwrcore.IWRCore.security.dto.CategoryDTO.ProDTO.ProSDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.*;
 import mit.iwrcore.IWRCore.security.service.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -404,5 +407,14 @@ public class SelectboxController {
                 .materCode(materCode).selectedYear(selectedYear)
                 .build();
         return contractService.stockdetailList(requestDTO);
+    }
+
+    // 긴급남품> 자재 선택
+    @PostMapping("/getUrgencyContract")
+    public PageResultDTO<EmergencyDTO, Emergency> getUrgencyContract(
+            @RequestParam(required = false) int page,
+            @RequestParam(required = false) Long proNo, @RequestParam(required = false) Long materCode){
+        Pageable pageable= PageRequest.of(page-1, 10, Sort.by("emerNo").descending());
+        return emergencyService.getEmergencyByProMat(pageable, proNo, materCode);
     }
 }

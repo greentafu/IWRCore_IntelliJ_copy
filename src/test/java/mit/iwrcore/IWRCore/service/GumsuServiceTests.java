@@ -27,4 +27,9 @@ public class GumsuServiceTests {
     private GumsuRepository gumsuRepository;
 
 
+    @Test
+    @Transactional
+    public void test(){
+        System.out.println("@@@@ "+gumsuService.getEveryQuantity(9L, 1L));
+    }
 }

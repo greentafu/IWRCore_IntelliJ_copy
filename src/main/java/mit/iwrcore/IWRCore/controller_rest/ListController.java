@@ -52,6 +52,8 @@ public class ListController {
     private MemberService memberService;
     @Autowired
     private PartnerService partnerService;
+    @Autowired
+    private EmergencyService emergencyService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -427,6 +429,18 @@ public class ListController {
                 .pno(authPartnerDTO.getPno()).returnCheck(selectedBox).build();
 
         return returnsService.getReturnPage(requestDTO);
+    }
+    // 협력회사> 긴급납품 목록
+    @GetMapping("/partnerUrgencyList")
+    public PageResultDTO<EmergencyDTO, Emergency> partnerUrgencyList(@RequestParam(required = false) int page, Long selectedBox){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
+
+        PageRequestDTO requestDTO=PageRequestDTO.builder()
+                .page(page).size(15)
+                .pno(authPartnerDTO.getPno()).urgencyCheck(selectedBox).build();
+
+        return emergencyService.getAllEmergencies(requestDTO);
     }
 
     // 재고> 수량 목록

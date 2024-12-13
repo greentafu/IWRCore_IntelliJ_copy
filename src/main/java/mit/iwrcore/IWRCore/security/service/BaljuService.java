@@ -6,6 +6,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.ProductDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuLLDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ContractBaljuDTO;
 
 import java.util.List;
@@ -37,4 +38,6 @@ public interface BaljuService {
     PageResultDTO<BaljuDTO, Balju> partnerBaljuList(PageRequestDTO requestDTO);
     // 메인화면> 발주 중인 제품 목록
     List<ProductDTO> baljuProduct();
+    // 긴급납품> 생산계획, 자재코드에 따른 마무리되지 않은 발주목록
+    List<BaljuLLDTO> notFinBaljuByProMater(Long proplanNo, Long materCode);
 }

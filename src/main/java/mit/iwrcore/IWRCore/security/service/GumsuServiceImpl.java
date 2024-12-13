@@ -11,6 +11,7 @@ import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuBaljuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.BaljuGumsuDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.LLLSDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -106,5 +107,15 @@ public class GumsuServiceImpl implements GumsuService{
         BaljuDTO baljuDTO=(balju!=null)?baljuService.entityToDTO(balju):null;
         BaljuChasuDTO baljuChasuDTO=(baljuChasu!=null)?baljuChasuService.entityToDto(baljuChasu):null;
         return new BaljuBaljuChasuDTO(baljuDTO, baljuChasuDTO);
+    }
+    // 긴급납품> 생산계획, 자재에 따른 수량들
+    @Override
+    public LLLSDTO getEveryQuantity(Long proplanNo, Long materCode){
+        List<Object[]> list=gumsuRepository.stockToProPlanMaterCode(proplanNo, materCode);
+        if(list.size()==0) return null;
+        else{
+            Object[] objects=list.get(0);
+            return new LLLSDTO((Long) objects[0], (Long) objects[1], (Long) objects[2], null);
+        }
     }
 }

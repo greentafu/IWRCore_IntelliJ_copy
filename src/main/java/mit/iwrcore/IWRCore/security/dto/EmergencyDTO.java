@@ -2,7 +2,6 @@ package mit.iwrcore.IWRCore.security.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import mit.iwrcore.IWRCore.entity.Balju;
 
 import java.time.LocalDateTime;
 
@@ -14,9 +13,9 @@ public class EmergencyDTO {
     private LocalDateTime emerDate;
     private String who;
     private Long emcheck;
+    private LocalDateTime regDate;
 
     private BaljuDTO baljuDTO;
     private MemberDTO memberDTO;
-    private RequestDTO requestDTO;
-
+//    private RequestDTO requestDTO;
 }

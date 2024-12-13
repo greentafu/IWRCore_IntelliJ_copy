@@ -189,5 +189,12 @@ public class ContractServiceImpl implements ContractService {
         Long sumReq=(tempSumReq!=null)?tempSumReq:0L;
         return new StockDetailDTO(contractDTO, sumShip, sumReq);
     }
+    // 긴급요청> 계약(생산계획, 자재코드)
+    @Override
+    public ContractDTO getContractByProMater(Long proplanNo, Long materCode){
+        List<Contract> list=contractRepository.getContractByProMater(proplanNo, materCode);
+        if(list.size()==0) return null;
+        return entityToDTO(list.get(0));
+    }
 
 }

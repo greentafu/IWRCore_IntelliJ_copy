@@ -228,7 +228,7 @@ function loadItems(type) {
     if(type==='order') orderList();
     if(type==='invoice') invoiceList();
     if(type==='returns') returnList();
-    if(type==='urgent') urgentList();
+    if(type==='urgency') urgencyList();
 
     page++;
 }
@@ -377,6 +377,77 @@ function returnList(){
 
                 firstTbody.appendChild(newRow);
             });
+        }
+    });
+}
+// 긴급납품
+function urgencyList(){
+    selectedBox = (document.getElementById("selectedBox").value!='')?document.getElementById("selectedBox").value:null;
+    $.ajax({
+        url:'/list/partnerUrgencyList',
+        method:'GET',
+        data:{page:page, selectedBox:selectedBox},
+        success:function(data){
+            if(data.totalPage<page) finPage=true;
+            data.dtoList.forEach(x=>{
+                const emerNo=x.emerNo;
+                const emerNum=x.emerNum;
+                const emerDate=x.emerDate.split('T')[0];
+                const regDate=x.regDate.split('T')[0];
+                const materialName=x.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name;
+                const emcheck=x.emcheck;
+
+                const newRow = document.createElement("tr");
+
+                const dateTd = document.createElement("td");
+                dateTd.textContent = regDate;
+                newRow.appendChild(dateTd);
+
+                const emDateTd = document.createElement("td");
+                emDateTd.id = 'emDate'+emerNo;
+                emDateTd.textContent = emerDate;
+                newRow.appendChild(emDateTd);
+
+                const nameTd = document.createElement("td");
+                nameTd.id = 'materialName'+emerNo;
+                nameTd.textContent = materialName;
+                newRow.appendChild(nameTd);
+
+                const emNumTd = document.createElement("td");
+                emNumTd.id = 'emNum'+emerNo;
+                emNumTd.textContent = emerNum;
+                newRow.appendChild(emNumTd);
+
+                const btnTd = document.createElement("td");
+                if(emcheck===0) btnTd.innerHTML=`
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalToggle"
+                        onclick="showUrgency(${emerNo})">
+                        확인 미완료
+                    </button>`;
+                if(emcheck===1) btnTd.innerHTML=`<button class="btn btn-secondary">확인 완료</button>`;
+                newRow.appendChild(btnTd);
+
+                firstTbody.appendChild(newRow);
+            });
+        }
+    });
+}
+function showUrgency(emerNo){
+    const emDate=document.getElementById('emDate'+emerNo).textContent
+    const materialName=document.getElementById('materialName'+emerNo).textContent
+    const emNum=document.getElementById('emNum'+emerNo).textContent
+
+    document.getElementById('checkText').innerHTML=materialName+"(희망일: "+emDate+", 희망수량: "+emNum+")의 납품요청을 완료하시겠습니까?";
+    document.getElementById('checkBtn').value=emerNo;
+}
+function checkUrgency(button){
+    const emerNo=button.value;
+    $.ajax({
+        url:'/saveEmergencyCheck',
+        method:'POST',
+        data:{emerNo:emerNo},
+        success:function(response){
+            window.location.reload();
         }
     });
 }

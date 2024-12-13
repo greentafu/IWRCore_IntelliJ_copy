@@ -78,10 +78,5 @@ public class PartnerController {
         model.addAttribute("returnsDTO", returnsService.getReturns(reNO));
     }
     @GetMapping("/list_urgent")
-    public void list_urgetn(PageRequestDTO requestDTO, Model model){
-        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
-        AuthPartnerDTO authPartnerDTO=(AuthPartnerDTO) authentication.getPrincipal();
-        requestDTO.setPno(authPartnerDTO.getPno());
-        model.addAttribute("urget_list", emergencyService.getAllEmergencies(requestDTO));
-    }
+    public void list_urgetn(PageRequestDTO requestDTO, Model model){}
 }
