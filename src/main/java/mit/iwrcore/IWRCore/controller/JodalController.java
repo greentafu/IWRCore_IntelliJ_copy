@@ -3,23 +3,15 @@ package mit.iwrcore.IWRCore.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.security.dto.*;
-import mit.iwrcore.IWRCore.security.dto.AjaxDTO.SaveJodalChasuDTO;
-import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.JodalChasuDateDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturcture2DTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ProPlanSturctureDTO;
 import mit.iwrcore.IWRCore.security.service.*;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +20,6 @@ import java.util.List;
 @Log4j2
 @RequiredArgsConstructor
 public class JodalController {
-
     private final JodalPlanService jodalPlanService;
     private final ContractService contractService;
     private final StructureService structureService;
@@ -75,8 +66,8 @@ public class JodalController {
             }
             tempProPlanDTO=item.getProplanDTO();
             tempStructureDTO=item.getStructureDTO();
-            tempSumRequest= item.getSumRequest();
-            tempSumShip= item.getSumShip();
+            tempSumRequest=item.getSumRequest();
+            tempSumShip=item.getSumShip();
             tempJodalPlanDTO=item.getJodalPlanDTO();
 
             if(item.getJodalChasuDTO()!=null){

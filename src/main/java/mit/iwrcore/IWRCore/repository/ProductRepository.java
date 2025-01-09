@@ -1,9 +1,7 @@
 package mit.iwrcore.IWRCore.repository;
 
-import mit.iwrcore.IWRCore.entity.Partner;
 import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.repositoryDSL.ProductRepositoryCustom;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,11 +14,6 @@ public interface  ProductRepository extends JpaRepository<Product, Long>, Produc
     @Query("select count(p) from Product p where p.mater_imsi=1 and p.mater_check=0")
     Long newProductCount();
 
-    @Query("select distinct p from PreRequest r " +
-            "left join Product p on (p.manuCode=r.proPlan.product.manuCode) " +
-            "where r.allCheck=0 order by p.manuCode desc")
-    List<Product> getRequestProduct();
-
     @Query("select p from Product p where p.proS.proScode=:code")
     List<Product> getProductByCategoryS(Long code);
 
@@ -29,6 +22,4 @@ public interface  ProductRepository extends JpaRepository<Product, Long>, Produc
 
     @Query("select p from Product p where p.proS.proM.proL.proLcode=:code")
     List<Product> getProductByCategoryL(Long code);
-
-
 }

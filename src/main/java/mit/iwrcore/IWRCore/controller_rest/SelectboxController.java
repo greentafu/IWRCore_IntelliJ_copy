@@ -131,21 +131,9 @@ public class SelectboxController {
         return list;
     }
 
-
-
-
-    @GetMapping("/anyPartner")
-    public PartnerDTO anyPartner(@RequestParam(required = false) Long pno){
-        return partnerService.findPartnerDto(pno, null, null);
-    }
-
-    @GetMapping("/noneContractJodalPlan")
-    public List<JodalPlanJodalChsuDTO> noneContractJodalPlan(){
-        return jodalPlanService.noneContract();
-    }
-
-    @GetMapping("/materialList")
-    public PageResultDTO<MaterialDTO, Material> materialList(
+    // 제품> 자재 목록 가져오기
+    @GetMapping("/getMaterialList")
+    public PageResultDTO<MaterialDTO, Material> getMaterialList(
             @RequestParam(required = false) int page, @RequestParam(required = false) List<Long> longList,
             @RequestParam(required = false) Long selectMaterL, @RequestParam(required = false) Long selectMaterM,
             @RequestParam(required = false) Long selectMaterS, @RequestParam(required = false) String materialSearch){
@@ -155,19 +143,13 @@ public class SelectboxController {
                 .materials(longList).build();
         return materialService.productMaterialList(requestDTO);
     }
-
-    @GetMapping("/selectedController")
-    public List<StructureDTO> selectedController(@RequestParam(required = false) String manuCode){
+    // 제품> 선택된 제품의 자재 목록 가져오기
+    @GetMapping("/getProductMaterial")
+    public List<StructureDTO> getProductMaterial(@RequestParam(required = false) String manuCode){
         Long code=Long.valueOf(manuCode);
         List<StructureDTO> dtoList=structureService.getStructureByProduct(code);
         return dtoList;
     }
-
-    @GetMapping("/checkProPlan")
-    public Long checkProPlan(@RequestParam(required = false) Long manuCode){
-        return proplanService.checkProPlan(manuCode);
-    }
-
 
     // 생산계획> 모든 제품 목록 가져오기
     @PostMapping("/getAllProduct")
@@ -409,7 +391,7 @@ public class SelectboxController {
         return contractService.stockdetailList(requestDTO);
     }
 
-    // 긴급남품> 자재 선택
+    // 긴급납품> 자재 선택
     @PostMapping("/getUrgencyContract")
     public PageResultDTO<EmergencyDTO, Emergency> getUrgencyContract(
             @RequestParam(required = false) int page,

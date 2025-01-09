@@ -366,12 +366,20 @@
               newRow.appendChild(progressTd);
 
               const btnTd = document.createElement("td");
-              btnTd.innerHTML=`
-                <a href="/proteam/modify_plan?proplanNo=${proplanNo}">
-                  <button class="btn btn-primary">수정</button>
-                </a>
-                <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${proplanNo}" onclick="deleteBtn(this)">삭제</button>
-              `;
+              if(conNum==0) {
+                btnTd.innerHTML=`
+                  <a href="/proteam/modify_plan?proplanNo=${proplanNo}">
+                    <button class="btn btn-primary">수정</button>
+                  </a>
+                  <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" value="${proplanNo}" onclick="deleteBtn(this)">삭제</button>
+                `;
+              }
+              if(conNum!=0) {
+                btnTd.innerHTML=`
+                  <button class="btn btn-outline-primary">수정</button>
+                  <button class="btn btn-outline-secondary">삭제</button>
+                `;
+              }
               newRow.appendChild(btnTd);
 
               const conNumTd = document.createElement("td");

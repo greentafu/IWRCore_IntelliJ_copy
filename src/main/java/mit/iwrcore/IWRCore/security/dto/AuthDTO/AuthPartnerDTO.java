@@ -17,6 +17,7 @@ public class AuthPartnerDTO extends User {
     private long pno;
     private String id;
     private String name;
+    private String department;
 
     public AuthPartnerDTO(
             String username,

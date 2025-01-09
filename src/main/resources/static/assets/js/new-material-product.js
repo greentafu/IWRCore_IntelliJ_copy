@@ -31,7 +31,7 @@ function loadItems() {
     });
 
     $.ajax({
-        url:'/select/materialList',
+        url:'/select/getMaterialList',
         method:'GET',
         data: {page:page, longList:longList, selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch},
         success:function(data){
@@ -241,7 +241,7 @@ function saveToLowerTable(whatButton){
 function initStructure(){
     const manuCode=$('#productCode').text();
     $.ajax({
-        url:'/select/selectedController',
+        url:'/select/getProductMaterial',
         method:'GET',
         data:{manuCode:manuCode},
         success:function(data){
@@ -348,9 +348,9 @@ function saveMaterial(whatButton){
                     $('#exLargeModal').modal('hide');
                     document.getElementById('materialName').value='';
                     document.getElementById('uploadFiles1').value='';
-                    document.getElementById('selectMaterL').value='';
-                    document.getElementById('selectMaterM').value='';
-                    document.getElementById('selectMaterS').value='';
+                    showMaterLCode=null;
+                    showMaterMCode=null;
+                    showMaterSCode=null;
                     document.getElementById('standard').value='';
                     document.getElementById('selUnit').value='';
                     document.getElementById('selColor').value='';

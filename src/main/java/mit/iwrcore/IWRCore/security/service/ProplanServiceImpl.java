@@ -107,24 +107,5 @@ public class ProplanServiceImpl implements ProplanService{
         Function<ProPlan, ProplanDTO> fn = (entity -> entityToDTO(entity));
         return new PageResultDTO<>(entityPage, fn);
     }
-//    // 생산부서> 생산계획에 따른 제품구성 및 수량
-//    @Override
-//    public List<ProPlanSturctureDTO> getStructureStock(Long proplanNo){
-//        List<Object[]> list = proPlanRepository.getStructureStock(proplanNo);
-//        return list.stream().map(this::proPlanSturctureToDTO).toList();
-//    }
-//    private ProPlanSturctureDTO proPlanSturctureToDTO(Object[] objects) {
-//        ProPlan proPlan = (ProPlan) objects[0];
-//        Structure structure = (Structure) objects[1];
-//        Long tempSumShip = (Long) objects[2];
-//        Long tempSumRequest = (Long) objects[3];
-//
-//        ProplanDTO proplanDTO = (proPlan != null) ? entityToDTO(proPlan) : null;
-//        StructureDTO structureDTO = (structure != null) ? structureService.entityToDto(structure) : null;
-//        Long sumShip = (tempSumShip != null) ? tempSumShip : 0L;
-//        Long sumRequest = (tempSumRequest != null) ? tempSumRequest : 0L;
-//
-//        return new ProPlanSturctureDTO(proplanDTO, structureDTO, sumRequest, sumShip, null, null, null);
-//    }
 }
 

@@ -35,6 +35,8 @@ function searchBtn(type){
 function loadItems(type){
     if(type==="member") getMemberList();
     if(type==="partner") getPartnerList();
+    if(type==="adminPartner") getPartnerList2();
+    if(type==="memberContent") getMemberContent();
 }
 function getMemberList(){
     $.ajax({
@@ -163,6 +165,51 @@ function getPartnerList(){
                     `;
                 }
                 newRow.appendChild(btnTd);
+
+                firstTbody.appendChild(newRow);
+            });
+        }
+    });
+    page++;
+}
+function getPartnerList2(){
+    $.ajax({
+        url:'/list/getPartnerPage',
+        method:'GET',
+        data:{page:page, selectPartL:selectPartL, selectPartM:selectPartM, selectPartS:selectPartS, partnerSearch:partnerSearch},
+        success:function(data){
+            if(data.totalPage<page) finPage=true;
+            data.dtoList.forEach(x=>{
+                const tempPno=x.pno;
+                const tempName=x.name;
+                const tempReg=x.registrationNumber;
+                const tempSector=x.sector;
+                const tempType=x.type;
+                const st=tempSector+'/'+tempType;
+                const tempTel=x.telNumber;
+
+                const newRow = document.createElement("tr");
+
+                const pnoTd = document.createElement("td");
+                pnoTd.textContent = tempPno;
+                pnoTd.id = 'pno'+tempPno;
+                newRow.appendChild(pnoTd);
+
+                const nameTd = document.createElement("td");
+                nameTd.innerHTML=`<a href="/adminpartner/view_partner?pno=${tempPno}">${tempName}</a>`;
+                nameTd.id = 'name'+tempPno;
+                newRow.appendChild(nameTd);
+
+                const regTd = document.createElement("td");
+                regTd.textContent = tempReg;
+                regTd.id = 'registerNumber'+tempPno;
+                newRow.appendChild(regTd);
+
+                [st, tempTel].forEach(text => {
+                    const item = document.createElement("td");
+                    item.textContent = text;
+                    newRow.appendChild(item);
+                });
 
                 firstTbody.appendChild(newRow);
             });

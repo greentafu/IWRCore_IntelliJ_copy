@@ -47,6 +47,7 @@
                     th:value=${product.name}
             />
             <label class="form-label">카테고리 선택</label>
+            <input type="number" style="display:none;" th:value="${product.proSDTO.proScode}" id="selectedProS">
             <div class="col">
               <div class="row">
                 <div class="col-md-2">
@@ -56,9 +57,7 @@
                   <select class="form-select mb-1" id="selectProM" onchange="updateProCode('M')"></select>
                 </div>
                 <div class="col-md-2">
-                  <select class="form-select mb-1" id="selectProS" onchange="updateProCode('S')">
-                    <option th:value="${product.proSDTO.proScode}" selected></option>
-                  </select>
+                  <select class="form-select mb-1" id="selectProS" onchange="updateProCode('S')"></select>
                 </div>
               </div>
             </div>
@@ -313,6 +312,9 @@
             }
           }
         });
+
+        showProSCode=document.getElementById('selectedProS').value;
+        initPro1();
 
         initStructure();
 

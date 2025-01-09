@@ -124,15 +124,6 @@ public class ProductServiceImpl implements ProductService {
         Function<Product, ProductDTO> fn=(entity->entityToDto(entity));
         return new PageResultDTO<>(entityPage, fn);
     }
-    // 메인화면> 출하요청 중인 제품 목록
-    @Override
-    public List<ProductDTO> getRequestProduct(){
-        List<Product> entityList=productRepository.getRequestProduct();
-        if(entityList.size()==0) return null;
-        List<ProductDTO> dtoList=new ArrayList<>();
-        entityList.forEach(x->dtoList.add(entityToDto(x)));
-        return dtoList;
-    }
 }
 
 

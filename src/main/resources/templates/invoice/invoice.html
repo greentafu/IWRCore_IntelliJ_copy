@@ -13,6 +13,7 @@
   <span id="head">
     <title>거래명세서 확인</title>
     <!--Style-->
+    <link rel="stylesheet" href="../assets/css/invoice.css" />
     <!--/Style-->
   </span>
 
@@ -25,145 +26,209 @@
             <!-- Bordered Table -->
             <div class="card">
               <div class="card-body">
-                <div class="text-end">
+                <div class="mb-4 text-end">
                   <button type="button" class="btn btn-primary" id="downloadBtn">발급하기</button>
                 </div>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive text-nowrap mb-4" id="downloadBody">
-                  <table class="table table-bordered">
-                    <tr>
-                      <th rowspan="6" style="writing-mode: vertical-lr;text-align: center; width: 5%;
-                               border-top: 2px solid red; border-bottom: 2px solid red;">
-                        공급자
-                      </th>
-                      <th style="text-align: center; border-top: 2px solid red; width: 5%;">
-                        등록<br />번호
-                      </th>
-                      <td colspan="5" style="border-top: 2px solid red; width: 260px;" id="partnerRegister">[[${partner.registrationNumber}]]
-                      </td>
-                      <th style="text-align: center; border-top: 2px solid red;">
-                        종사업장<br />번호
-                      </th>
-                      <td colspan="5" style="border-top: 2px solid red;"></td>
-                      <th rowspan="6"
-                          style="writing-mode: vertical-lr; text-align: center; width: 5%;
-                               border-top: 2px solid blue; border-bottom: 2px solid blue; border-left: 3px solid gray;">
-                        공급받는자
-                      </th>
-                      <th style="text-align: center; border-top: 2px solid blue; width: 5%;">
-                        등록<br />번호
-                      </th>
-                      <td colspan="5" style="border-top: 2px solid blue; width: 260px;">[[${company.registrationNumber}]]</td>
-                      <th style="text-align: center; border-top: 2px solid blue;">
-                        종사업자<br />번호
-                      </th>
-                      <td colspan="5" style="border-top: 2px solid blue;"></td>
-                    </tr>
-                    <tr>
-                      <th style="text-align: center;">상호</th>
-                      <td colspan="5" id="partnerName">[[${partner.name}]]</td>
-                      <th style="text-align: center;">성명</th>
-                      <td colspan="5" id="partnerCEO">[[${partner.ceo}]]</td>
-                      <th style="text-align: center;">상호</th>
-                      <td colspan="5">[[${company.name}]]</td>
-                      <th style="text-align: center;">성명</th>
-                      <td colspan="5">[[${company.ceo}]]</td>
-                    </tr>
-                    <tr>
-                      <th style="text-align: center;">사업장</th>
-                      <td colspan="11" id="partnerLocation">[[${partner.location}]]</td>
-                      <th style="text-align: center;">사업장</th>
-                      <td colspan="11">[[${company.location}]]</td>
-                    </tr>
-                    <tr>
-                      <th style="text-align: center;">업태</th>
-                      <td colspan="5" id="partnerType">[[${partner.type}]]</td>
-                      <th style="text-align: center;">종목</th>
-                      <td colspan="5" id="partnerSector">[[${partner.sector}]]</td>
-                      <th style="text-align: center;">업태</th>
-                      <td colspan="5">[[${company.type}]]</td>
-                      <th style="text-align: center;">종목</th>
-                      <td colspan="5">[[${company.sector}]]</td>
-                    </tr>
-                    <tr>
-                      <th style="text-align: center;">이메일</th>
-                      <td colspan="11">[[${invoice.email1}]]</td>
-                      <th rowspan="2" style="text-align: center; border-bottom: 2px solid blue;">
-                        이메일
-                      </th>
-                      <td rowspan="2" colspan="11" style=" border-bottom: 2px solid blue;">[[${company.email}]]</td>
-                    </tr>
-                    <tr>
-                      <th style="text-align: center; border-bottom: 2px solid red;">이메일</th>
-                      <td colspan="11" style="border-bottom: 2px solid red;">[[${invoice.email2}]]</td>
-                    </tr>
-                    <tr>
-                      <td colspan="22"></td>
-                    </tr>
-                    <tr>
-                      <th colspan="2" style="text-align: center;">작성일자</th>
-                      <td colspan="11" id="regDate">[[${date}]]</td>
-                      <th colspan="2" style="text-align: center;">비고</th>
-                      <td colspan="11">[[${invoice.text}]]</td>
-                    </tr>
-                    <tr>
-                      <th colspan="2" style="text-align: center;">합계금액</th>
-                      <td colspan="6" id="totalSum"></td>
-                      <th style="text-align: center;">공급가액</th>
-                      <td colspan="6" id="totalSupply"></td>
-                      <th style="text-align: center;">세액</th>
-                      <td colspan="6" id="totalTax"></td>
-                    </tr>
-                    <tr>
-                      <td colspan="22"></td>
-                    </tr>
-                    <tr>
-                      <th style="text-align: center;">월</th>
-                      <th style="text-align: center;">일</th>
-                      <th colspan="6" style="text-align: center;">품목</th>
-                      <th colspan="2" style="text-align: center;">규격</th>
-                      <th style="text-align: center;">수량</th>
-                      <th colspan="4" style="text-align: center;">단가</th>
-                      <th colspan="3" style="text-align: center;">공급가액</th>
-                      <th colspan="3" style="text-align: center;">세액</th>
-                      <th colspan="2" style="text-align: center;">비고</th>
-                    </tr>
-                    <tbody id="insertPoint">
-                      <tr th:each="shipment:${shipmentList}">
-                        <td>[[${#temporals.format(shipment.receipt, 'MM')}]]</td>
-                        <td>[[${#temporals.format(shipment.receipt, 'dd')}]]</td>
-                        <td colspan="6">[[${shipment.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}]]</td>
-                        <td colspan="2">[[${shipment.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.standard}]]</td>
-                        <td>[[${shipment.shipNum}]]</td>
-                        <td colspan="4">[[${shipment.baljuDTO.contractDTO.money}]]</td>
-                        <td colspan="3" th:id="'presupplyValue'+${shipment.shipNO}">[[${shipment.shipNum * shipment.baljuDTO.contractDTO.money}]]</td>
-                        <td colspan="3" th:id="'pretax'+${shipment.shipNO}">[[${#numbers.formatInteger(shipment.shipNum * shipment.baljuDTO.contractDTO.money * 0.1, 1)}]]</td>
-                        <td colspan="2">[[${shipment.bGo}]]</td>
-                      </tr>
-                    </tbody>
-                    <tr>
-                      <td colspan="22"></td>
-                    </tr>
-                    <tr>
-                      <th colspan="5" style="text-align: center;">현금</th>
-                      <th colspan="5" style="text-align: center;">수표</th>
-                      <th colspan="5" style="text-align: center;">어음</th>
-                      <th colspan="5" style="text-align: center;">외상미수금</th>
-                      <th rowspan="2" colspan="2">
-                        <div class="text-center">
-                          <input type="radio" name="type" value="영수" class="mb-2" th:checked="${invoice.plz == '영수'}" readonly>영수<br/>
-                          <input type="radio" name="type" value="청구" th:checked="${invoice.plz == '청구'}" readonly>청구
+                <div class="table-responsive" style="padding-left: 20px;">
+                  <div class="mb-4" id="downloadBody">
+                    <div class="row row-box">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-1 box-r red-t red-b tc pd" style="writing-mode: vertical-lr; text-align: center;">공급자</div>
+                          <div class="col-md-11">
+                            <div class="row">
+                              <div class="col-md-2 red-t tc pd">등록<br/>번호</div>
+                              <div class="col-md-4 box-rl red-t pd" id="partnerRegister pd">[[${partner.registrationNumber}]]</div>
+                              <div class="col-md-2 red-t tc pd">종사업자<br/>번호</div>
+                              <div class="col-md-4 box-rl red-t pd"></div>
+                            </div>
+                            <div class="row box-tb">
+                              <div class="col-md-2 tc pd">상호</div>
+                              <div class="col-md-4 box-rl pd" id="partnerName">[[${partner.name}]]</div>
+                              <div class="col-md-2 tc pd">성명</div>
+                              <div class="col-md-4 box-rl pd" id="partnerCEO">[[${partner.ceo}]]</div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-2 tc pd">사업장</div>
+                              <div class="col-md-10 box-rl pd" id="partnerLocation">[[${partner.location}]]</div>
+                            </div>
+                            <div class="row box-tb">
+                              <div class="col-md-2 tc pd">업태</div>
+                              <div class="col-md-4 box-rl pd" id="partnerType">[[${partner.type}]]</div>
+                              <div class="col-md-2 tc pd">종목</div>
+                              <div class="col-md-4 box-rl pd" id="partnerSector">[[${partner.sector}]]</div>
+                            </div>
+                            <div class="row box-b">
+                              <div class="col-md-2 tc pd">이메일</div>
+                              <div class="col-md-10 box-rl pd">[[${invoice.email1}]]</div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-2 red-b tc pd">이메일</div>
+                              <div class="col-md-10 box-rl red-b pd">[[${invoice.email2}]]</div>
+                            </div>
+                          </div>
                         </div>
-                      </th>
-                    </tr>
-                    <tr>
-                      <td colspan="5">[[${invoice.cash}]]</td>
-                      <td colspan="5">[[${invoice.cheque}]]</td>
-                      <td colspan="5">[[${invoice.promissory}]]</td>
-                      <td colspan="5">[[${invoice.receivable}]]</td>
-                    </tr>
-                  </table>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-1 box-r blue-t blue-b tc pd" style="writing-mode: vertical-lr; text-align: center;">공급받는자</div>
+                          <div class="col-md-11">
+                            <div class="row">
+                              <div class="col-md-2 blue-t tc pd">등록<br/>번호</div>
+                              <div class="col-md-4 box-rl blue-t pd">[[${company.registrationNumber}]]</div>
+                              <div class="col-md-2 blue-t tc pd">종사업자<br/>번호</div>
+                              <div class="col-md-4 box-l blue-t pd"></div>
+                            </div>
+                            <div class="row box-tb">
+                              <div class="col-md-2 tc pd">상호</div>
+                              <div class="col-md-4 box-rl pd">[[${company.name}]]</div>
+                              <div class="col-md-2 tc pd">성명</div>
+                              <div class="col-md-4 box-l pd">[[${company.ceo}]]</div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-2 tc pd">사업장</div>
+                              <div class="col-md-10 box-l pd">[[${company.location}]]</div>
+                            </div>
+                            <div class="row box-tb">
+                              <div class="col-md-2 tc pd">업태</div>
+                              <div class="col-md-4 box-rl pd">[[${company.type}]]</div>
+                              <div class="col-md-2 tc pd">종목</div>
+                              <div class="col-md-4 box-l pd">[[${company.sector}]]</div>
+                            </div>
+                            <div class="row box-b">
+                              <div class="col-md-2 tc pd">이메일</div>
+                              <div class="col-md-10 box-l pd">[[${company.email}]]</div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-2 blue-b tc pd">이메일</div>
+                              <div class="col-md-10 box-l blue-b pd">&nbsp;</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row row-box">
+                      <div class="col-md-12 row">&nbsp;</div>
+                    </div>
+                    <div class="row row-box box-tb">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-2 tc pd">작성일자</div>
+                          <div class="col-md-10 box-rl pd" id="regDate">[[${date}]]</div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-2 tc pd">비고</div>
+                          <div class="col-md-10 box-l pd">[[${invoice.text}]]</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row row-box">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-2 tc pd">합계금액</div>
+                          <div class="col-md-7 box-rl pd" id="totalSum"></div>
+                          <div class="col-md-3 tc pd">공급가액</div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-7 box-rl pd" id="totalSupply"></div>
+                          <div class="col-md-2 box-r tc pd">세액</div>
+                          <div class="col-md-3 pd" id="totalTax"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row row-box box-tb">
+                      <div class="col-md-12">&nbsp;</div>
+                    </div>
+                    <div class="row row-box tc">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-1 pd">월</div>
+                          <div class="col-md-1 box-rl pd">일</div>
+                          <div class="col-md-7 pd">품목</div>
+                          <div class="col-md-3 box-rl pd">규격</div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-2 pd">수량</div>
+                          <div class="col-md-2 box-rl pd">단가</div>
+                          <div class="col-md-3 pd">공급가액</div>
+                          <div class="col-md-2 box-rl pd">세액</div>
+                          <div class="col-md-3 pd">비고</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row row-box box-t">
+                      <div class="col-md-12">
+                        <span th:each="shipment:${shipmentList}">
+                          <div class="row box-b">
+                            <div class="col-md-6">
+                              <div class="row">
+                                <div class="col-md-1 pd">[[${#temporals.format(shipment.receipt, 'MM')}]]</div>
+                                <div class="col-md-1 box-rl pd">[[${#temporals.format(shipment.receipt, 'dd')}]]</div>
+                                <div class="col-md-7 pd">[[${shipment.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.name}]]</div>
+                                <div class="col-md-3 box-rl pd">[[${shipment.baljuDTO.contractDTO.jodalPlanDTO.materialDTO.standard}]]</div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="row">
+                                <div class="col-md-2 pd">[[${shipment.shipNum}]]</div>
+                                <div class="col-md-2 box-rl pd">[[${shipment.baljuDTO.contractDTO.money}]]</div>
+                                <div class="col-md-3 pd" th:id="'presupplyValue'+${shipment.shipNO}">[[${shipment.shipNum * shipment.baljuDTO.contractDTO.money}]]</div>
+                                <div class="col-md-2 box-rl pd" th:id="'pretax'+${shipment.shipNO}">[[${#numbers.formatInteger(shipment.shipNum * shipment.baljuDTO.contractDTO.money * 0.1, 1)}]]</div>
+                                <div class="col-md-3 pd">[[${shipment.bGo}]]</div>
+                              </div>
+                            </div>
+                          </div>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="row row-box">
+                      <div class="col-md-12">&nbsp;</div>
+                    </div>
+                    <div class="row row-box box-tb">
+                      <div class="col-md-3">
+                        <div class="row">
+                          <div class="box-b tc pd">현금</div>
+                        </div>
+                        <div class="row">
+                          <div class="pd">[[${invoice.cash}]]</div>
+                        </div>
+                      </div>
+                      <div class="col-md-3 box-rl">
+                        <div class="row ">
+                          <div class="box-b tc pd">수표</div>
+                        </div>
+                        <div class="row">
+                          <div class="pd">[[${invoice.cheque}]]</div>
+                        </div>
+                      </div>
+                      <div class="col-md-2">
+                        <div class="row">
+                          <div class="box-b tc pd">어음</div>
+                        </div>
+                        <div class="row">
+                          <div class="pd">[[${invoice.promissory}]]</div>
+                        </div>
+                      </div>
+                      <div class="col-md-2 box-rl">
+                        <div class="row">
+                          <div class="box-b tc pd">외상미수금</div>
+                        </div>
+                        <div class="row">
+                          <div class="pd">[[${invoice.receivable}]]</div>
+                        </div>
+                      </div>
+                      <div class="col-md-2 box tc pd">
+                        <input type="radio" name="type" value="영수" class="mb-2" th:checked="${invoice.plz == '영수'}" disabled>영수<br/>
+                        <input type="radio" name="type" value="청구" th:checked="${invoice.plz == '청구'}" disabled>청구
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="d-flex justify-content-between w-100">
                   <a th:href="@{/invoice/list_invoice}">
@@ -203,65 +268,27 @@
       document.getElementById('totalTax').innerText=totalTax;
     });
     </script>
-    <script src="../assets/vendor/libs/outside-library/jspdf.umd.min.js"></script>
-    <script src="../assets/vendor/libs/outside-library/malgun-normal.js"></script>
-    <script src="../assets/vendor/libs/outside-library/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <script>
-      document.getElementById('downloadBtn').addEventListener('click', function() {
-        const { jsPDF } = window.jspdf;
+      document.getElementById("downloadBtn").addEventListener("click", () => {
+        const element = document.getElementById("downloadBody");
+        element.style.padding = '30px';
 
-        const doc = new jsPDF();
+        const partnerName=document.getElementById('partnerName').innerText;
+        const regDate=document.getElementById('regDate').innerText;
 
-        const tableData = [
-          [{ content: "", colSpan: 1, rowSpan: 1 }, "등록", { content: "A1", colSpan: 2, rowSpan: 2 }, "종사업장", { content: "A2", colSpan: 2, rowSpan: 2 },
-           { content: "", colSpan: 1, rowSpan: 1 }, "등록", { content: "B1", colSpan: 2, rowSpan: 2 }, "종사업장", { content: "B2", colSpan: 2, rowSpan: 2 }],
-          [{ content: "", colSpan: 1, rowSpan: 1 }, "번호", "번호", { content: "공", colSpan: 1, rowSpan: 1 }, "번호", "번호" ],
-          [{ content: "공", colSpan: 1, rowSpan: 1 }, "상호", { content: "A3", colSpan: 2, rowSpan: 1 }, "성명", { content: "A4", colSpan: 2, rowSpan: 1 },
-           { content: "급", colSpan: 1, rowSpan: 1 }, "상호", { content: "B3", colSpan: 2, rowSpan: 1 }, "성명", { content: "B4", colSpan: 2, rowSpan: 1 }],
-          [{ content: "급", colSpan: 1, rowSpan: 1 }, "사업장", { content: "A5", colSpan: 5, rowSpan: 1 },
-           { content: "받", colSpan: 1, rowSpan: 1 }, "사업장", { content: "B5", colSpan: 5, rowSpan: 1 }],
-          [{ content: "자", colSpan: 1, rowSpan: 1 }, "업태", { content: "A6", colSpan: 2, rowSpan: 1 }, "종목", { content: "A7", colSpan: 2, rowSpan: 1 },
-           { content: "는", colSpan: 1, rowSpan: 1 }, "업태", { content: "B6", colSpan: 2, rowSpan: 1 }, "종목", { content: "B7", colSpan: 2, rowSpan: 1 }],
-          [{ content: "", colSpan: 1, rowSpan: 1 }, "이메일", { content: "A8", colSpan: 5, rowSpan: 1 },
-           { content: "자", colSpan: 1, rowSpan: 1 }, { content: "이메일", colSpan: 1, rowSpan: 2 }, { content: "B8", colSpan: 5, rowSpan: 2 }],
-          [{ content: "", colSpan: 1, rowSpan: 1 }, "이메일", { content: "A9", colSpan: 5, rowSpan: 2 }, { content: "", colSpan: 1, rowSpan: 1 } ],
-          [{ content: "", colSpan: 14, rowSpan: 1, styles: {minCellHeight: 1} }],
-          [{ content: "작성일자", colSpan: 2, rowSpan: 1 }, { content: "C1", colSpan: 5, rowSpan: 1 }, { content: "비고", colSpan: 2, rowSpan: 1 }, { content: "C2", colSpan: 5, rowSpan: 1 }],
-          [{ content: "합계금액", colSpan: 2, rowSpan: 1 }, { content: "C3", colSpan: 3, rowSpan: 1 },
-           "공급가액", { content: "C3", colSpan: 3, rowSpan: 1 },
-           { content: "세액", colSpan: 2, rowSpan: 1 }, { content: "C3", colSpan: 3, rowSpan: 1 }],
-          [{ content: "", colSpan: 14, rowSpan: 1 }],
-          ["월", "일", { content: "품목", colSpan: 3, rowSpan: 1 }, "규격", "수량", { content: "단가", colSpan: 2, rowSpan: 1 }, { content: "공급가액", colSpan: 2, rowSpan: 1 }, "세액", { content: "비고", colSpan: 2, rowSpan: 1 }],
-          [{ content: "", colSpan: 14, rowSpan: 1 }],
-          [{ content: "", colSpan: 14, rowSpan: 1 }],
-          [{ content: "현금", colSpan: 3, rowSpan: 1 }, { content: "수표", colSpan: 3, rowSpan: 1 }, { content: "어음", colSpan: 3, rowSpan: 1 }, { content: "외상미수금", colSpan: 2, rowSpan: 1 }, { content: "C", colSpan: 3, rowSpan: 2 }],
-          [{ content: "현금", colSpan: 3, rowSpan: 1 }, { content: "수표", colSpan: 3, rowSpan: 1 }, { content: "어음", colSpan: 3, rowSpan: 1 }, { content: "외상미수금", colSpan: 2, rowSpan: 1 }]
-        ];
+        const options = {
+          margin: [20, 20, 0, 20],
+          filename: regDate+'_'+partnerName+'_거래명세서.pdf',
+          image: { type: 'jpeg', quality: 1 },
+          html2canvas:  { dpi: 600, letterRendering: true, width: 1560},
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape'}
+        };
 
-        doc.autoTable({
-          styles : { font : 'malgun', fontStyle :'normal'},
-          body: tableData,
-          theme: 'grid',
-          bodyStyles: { fontSize: 5 },
-          columnStyles: {
-            0: { cellWidth: 5 },
-            1: { cellWidth: 10 },
-            2: { cellWidth: 15 },
-            3: { cellWidth: 15 },
-            4: { cellWidth: 15 },
-            5: { cellWidth: 15 },
-            6: { cellWidth: 15 },
-            7: { cellWidth: 5 },
-            8: { cellWidth: 10 },
-            9: { cellWidth: 15 },
-            10: { cellWidth: 15 },
-            11: { cellWidth: 15 },
-            12: { cellWidth: 15 },
-            13: { cellWidth: 15 }
-          }
-        });
-
-        doc.save('table.pdf')
+        html2pdf()
+          .from(element)
+          .set(options)
+          .save();
       });
     </script>
     <!--Script-->

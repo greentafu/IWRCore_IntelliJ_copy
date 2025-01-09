@@ -2,10 +2,6 @@ package mit.iwrcore.IWRCore.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import mit.iwrcore.IWRCore.security.dto.MemberDTO;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
-import mit.iwrcore.IWRCore.security.dto.CategoryDTO.PartDTO.PartSDTO;
-import mit.iwrcore.IWRCore.security.dto.PartnerDTO;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Log4j2
 public class ManagerController {
-
     private final PartCodeService partCodeService;
     private final MemberService memberService;
     private final PartnerService partnerService;

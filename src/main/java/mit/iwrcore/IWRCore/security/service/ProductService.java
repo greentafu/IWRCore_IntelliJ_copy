@@ -31,7 +31,4 @@ public interface ProductService {
     PageResultDTO<ProductDTO, Product> getNonCheckProducts(PageRequestDTO requestDTO);
     // 제품관리> 최종확인까지 완료한 제품 리스트
     PageResultDTO<ProductDTO, Product> getCheckProducts(PageRequestDTO requestDTO);
-    // 메인화면> 출하요청 중인 제품 목록
-    List<ProductDTO> getRequestProduct();
-
 }

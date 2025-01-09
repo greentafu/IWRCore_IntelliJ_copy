@@ -53,6 +53,7 @@
           <hr class="m-0"/>
           <div class="card-body">
             <!-- Form controls -->
+            <input type="number" style="display:none;" th:value="${material.materSDTO.materScode}" id="selectedMaterS">
             <div class="row mb-3">
               <h5>세부 항목</h5>
               <label class="col-form-label" style="width: 85px;">대분류 : </label>
@@ -76,7 +77,6 @@
                 <div class="row">
                   <select class="form-select col-form-label" style="width: fit-content;" name="materS"
                           id="selectMaterS" onchange="updateMaterCode('S')">
-                    <option th:value="${material.materSDTO.materScode}" selected></option>
                   </select>
                 </div>
               </div>
@@ -157,6 +157,9 @@
       document.addEventListener("DOMContentLoaded", function () {
         const materCode=document.getElementById('materCode').value;
         initMaterialFile(materCode);
+
+        showMaterSCode=document.getElementById('selectedMaterS').value;
+        initMater1();
       });
     </script>
     <!--Script-->

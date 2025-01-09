@@ -1,7 +1,6 @@
 package mit.iwrcore.IWRCore.controller;
 
 import lombok.RequiredArgsConstructor;
-import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

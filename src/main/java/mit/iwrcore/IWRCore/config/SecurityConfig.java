@@ -24,19 +24,31 @@ public class SecurityConfig {
         log.info("---------------filterChain-----------------");
 
         http.authorizeRequests()
-                .requestMatchers("/", "/assets/**", "/fonts/**", "/js/**", "/libs/**", "/line/**", "/scss/**", "/tasks/**").permitAll()
-                .requestMatchers("/main").permitAll()
-                .requestMatchers("/manager/**").permitAll()
-                .requestMatchers("/**").permitAll()
-                .anyRequest().authenticated();
+                .requestMatchers("/assets/**", "/fonts/**", "/js/**", "/libs/**", "/line/**", "/scss/**", "/tasks/**").permitAll()
+                .requestMatchers("/login", "/checkrole", "/logout").permitAll()
+                .requestMatchers("/manager/**").hasRole("MANAGER")
+                .requestMatchers("/partner/**").hasRole("PARTNER")
+                .requestMatchers("/proteam/**", "/development/**").hasAnyRole("DEV_PROD_TEAM", "MANAGER")
+                .requestMatchers("/contract/**", "/goodshandling/**", "/invoice/**", "/jodal/**", "/material/**", "/order/**", "/production/**", "/progress/**").hasAnyRole("MATERIAL_TEAM", "MANAGER")
+                .requestMatchers("/main", "/jago/**", "/adminpartner/**", "/category").hasAnyRole("DEV_PROD_TEAM", "MATERIAL_TEAM", "MANAGER")
+                .requestMatchers("/saveReceiveShipment").hasAnyRole("MATERIAL_TEAM", "MANAGER")
+                .anyRequest().authenticated()
+                .and()
+                .exceptionHandling().accessDeniedPage("/checkrole");
         http.formLogin(formLogin->
                 formLogin.loginPage("/login")
-                        .defaultSuccessUrl("/checkrole")
+                        .defaultSuccessUrl("/checkrole", true)
                         .failureUrl("/login?error"));
         http.csrf(csrf->csrf.disable());
         http.logout(logout->
-                logout.permitAll());
+                logout.logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll());
         http.headers().frameOptions().sameOrigin();
+        http.sessionManagement().invalidSessionUrl("/main");
         return http.build();
     }
 

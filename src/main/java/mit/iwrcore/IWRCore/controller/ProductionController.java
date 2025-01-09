@@ -15,7 +15,6 @@ import java.util.List;
 public class ProductionController {
     private final ProductService productService;
     private final StructureService structureService;
-    private final FileService fileService;
 
     @GetMapping("/list_manufacture")
     public void list_manufacture() {}
@@ -35,9 +34,5 @@ public class ProductionController {
     public void manufacture(@RequestParam Long manuCode, Model model) {
         model.addAttribute("product", productService.getProduct(manuCode));
         model.addAttribute("structures", structureService.getStructureByProduct(manuCode));
-    }
-    @GetMapping("/structures")
-    public List<StructureDTO> getStructures(@RequestParam Long manuCode) {
-        return structureService.getStructureByProduct(manuCode);
     }
 }

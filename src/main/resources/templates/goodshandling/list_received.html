@@ -162,7 +162,6 @@
                         <option value="3">반품 상태</option>
                       </select>
                     </th>
-                    <th>추가 요청</th>
                   </tr>
                 </thead>
                 <tbody id="firstTbody"></tbody>
@@ -217,16 +216,6 @@
       </div>
     </div>
     <!--/Modal2-->
-    <!--Modal3-->
-    <div id="myModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <p>원하는 작업을 선택하세요:</p>
-        <button onclick="callContact()" class="btn btn-secondary">담당자 전화 걸기</button>
-        <button onclick="emailContact()" class="btn btn-secondary">담당자 이메일 보내기</button>
-      </div>
-    </div>
-    <!--/Modal3-->
     <!--/Modal-->
 
     <!--Script-->
@@ -371,9 +360,9 @@
               `; }
               if(receipt!=null && reNo==0 && receiveCheck==0) { receiveReturnTd.innerHTML=`
                 <a href="/goodshandling/return_received?shipNo=${shipNO}">
-                  <button class="btn btn-primary">반품</button>
+                  <button class="btn btn-outline-primary">반품</button>
                 </a>
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalCenter" shipNum="${shipNum}" shipNo="${shipNO}" onclick="receiveConfirm(this)">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCenter" shipNum="${shipNum}" shipNo="${shipNO}" onclick="receiveConfirm(this)">
                   입고
                 </button>
               `;
@@ -381,10 +370,6 @@
               if(receiveCheck==1) receiveReturnTd.innerHTML=`<button class="btn btn-secondary" style="width: 150px;">입고완료</button>`;
               if(reNo!=0) receiveReturnTd.innerHTML=`<button class="btn btn-secondary" style="width: 150px;">반품완료</button>`;
               newRow.appendChild(receiveReturnTd);
-
-              const btn2Td = document.createElement("td");
-              btn2Td.innerHTML=`<button onclick="showOptions()" class="btn btn-outline-primary">요청</button>`;
-              newRow.appendChild(btn2Td);
 
               firstTbody.appendChild(newRow);
             });

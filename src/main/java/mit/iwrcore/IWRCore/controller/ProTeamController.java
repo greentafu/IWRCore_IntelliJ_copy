@@ -15,7 +15,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @Log4j2
 public class ProTeamController {
-
     private final ProductService productService;
     private final ProplanService proplanService;
     private final PreRequestService preRequestService;
@@ -23,7 +22,6 @@ public class ProTeamController {
     private final LineService lineService;
     private final PlanService planService;
     private final LineStructureService lineStructureService;
-
 
     @GetMapping("/list_pro")
     public void list_pro() {}

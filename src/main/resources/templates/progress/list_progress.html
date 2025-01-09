@@ -155,7 +155,6 @@
                     <th colspan="2">협력회사</th>
                     <th colspan="4">검수</th>
                     <th rowspan="2">수정</th>
-                    <th rowspan="2">추가 요청</th>
                   </tr>
                   <tr>
                     <th>제작수량</th>
@@ -175,47 +174,6 @@
     </div>
 
     <!--Modal-->
-    <div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalCenterTitle">입고처리</h5>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col mb-3 text-center">
-                [긴급]추가 납품지시 가능 수량 : 380개
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col mb-0">
-                <label for="emailWithTitle" class="form-label">담당자</label>
-                <input
-                        type="text"
-                        id="emailWithTitle"
-                        class="form-control"
-                        placeholder="실명 입력"
-                />
-              </div>
-              <div class="col mb-0">
-                <label for="dobWithTitle" class="form-label">납품지시 수량 입력</label>
-                <input
-                        type="number"
-                        id="dobWithTitle"
-                        class="form-control"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              취소
-            </button>
-            <button type="button" class="btn btn-primary">납품 지시</button>
-          </div>
-        </div>
-      </div>
-    </div>
     <!--/Modal-->
 
     <!--Script-->
@@ -326,14 +284,6 @@
                   </a>
                 `;
                 newRow.appendChild(btn1Td);
-                const btn2Td = document.createElement("td");
-                btn2Td.rowSpan = 3;
-                btn2Td.innerHTML=`
-                  <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalCenter" >
-                    요청
-                  </button>
-                `;
-                newRow.appendChild(btn2Td);
               }
               firstTbody.appendChild(newRow);
 

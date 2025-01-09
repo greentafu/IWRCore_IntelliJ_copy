@@ -31,6 +31,4 @@ public interface ProplanService {
     PageResultDTO<ProPlanContractNumDTO, Object[]> getAllProPlans(PageRequestDTO2 requestDTO);
     // 생산부서> 진행중인 생산계획 목록
     PageResultDTO<ProplanDTO, ProPlan> getNotFinProPlan(PageRequestDTO requestDTO);
-//    // 생산부서> 생산계획에 따른 제품구성 및 수량
-//    List<ProPlanSturctureDTO> getStructureStock(Long proplanNo);
 }

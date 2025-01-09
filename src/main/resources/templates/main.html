@@ -11,7 +11,7 @@
 <th:block th:replace="~{layout/mainlayout::all(~{this::#head} ,~{this::#content})}">
 
   <span id="head">
-    <title>타이틀</title>
+    <title>직원 메인화면</title>
     <!--Style-->
     <style>
       .modal {
@@ -176,74 +176,10 @@
           </div>
           <!--/Card-->
         </div>
-        <div class="col-lg-12 col-md-6 mb-4">
-          <!-- Card 6 -->
-          <div class="card" style="height: 446px;">
-            <div class="card-body">
-              <div class="mb-2"><strong>일정</strong></div>
-              <select class="form-select form-select-sm" style="width: fit-content;" id="requestProductName">
-                <option value="">전체 제품</option>
-                <option th:each="list:${requestProductList}" th:value="${list.manuCode}">[[${list.name}]]</option>
-              </select>
-              <div id="calendar"></div>
-            </div>
-          </div>
-          <!--/Card6-->
-        </div>
       </div>
     </div>
 
     <!--Modal-->
-    <!--Modal1-->
-    <div class="modal fade" id="modalCenter" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalCenterTitle">입고처리</h5>
-          </div>
-          <div class="modal-body">
-            <div class="row">
-              <div class="col mb-3 text-center">
-                [긴급]부족 수량 :  <span id="shortageAmount"></span>개
-              </div>
-            </div>
-            <div class="row g-2">
-              <div class="col mb-0">
-                <label for="emailWithTitle" class="form-label">담당자</label>
-                <input
-                        type="text"
-                        id="emailWithTitle"
-                        class="form-control"
-                        placeholder="실명 입력"
-                /> <label class="form-label">납품 받을 날짜 입력</label>
-                <input  id="deliveryDate"
-                        type="date"
-
-                        class="form-control"
-                />
-              </div>
-              <div class="col mb-0">
-                <label  class="form-label">납품지시 수량 입력</label>
-                <input
-                        id="deliveryQuantity"
-                        type="number"
-                        class="form-control"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-    <input type="hidden" id="requestIdInput"> <!-- 숨겨진 입력 필드 추가 -->
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              취소
-            </button>
-            <button type="button" class="btn btn-primary" id="deliveryConfirmButton" >납품 지시</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--/Modal1-->
-    <!--Modal2-->
     <div class="modal fade" id="modalCenter2" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -263,7 +199,6 @@
         </div>
       </div>
     </div>
-    <!--/Modal2-->
     <!--/Modal-->
 
     <!--Script-->
@@ -325,11 +260,8 @@
             });
           }
         });
-
         page++;
       }
-
-
 
       document.addEventListener("DOMContentLoaded", function () {
         content1.addEventListener("scroll", function () {
@@ -344,9 +276,7 @@
           }
         });
 
-
         loadItems();
-
       });
     </script>
     <script>
