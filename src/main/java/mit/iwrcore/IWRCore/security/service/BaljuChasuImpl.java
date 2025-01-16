@@ -7,6 +7,7 @@ import mit.iwrcore.IWRCore.repository.BaljuChasuRepository;
 import mit.iwrcore.IWRCore.security.dto.BaljuChasuDTO;
 import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.ContractDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CalendarDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ModifyOrderDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.QuantityDateDTO;
 import org.springframework.stereotype.Service;
@@ -152,6 +153,22 @@ public class BaljuChasuImpl implements BaljuChasuService{
             }
         }
         return modifyOrderDTOList.get(0);
+    }
+    @Override
+    public List<CalendarDTO> getAllBaljuChasu(){
+        List<CalendarDTO> result=new ArrayList<>();
+        List<BaljuChasu> entityList=baljuChasuRepository.findAll();
+        entityList.forEach(x->{
+            String title=x.getBalju().getContract().getJodalPlan().getMaterial().getName()+"("+x.getBalNum()+"개)";
+            String tempStartDate=x.getBalju().getRegDate().toString();
+            String tempEndDate=x.getBalDate().toString();
+            String startDate=(tempStartDate.contains("."))?tempStartDate.substring(0, 19):tempStartDate+":00";
+            String endDate=(tempEndDate.contains("."))?tempStartDate.substring(0, 19):tempEndDate+":00";
+            Long finCheck=x.getBalju().getFinCheck();
+            String url="/order/order?baljuNo="+x.getBalju().getBaljuNo();
+            result.add(new CalendarDTO(title, startDate, endDate, (finCheck==0)?2:3, url));
+        });
+        return result;
     }
 
 

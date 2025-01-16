@@ -9,10 +9,12 @@ import mit.iwrcore.IWRCore.repository.RequestRepository;
 import mit.iwrcore.IWRCore.security.dto.PreRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.RequestDTO;
 import mit.iwrcore.IWRCore.security.dto.StructureDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CalendarDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.PreRequestSturctureDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -83,6 +85,22 @@ public class RequestServiceImpl implements RequestService{
     public List<RequestDTO> getRequestByPreRequest(Long preCode){
         List<Request> entityList=requestRepository.getRequestByPreRequest(preCode);
         return entityList.stream().map(x->entityToDTO(x)).toList();
+    }
+    @Override
+    public List<CalendarDTO> getAllRequest(){
+        List<CalendarDTO> result=new ArrayList<>();
+        List<Request> entityList=requestRepository.findAll();
+        entityList.forEach(x->{
+            String title=x.getMaterial().getName()+"("+x.getRequestNum()+"개)";
+            String tempStartDate=x.getRegDate().toString();
+            String tempEndDate=x.getEventDate().toString();
+            String startDate=(tempStartDate.contains("."))?tempStartDate.substring(0, 19):tempStartDate+":00";
+            String endDate=(tempEndDate.contains("."))?tempStartDate.substring(0, 19):tempEndDate+":00";
+            LocalDateTime releaseDate=x.getReleaseDate();
+            String url="/goodshandling/view_request?preReqCode="+x.getPreRequest().getPreReqCode();
+            result.add(new CalendarDTO(title, startDate, endDate, (releaseDate==null)?1:0, url));
+        });
+        return result;
     }
 
 

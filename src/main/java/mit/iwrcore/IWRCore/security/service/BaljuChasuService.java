@@ -2,6 +2,7 @@ package mit.iwrcore.IWRCore.security.service;
 
 import mit.iwrcore.IWRCore.entity.BaljuChasu;
 import mit.iwrcore.IWRCore.security.dto.BaljuChasuDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CalendarDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.ModifyOrderDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.QuantityDateDTO;
 
@@ -23,6 +24,7 @@ public interface BaljuChasuService {
     List<BaljuChasuDTO> getBaljuChasuListByBaljuNo(Long baljuNo);
     List<ModifyOrderDTO> modifyBalju(Long pno);
     ModifyOrderDTO getOneBalju(Long balNo);
+    List<CalendarDTO> getAllBaljuChasu();
 
     // 협력회사> 협력회사 메인화면 목록
     List<QuantityDateDTO> partnerMainBalju(Long baljuNo, LocalDateTime baljuDate, Long make);

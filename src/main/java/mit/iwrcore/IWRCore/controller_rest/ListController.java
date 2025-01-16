@@ -56,6 +56,10 @@ public class ListController {
     private PartnerService partnerService;
     @Autowired
     private EmergencyService emergencyService;
+    @Autowired
+    private RequestService requestService;
+    @Autowired
+    private BaljuChasuService baljuChasuService;
 
     @GetMapping("/materialList")
     public PageResultDTO<MaterialDTO, Material> materialList(@RequestParam(required = false) int page,
@@ -530,5 +534,13 @@ public class ListController {
                 .partL(selectPartL).partM(selectPartM).partS(selectPartS).partnerSearch(partnerSearch)
                 .build();
         return partnerService.findPartnerList(requestDTO);
+    }
+    // 메인>달력
+    @GetMapping("/getCalendar")
+    public List<CalendarDTO> getCalendar(){
+        List<CalendarDTO> calendarDTOList=requestService.getAllRequest();
+        List<CalendarDTO> baljuChasuList=baljuChasuService.getAllBaljuChasu();
+        calendarDTOList.addAll(baljuChasuList);
+        return calendarDTOList;
     }
 }

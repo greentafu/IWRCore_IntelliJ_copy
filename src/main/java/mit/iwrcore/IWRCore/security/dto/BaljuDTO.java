@@ -2,10 +2,8 @@ package mit.iwrcore.IWRCore.security.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import mit.iwrcore.IWRCore.entity.BaljuChasu;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder

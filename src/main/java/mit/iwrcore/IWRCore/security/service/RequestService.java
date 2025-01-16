@@ -2,6 +2,7 @@ package mit.iwrcore.IWRCore.security.service;
 
 import mit.iwrcore.IWRCore.entity.Request;
 import mit.iwrcore.IWRCore.security.dto.RequestDTO;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CalendarDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.PreRequestSturctureDTO;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public interface RequestService {
     RequestDTO getRequestById(Long id);
     List<RequestDTO> getRequestByPreRequest(Long preCode);
     RequestDTO updateRequest(Long id, RequestDTO requestDTO);
+    List<CalendarDTO> getAllRequest();
 
 
     // 출하요청> 출하요청 수정시 목록

@@ -1,9 +1,13 @@
 package mit.iwrcore.IWRCore.security;
 
+import jakarta.transaction.Transactional;
 import mit.iwrcore.IWRCore.entity.Contract;
+import mit.iwrcore.IWRCore.entity.Request;
 import mit.iwrcore.IWRCore.repository.ContractRepository;
+import mit.iwrcore.IWRCore.security.dto.multiDTO.CalendarDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.StockDetailDTO;
 import mit.iwrcore.IWRCore.security.service.ContractService;
+import mit.iwrcore.IWRCore.security.service.RequestService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,9 +27,13 @@ public class Testing {
     ContractRepository contractRepository;
     @Autowired
     ContractService contractService;
+    @Autowired
+    RequestService requestService;
 
     @Test
+    @Transactional
     public void test1(){
-
+        List<CalendarDTO> a=requestService.getAllRequest();
+        a.forEach(x-> System.out.println("@@ "+x.getTitle()+"/"+x.getStartDate()+"/"+x.getEndDate()));
     }
 }
