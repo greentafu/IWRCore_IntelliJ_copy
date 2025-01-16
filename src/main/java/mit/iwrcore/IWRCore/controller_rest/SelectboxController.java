@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -381,14 +382,32 @@ public class SelectboxController {
 
     // 재고목록> 재고 상세보기
     @PostMapping("/getStockDetail")
-    public PageResultDTO<StockDetailDTO, Object[]> getStockDetail(
-            @RequestParam(required = false) int page,
+    public List<StockDetailDTO> getStockDetail(
             @RequestParam(required = false) Long materCode, @RequestParam(required = false) Integer selectedYear){
-        PageRequestDTO requestDTO=PageRequestDTO.builder()
-                .page(page).size(15)
-                .materCode(materCode).selectedYear(selectedYear)
-                .build();
-        return contractService.stockdetailList(requestDTO);
+        List<Integer> dateList=new ArrayList<>();
+
+        LocalDateTime localDateTime=LocalDateTime.now();
+        String firstDate=contractService.getFirstConDateByMater(materCode);
+        int todayYear=localDateTime.getYear();
+        int todayMonth=localDateTime.getMonthValue();
+
+        if(firstDate!=null){
+            int firstYear=Integer.parseInt(firstDate.split("-")[0]);
+            int firstMonth=Integer.parseInt(firstDate.split("-")[1]);
+
+            Integer year=selectedYear;
+            int tempStart=12;
+            int tempEnd=0;
+            if(selectedYear==todayYear) tempStart=todayMonth;
+            if(selectedYear==firstYear) tempEnd=firstMonth-1;
+            for(int j=tempStart; j>tempEnd; j--){
+                if(j<10) dateList.add(Integer.parseInt(year+"0"+j));
+                else dateList.add(Integer.parseInt(year+""+j));
+            }
+            if(selectedYear!=firstYear) dateList.add(Integer.parseInt(year-1+""+12));
+
+            return contractService.stockdetailList(materCode, dateList);
+        }else return null;
     }
 
     // 긴급납품> 자재 선택

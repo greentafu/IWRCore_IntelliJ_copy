@@ -89,6 +89,12 @@ public class ContractServiceImpl implements ContractService {
 
         return longList;
     }
+    @Override
+    public String getFirstConDateByMater(Long materCode){
+        LocalDateTime dateTime=contractRepository.getFirstContractByMater(materCode);
+        if(dateTime!=null) return dateTime.toString().substring(0, 7);
+        else return null;
+    }
 
     // 조달계획> 조달차수 있는(조달계획한) 자재 목록+계약서 등록여부
     @Override
@@ -175,19 +181,20 @@ public class ContractServiceImpl implements ContractService {
         return new StockQuantityDTO(materialDTO, contractDTO, shipNum, reqNum, orderNum);
     }
     // 재고> 재고상세목록
-    public PageResultDTO<StockDetailDTO, Object[]> stockdetailList(PageRequestDTO requestDTO){
-        Page<Object[]> entityPage=contractRepository.stockDetailPage(requestDTO);
-        return new PageResultDTO<>(entityPage, this::exStockDetailDTO);
-    }
-    private StockDetailDTO exStockDetailDTO(Object[] objects){
-        Long tempConNo=(Long) objects[0];
-        Long tempSumShip=(Long) objects[1];
-        Long tempSumReq=(Long) objects[2];
+    public List<StockDetailDTO> stockdetailList(Long materCode, List<Integer> dateList){
+        List<StockDetailDTO> result=new ArrayList<>();
+        dateList.forEach(x->{
+            Object[] objects=contractRepository.stockDetailList(materCode, x);
+            Long tempConNo=(Long) objects[0];
+            Long tempSumShip=(Long) objects[1];
+            Long tempSumReq=(Long) objects[2];
 
-        ContractDTO contractDTO=(tempConNo!=null)?getContract(tempConNo):null;
-        Long sumShip=(tempSumShip!=null)?tempSumShip:0L;
-        Long sumReq=(tempSumReq!=null)?tempSumReq:0L;
-        return new StockDetailDTO(contractDTO, sumShip, sumReq);
+            ContractDTO contractDTO=(tempConNo!=null)?getContract(tempConNo):null;
+            Long sumShip=(tempSumShip!=null)?tempSumShip:0L;
+            Long sumReq=(tempSumReq!=null)?tempSumReq:0L;
+            result.add(new StockDetailDTO(x, contractDTO, sumShip, sumReq));
+        });
+        return result;
     }
     // 긴급요청> 계약(생산계획, 자재코드)
     @Override

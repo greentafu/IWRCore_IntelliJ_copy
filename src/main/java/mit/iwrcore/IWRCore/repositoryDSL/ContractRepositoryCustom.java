@@ -15,5 +15,5 @@ public interface ContractRepositoryCustom {
     // 재고> 재고 목록
     Page<Object[]> stockQuantityPage(PageRequestDTO requestDTO);
     // 재고> 재고 상세목록
-    Page<Object[]> stockDetailPage(PageRequestDTO requestDTO);
+    Object[] stockDetailList(Long materCode, Integer selectedDate);
 }

@@ -65,8 +65,6 @@ public class PageRequestDTO {
     // 재고
     private Long stockStatus;
     private Long baljuStatus;
-    private Long materCode;
-    private Integer selectedYear;
 
     // 출하요청
     private Long releaseStatus;
@@ -74,5 +72,4 @@ public class PageRequestDTO {
     // 긴급납품
     private Long proplanNo;
     private Long urgencyCheck;
-
 }

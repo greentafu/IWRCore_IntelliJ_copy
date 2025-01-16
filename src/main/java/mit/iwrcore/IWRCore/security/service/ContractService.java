@@ -22,6 +22,7 @@ public interface ContractService {
     // 조회
     ContractDTO getContract(Long id);
     List<Long> getConDateList();
+    String getFirstConDateByMater(Long materCode);
 
 
     // 조달계획> 조달차수 있는(조달계획한) 자재 목록+계약서 등록여부
@@ -35,7 +36,7 @@ public interface ContractService {
     // 재고> 재고목록
     PageResultDTO<StockQuantityDTO, Object[]> stockList(PageRequestDTO requestDTO);
     // 재고> 재고상세목록
-    PageResultDTO<StockDetailDTO, Object[]> stockdetailList(PageRequestDTO requestDTO);
+    List<StockDetailDTO> stockdetailList(Long materCode, List<Integer> dateList);
     // 긴급요청> 계약(생산계획, 자재코드)
     ContractDTO getContractByProMater(Long proplanNo, Long materCode);
 }

@@ -2,6 +2,8 @@ package mit.iwrcore.IWRCore.repository;
 
 import mit.iwrcore.IWRCore.entity.Contract;
 import mit.iwrcore.IWRCore.repositoryDSL.ContractRepositoryCustom;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,4 +23,8 @@ public interface ContractRepository extends JpaRepository<Contract, Long>, Contr
     @Query("select c from Contract c " +
             "where c.jodalPlan.proPlan.proplanNo=:proplanNo and c.jodalPlan.material.materCode=:materCode")
     List<Contract> getContractByProMater(Long proplanNo, Long materCode);
+
+    @Query("select MIN(c.conDate) from Contract c " +
+            "where c.jodalPlan.material.materCode = :materCode")
+    LocalDateTime getFirstContractByMater(Long materCode);
 }

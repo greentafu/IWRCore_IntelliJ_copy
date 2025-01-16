@@ -1,5 +1,7 @@
 // 변수
 let page = 1;
+let totalPage = 1;
+
 let finPage=false;
 let selectProL = null;
 let selectProM = null;
@@ -72,6 +74,7 @@ function stockList(){
               selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
               selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch},
         success:function(data){
+            totalPage=data.totalPage;
             if(data.totalPage<page) finPage=true;
             data.dtoList.forEach(x=>{
                 const materCode=x.materialDTO.materCode;
@@ -127,6 +130,7 @@ const content1 = document.getElementById("content1");
               selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch,
               selectMaterL:selectMaterL, selectMaterM:selectMaterM, selectMaterS:selectMaterS, materialSearch:materialSearch},
         success:function(data){
+            totalPage=data.totalPage;
             if(data.totalPage<page) finPage=true;
             data.dtoList.forEach(x=>{
                 const materCode=x.materialDTO.materCode;

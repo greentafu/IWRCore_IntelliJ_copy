@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -337,7 +338,7 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
             }else{
                 builder1.and(subQueryShipment.isNotNull().and(subQueryRequest.isNull()))
                         .or(subQueryShipment.isNotNull().and(subQueryRequest.isNotNull())
-                                .and(subQueryShipment.goe(subQueryRequest))
+                                .and(subQueryShipment.gt(subQueryRequest))
                         );
             }
         }
@@ -387,60 +388,48 @@ public class ContractRepositoryImpl implements ContractRepositoryCustom{
 
     @Override
     @Transactional
-    public Page<Object[]> stockDetailPage(PageRequestDTO requestDTO){
+    public Object[] stockDetailList(Long materCode, Integer selectedDate){
         QMaterial qMaterial=QMaterial.material;
-        QContract qContract=QContract.contract;
-        QContract qContract1=QContract.contract;
         QShipment qShipment=QShipment.shipment;
         QRequest qRequest=QRequest.request;
+        QContract qContract=QContract.contract;
+        QContract qContract1=QContract.contract;
 
-        BooleanBuilder builder=new BooleanBuilder();
-        if(requestDTO.getSelectedYear()!=null) builder.and(qContract.conDate.year().eq(requestDTO.getSelectedYear()));
-
-        JPAQuery<Contract> subQuery=new JPAQuery<>()
-                .select(qContract1).distinct()
+        JPAQuery<Contract> subQueryContract=new JPAQuery<>()
+                .select(qContract1)
                 .from(qContract1)
-                .leftJoin(qContract1.jodalPlan.material, qMaterial)
-                .where(qMaterial.materCode.eq(requestDTO.getMaterCode()));
-        builder.and(qContract.in(subQuery));
+                .where(qContract1.jodalPlan.material.eq(qMaterial));
 
-        Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
-        List<Tuple> tupleList = queryFactory
-                .select(qContract.conNo.max(), qShipment.shipNum.sum(), qRequest.requestNum.sum())
-                .from(qContract)
-                .leftJoin(qShipment).distinct().on(qShipment.balju.contract.in(subQuery)
-                        .and(qShipment.receiveCheck.eq(1L)))
-                .leftJoin(qRequest).on(qRequest.material.eq(qContract.jodalPlan.material)
+        JPAQuery<Long> subQueryShipment=new JPAQuery<>()
+                .select(qShipment.shipNum.sum())
+                .from(qShipment)
+                .where(qShipment.balju.contract.in(subQueryContract)
+                        .and(qShipment.receiveCheck.eq(1L))
+                        .and(qShipment.receipt.yearMonth().loe(selectedDate)));
+
+        JPAQuery<Long> subQueryRequest=new JPAQuery<>()
+                .select(qRequest.requestNum.sum()).distinct()
+                .from(qRequest)
+                .where(qRequest.material.eq(qMaterial)
                         .and(qRequest.releaseDate.isNotNull())
-                        .and(qRequest.releaseDate.yearMonth().loe(qContract.conDate.yearMonth())))
-                .where(builder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .groupBy(qContract.conDate.yearMonth())
-                .orderBy(qContract.conDate.yearMonth().desc())
-                .fetch();
+                        .and(qRequest.releaseDate.yearMonth().loe(selectedDate)));
 
-        long total = queryFactory
-                .select(qContract.conNo.max(), qShipment.shipNum.sum(), qRequest.requestNum.sum())
-                .from(qContract)
-                .leftJoin(qShipment).distinct().on(qShipment.balju.contract.in(subQuery)
-                        .and(qShipment.receiveCheck.eq(1L)))
-                .leftJoin(qRequest).on(qRequest.material.eq(qContract.jodalPlan.material)
-                        .and(qRequest.releaseDate.isNotNull())
-                        .and(qRequest.releaseDate.yearMonth().loe(qContract.conDate.yearMonth())))
-                .where(builder)
-                .groupBy(qContract.conDate.yearMonth())
-                .orderBy(qContract.conDate.yearMonth().desc())
-                .fetchCount();
+        Tuple tuple = queryFactory
+                .select(qContract.conNo.max(), subQueryShipment, subQueryRequest)
+                .from(qMaterial)
+                .leftJoin(qContract).on(qContract.in(subQueryContract)
+                        .and(qContract.conDate.yearMonth().loe(selectedDate)))
+                .where(qMaterial.materCode.eq(materCode))
+                .groupBy(qMaterial.materCode)
+                .fetchOne();
 
-        List<Object[]> objectList = tupleList.stream()
-                .map(tuple -> new Object[]{
-                        tuple.get(qContract.conNo.max()),
-                        tuple.get(qShipment.shipNum.sum()),
-                        tuple.get(qRequest.requestNum.sum())
-                })
-                .collect(Collectors.toList());
+        Object[] object = new Object[]{
+                tuple.get(qContract.conNo.max()),
+                tuple.get(subQueryShipment),
+                tuple.get(subQueryRequest)
+        };
 
-        return new PageImpl<>(objectList, pageable, total);
+        return object;
     }
+
 }

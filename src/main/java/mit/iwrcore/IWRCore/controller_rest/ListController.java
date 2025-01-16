@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/list")
 @Log4j2
@@ -452,13 +454,15 @@ public class ListController {
             @RequestParam(required = false) Long selectProS, @RequestParam(required = false) String productSearch,
             @RequestParam(required = false) Long selectMaterL, @RequestParam(required = false) Long selectMaterM,
             @RequestParam(required = false) Long selectMaterS, @RequestParam(required = false) String materialSearch){
+        if (productSearch != null && productSearch.trim().isEmpty()) { productSearch = null; }
+        if (materialSearch != null && materialSearch.trim().isEmpty()) { materialSearch = null; }
         PageRequestDTO requestDTO=PageRequestDTO.builder()
                 .page(page).size(15)
                 .proL(selectProL).proM(selectProM).proS(selectProS).productSearch(productSearch)
                 .materL(selectMaterL).materM(selectMaterM).materS(selectMaterS).materialSearch(materialSearch)
                 .box(selectedBox).baljuStatus(orderStatus).stockStatus(stockStatus)
                 .build();
-        return  contractService.stockList(requestDTO);
+        return contractService.stockList(requestDTO);
     }
     // 출하요청> 출하요청 목록
     @GetMapping("/getRequestList")
