@@ -205,7 +205,7 @@ function updatePartCode2(changedSelect){
     const selectPartS = document.getElementById('selectPartS2');
 
     if(selectPartL) {
-        const tempL=selectPartL2.value;
+        const tempL=selectPartL.value;
         if(tempL==='') showPartLCode2=null;
         else showPartLCode2=tempL;
     }

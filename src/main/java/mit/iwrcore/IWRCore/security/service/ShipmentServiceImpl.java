@@ -112,9 +112,6 @@ public class ShipmentServiceImpl implements ShipmentService {
         List<Shipment> entityList=shipmentRepository.getInvoiceContent(tranNO);
         return entityList.stream().map(this::entityToDto).toList();
     }
-
-
-
     @Override
     public ShipmentReturnDTO findShipment(Long shipNo){
         Shipment shipment=shipmentRepository.findShipment(shipNo);
@@ -123,12 +120,11 @@ public class ShipmentServiceImpl implements ShipmentService {
             return new ShipmentReturnDTO(shipNo, shipment.getShipNum(), materialName);
         }else return null;
     }
-
-
-
-
-
-
+    @Override
+    public Long getSavedShipNum(Long baljuNo){
+        Long allShipNum=shipmentRepository.savedShipNumByBalju(baljuNo);
+        return (allShipNum!=null)? allShipNum: 0L;
+    }
 
 
     // 메인페이지> 배송갯수

@@ -418,14 +418,23 @@ function saveContract(){
     const partnerNo=document.getElementById('partnerNo').value;
     const planData=[];
 
+    let trueCash=false;
+    let trueNum=false;
+    let trueDate=false;
+
     const insertPoint=document.querySelectorAll('#insertPoint tr');
     insertPoint.forEach(x=>{
         const cells=x.querySelectorAll('td');
         const joNo=cells[0].innerText;
 
-        const inputCash=document.getElementById('inputCash'+joNo).value;
-        const inputNum=document.getElementById('inputNum'+joNo).value;
+        const inputCash=Number(document.getElementById('inputCash'+joNo).value);
+        const inputNum=Number(document.getElementById('inputNum'+joNo).value);
         const inputDate=document.getElementById('inputDate'+joNo).value;
+
+        if(inputCash<0 || inputCash===null || inputCash=='') trueCash=true;
+        if(inputNum<0 || inputNum===null || inputNum=='') trueNum=true;
+        if(inputDate===null || inputDate=='') trueDate=true;
+        if(!Number.isInteger(inputCash) || !Number.isInteger(inputNum)) trueCash=true;
 
         planData.push({long1:joNo, long2:inputCash, long3:inputNum, string:inputDate});
     });
@@ -436,20 +445,27 @@ function saveContract(){
     formData1.append('planData', JSON.stringify(planData));
     formData1.append('deleteFile', deleteFile1);
 
-    $.ajax({
-        url:'/saveContract',
-        method:'POST',
-        contentType:'application/json',
-        data: formData1,
-              processData: false, // jQuery가 데이터를 처리하지 않도록 설정
-              contentType: false, // jQuery가 Content-Type을 설정하지 않도록 설정
-        success: function(response) {
-            window.location.href = '/contract/list_contract';
-        },
-        error: function(xhr, status, error) {
-            window.location.href = '/contract/list_contract';
-        }
-    });
+    if(partnerNo===null || partnerNo===''){
+        alert('협력회사를 선택해주세요.');
+    }else if(trueCash || trueNum || trueDate){
+        alert('수량, 금액, 날짜를 정확히 입력해주세요.');
+        console.log(trueCash,'/',trueNum,'/',trueDate);
+    }else{
+        $.ajax({
+            url:'/saveContract',
+            method:'POST',
+            contentType:'application/json',
+            data: formData1,
+                  processData: false, // jQuery가 데이터를 처리하지 않도록 설정
+                  contentType: false, // jQuery가 Content-Type을 설정하지 않도록 설정
+            success: function(response) {
+                window.location.href = '/contract/list_contract';
+            },
+            error: function(xhr, status, error) {
+                window.location.href = '/contract/list_contract';
+            }
+        });
+    }
 }
 
 

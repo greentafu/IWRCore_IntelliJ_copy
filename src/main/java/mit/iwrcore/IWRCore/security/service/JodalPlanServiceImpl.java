@@ -97,13 +97,8 @@ public class JodalPlanServiceImpl implements JodalPlanService {
         return dtoList;
     }
     @Override
-    public List<JodalPlanJodalChsuDTO> noneContract(){
-        List<Object[]> entityList=jodalPlanRepository.noneContractJodalPlanList();
-        return entityList.stream().map(this::exJodalPlanJodalChsuDTO).toList();
-    }
-    @Override
-    public List<JodalPlanDTO> getJodalPlanByProductMaterial(Long manuCode, Long materCode){
-        List<JodalPlan> entityList=jodalPlanRepository.findByProductMaterial(manuCode, materCode);
+    public List<JodalPlanDTO> getJodalPlanByProPlanMaterial(Long proplanNo, Long materCode){
+        List<JodalPlan> entityList=jodalPlanRepository.findByProPlanMaterial(proplanNo, materCode);
         return entityList.stream().map(x->entityToDTO(x)).toList();
     }
 

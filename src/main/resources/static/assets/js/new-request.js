@@ -396,6 +396,7 @@ function viewRequest(){
                 newRow.appendChild(dateTd);
 
                 const btn1Td = document.createElement("td");
+                btn1Td.id = 'btn'+materialCode;
                 if(reqRelease!==null){
                     btn1Td.innerHTML='출하완료';
                     btn1Td.style.color = 'green';
@@ -407,7 +408,7 @@ function viewRequest(){
                         </button>
                     `;
                 }else{
-                    btn1Td.innerHTML=`<button class="btn btn-primary btn-sm" onclick=checkRequest(${reqCode})>출하하기</button>`;
+                    btn1Td.innerHTML=`<button class="btn btn-primary btn-sm" onclick="checkRequest(${reqCode}, ${materialCode})">출하하기</button>`;
                 }
                 newRow.appendChild(btn1Td);
 
@@ -487,17 +488,15 @@ function saveRequest(){
     }
 }
 // 출하요청> 출하 확인
-function checkRequest(button){
-    const reqCode=button;
+function checkRequest(reqCode, materialCode){
     $.ajax({
         url:'/saveRequestCheck',
         method:'POST',
         data: {reqCode:reqCode},
         success: function(response) {
-            viewRequest();
-        },
-        error: function(xhr, status, error) {
-            viewRequest();
+            const btnTd=document.getElementById('btn'+materialCode);
+            btnTd.innerHTML='출하완료';
+            btnTd.style.color = 'green';
         }
     });
 }

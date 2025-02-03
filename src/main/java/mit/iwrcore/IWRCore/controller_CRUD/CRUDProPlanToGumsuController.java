@@ -65,6 +65,8 @@ public class CRUDProPlanToGumsuController {
     private GumsuChasuService gumsuChasuService;
     @Autowired
     private ShipmentService shipmentService;
+    @Autowired
+    private LocationService locationService;
 
 
     // 생산계획> 라인-생산량 가져오기
@@ -199,21 +201,22 @@ public class CRUDProPlanToGumsuController {
         for(ProPlanSturctureDTO ppsDTO:proPlanSturctureDTOList){
             ProductDTO productDTO=ppsDTO.getProplanDTO().getProductDTO();
             MaterialDTO materialDTO=ppsDTO.getStructureDTO().getMaterialDTO();
-            JodalPlanDTO jodalPlanDTO=jodalPlanService.getJodalPlanByProductMaterial(productDTO.getManuCode(), materialDTO.getMaterCode()).get(0);
+            JodalPlanDTO jodalPlanDTO=jodalPlanService.getJodalPlanByProPlanMaterial(proplanNo, materialDTO.getMaterCode()).get(0);
             StructureDTO structureDTO=structureService.getStructureByProductMaterial(productDTO.getManuCode(), materialDTO.getMaterCode()).get(0);
 
             Long calNum=ppsDTO.getProplanDTO().getPronum();
             Long stNum=structureDTO.getQuantity();
             Long stockNum=ppsDTO.getSumShip()-ppsDTO.getSumRequest();
             Long reqNum=(calNum*stNum)-stockNum;
+            if(calNum*stNum<stockNum) reqNum=0L;
             Long eachQuantity=(long) Math.floor(reqNum/3);
             Long remainder=reqNum%3;
             Long thirdQuantity=eachQuantity+remainder;
 
             LocalDateTime baseDate=ppsDTO.getProplanDTO().getStartDate().minusDays(3L);
-            LocalDateTime firstDate=baseDate.plusDays(15L);
-            LocalDateTime secondDate=firstDate.plusDays(15L);
-            LocalDateTime thiredDate=secondDate.plusDays(15L);
+            LocalDateTime firstDate=baseDate;
+            LocalDateTime secondDate=firstDate.plusDays(12L);
+            LocalDateTime thiredDate=secondDate.plusDays(12L);
 
             SaveJodalChasuDTO saveDTO= SaveJodalChasuDTO.builder()
                     .id(jodalPlanDTO.getJoNo()+"")
@@ -224,6 +227,8 @@ public class CRUDProPlanToGumsuController {
                     .build();
             saveJodalChasuDTOList.add(saveDTO);
         }
+
+        System.out.println("###### saveJodalChasuDTOList: "+saveJodalChasuDTOList);
         saveJodalChasuDetail(saveJodalChasuDTOList);
     }
     // 생산계획> 생산계획 삭제
@@ -401,6 +406,16 @@ public class CRUDProPlanToGumsuController {
     }
 
 
+    //발주> 위치 저장
+    @PostMapping("/saveLocation")
+    public void saveLocation(@RequestParam(required = false) String location){
+        LocalDateTime localDateTime=LocalDateTime.now();
+        LocationDTO locationDTO=LocationDTO.builder()
+                .location(location)
+                .useTime(localDateTime)
+                .build();
+        locationService.saveLocation(locationDTO);
+    }
 
     // 발주> 발주 저장
     @PostMapping("/saveBalju")

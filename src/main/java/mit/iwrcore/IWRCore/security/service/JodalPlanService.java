@@ -25,8 +25,7 @@ public interface JodalPlanService {
     JodalPlanDTO getJodalPlan(Long id);
     Long newNoneJodalChasuCount();
     List<JodalPlanDTO> getJodalPlanByProPlan(Long proplanNo);
-    List<JodalPlanJodalChsuDTO> noneContract();
-    List<JodalPlanDTO> getJodalPlanByProductMaterial(Long manuCode, Long materCode);
+    List<JodalPlanDTO> getJodalPlanByProPlanMaterial(Long proplanNo, Long materCode);
 
     // 생산부서> 생산계획에 따른 제품구성 및 수량
     List<ProPlanSturctureDTO> getStructureStock(Long proplanNo);

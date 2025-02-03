@@ -34,7 +34,6 @@ function loadTable(){
                         const sumreq=x.sumRequestNum;
 
                         const stock=sumship-sumreq;
-                        console.log(stock+'='+sumship+'-'+sumreq);
 
                         const newRow = document.createElement("tr");
 

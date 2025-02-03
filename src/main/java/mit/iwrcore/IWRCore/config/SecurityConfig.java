@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -34,7 +35,7 @@ public class SecurityConfig {
                 .requestMatchers("/saveReceiveShipment").hasAnyRole("MATERIAL_TEAM", "MANAGER")
                 .anyRequest().authenticated()
                 .and()
-                .exceptionHandling().accessDeniedPage("/checkrole");
+                .exceptionHandling().accessDeniedHandler(accessDeniedHandler());
         http.formLogin(formLogin->
                 formLogin.loginPage("/login")
                         .defaultSuccessUrl("/checkrole", true)
@@ -52,4 +53,8 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler(){
+        return new CustomAccessDeniedHandler();
+    }
 }

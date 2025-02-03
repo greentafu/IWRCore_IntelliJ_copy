@@ -4,14 +4,12 @@ import lombok.extern.log4j.Log4j2;
 import mit.iwrcore.IWRCore.entity.FileReturns;
 import mit.iwrcore.IWRCore.entity.Member;
 import mit.iwrcore.IWRCore.security.dto.AuthDTO.AuthMemberDTO;
+import mit.iwrcore.IWRCore.security.dto.BaljuDTO;
 import mit.iwrcore.IWRCore.security.dto.FileDTO.FileReturnsDTO;
 import mit.iwrcore.IWRCore.security.dto.MemberDTO;
 import mit.iwrcore.IWRCore.security.dto.ReturnsDTO;
 import mit.iwrcore.IWRCore.security.dto.ShipmentDTO;
-import mit.iwrcore.IWRCore.security.service.FileService;
-import mit.iwrcore.IWRCore.security.service.MemberService;
-import mit.iwrcore.IWRCore.security.service.ReturnsService;
-import mit.iwrcore.IWRCore.security.service.ShipmentService;
+import mit.iwrcore.IWRCore.security.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -35,6 +33,8 @@ public class CRUDShipmentController {
     private MemberService memberService;
     @Autowired
     private FileService fileService;
+    @Autowired
+    private BaljuService baljuService;
 
     @PostMapping("/saveReceiveShipment")
     public void saveReceiveShipment(@RequestParam(required = false) Long shipNo){
@@ -48,6 +48,12 @@ public class CRUDShipmentController {
         MemberDTO memberDTO=memberService.findMemberDto(authMemberDTO.getMno(), null);
         Member member=memberService.memberdtoToEntity(memberDTO);
         shipmentService.updateMemberCheck(member, shipNo);
+        ShipmentDTO shipmentDTO=shipmentService.getShipment(shipNo);
+        BaljuDTO baljuDTO=shipmentDTO.getBaljuDTO();
+        Long allShipNum=shipmentService.getSavedShipNum(shipmentDTO.getBaljuDTO().getBaljuNo());
+        if(baljuDTO.getBaljuNum()<=allShipNum) {
+            baljuService.updateBaljuFin(baljuDTO.getBaljuNo());
+        }
     }
     @PostMapping("/saveReturnShipment")
     public void saveReturnShipment(@RequestParam(name = "shipNo") Long shipNo,
@@ -61,7 +67,6 @@ public class CRUDShipmentController {
         AuthMemberDTO authMemberDTO = (AuthMemberDTO) authentication.getPrincipal();
         MemberDTO memberDTO = memberService.findMemberDto(authMemberDTO.getMno(), null);
 
-        // returnsService.addReturns(returnsDTO, memberDTO, shipNo);
         ShipmentDTO shipmentDTO=shipmentService.getShipment(shipNo);
         ReturnsDTO returnsDTO=ReturnsDTO.builder()
                 .email(email)

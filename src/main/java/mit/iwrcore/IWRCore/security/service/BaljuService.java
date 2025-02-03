@@ -17,6 +17,8 @@ public interface BaljuService {
     void deleteBalju(Long id);
     BaljuDTO modifyBalju(BaljuDTO baljuDTO);
 
+    void updateBaljuFin(Long baljuNo);
+
     // 변환
     Balju dtoToEntity(BaljuDTO dto);
     BaljuDTO entityToDTO(Balju entity);

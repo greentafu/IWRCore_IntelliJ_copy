@@ -13,13 +13,6 @@ public interface JodalPlanRepository extends JpaRepository<JodalPlan, Long>, Jod
     Long newNoneJodalPlanCount();
     List<JodalPlan> findByProPlanProplanNo(Long proplanNo);
 
-    @EntityGraph(attributePaths = {"proPlan"})
-    @Query("select j, sum(jc.joNum) from JodalPlan j " +
-            "join JodalChasu jc on (j.joNo=jc.jodalPlan.joNo) " +
-            "where j.joNo not in (select c.jodalPlan.joNo from Contract c) and j.joNo in (select jc.jodalPlan.joNo from JodalChasu jc) " +
-            "group by j")
-    List<Object[]> noneContractJodalPlanList();
-
     // 계약서> 선택한 조달계획
     @EntityGraph(attributePaths = {"proPlan"})
     @Query("select j, sum(jc.joNum) from JodalPlan j " +
@@ -29,6 +22,6 @@ public interface JodalPlanRepository extends JpaRepository<JodalPlan, Long>, Jod
     List<Object[]> selectedJodalPlan(Long joNo);
 
     @Query("select j from JodalPlan j " +
-            "where j.proPlan.product.manuCode=:manuCode and j.material.materCode=:materCode")
-    List<JodalPlan> findByProductMaterial(Long manuCode, Long materCode);
+            "where j.proPlan.proplanNo=:proplanNo and j.material.materCode=:materCode")
+    List<JodalPlan> findByProPlanMaterial(Long proplanNo, Long materCode);
 }

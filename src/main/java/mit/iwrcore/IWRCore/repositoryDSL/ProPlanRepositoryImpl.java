@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,6 +111,8 @@ public class ProPlanRepositoryImpl implements ProPlanRepositoryCustom{
         QProM qProM=QProM.proM;
         QProS qProS=QProS.proS;
 
+        LocalDateTime localDateTime=LocalDateTime.now();
+
         BooleanBuilder builder=new BooleanBuilder();
 
         if (requestDTO.getProL() != null) { builder.and(qProS.proM.proL.proLcode.eq(requestDTO.getProL())); }
@@ -120,6 +123,7 @@ public class ProPlanRepositoryImpl implements ProPlanRepositoryCustom{
                     .or(qProduct.supervisor.containsIgnoreCase(requestDTO.getProductSearch())));
         }
         builder.and(qProPlan.finCheck.eq(0L));
+        builder.and(qProPlan.endDate.after(localDateTime));
 
         Pageable pageable= PageRequest.of(requestDTO.getPage()-1, requestDTO.getSize());
         List<ProPlan> proPlanlList = queryFactory

@@ -128,6 +128,13 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initPartnerProduct();
+
+        document.getElementById("shipNum").addEventListener("input", function () {
+          const stockNum=Number(document.getElementById('getNum').value);
+          const releaseNum=document.getElementById('shipNum');
+          if(releaseNum.value>stockNum) releaseNum.value=stockNum;
+          if(releaseNum.value<0) releaseNum.value=0;
+        });
       });
     </script>
     <!--Script-->

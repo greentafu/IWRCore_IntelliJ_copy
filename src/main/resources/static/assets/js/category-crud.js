@@ -37,7 +37,7 @@ function showPart(selectedBtn){
         success:function(data){
             if(data.totalPage<page) finPage=true;
 
-            let num=0;
+            let num=page*10+0;
             data.dtoList.forEach(x=>{
                 const LDTO=x.partLDTO;
                 const MDTO=x.partMDTO;
@@ -138,7 +138,7 @@ function showPro(selectedBtn){
         success:function(data){
             if(data.totalPage<page2) finPage2=true;
 
-            let num=0;
+            let num=page2*10+0;
             data.dtoList.forEach(x=>{
                 const LDTO=x.proLDTO;
                 const MDTO=x.proMDTO;
@@ -239,7 +239,7 @@ function showMater(selectedBtn){
         success:function(data){
             if(data.totalPage<page2) finPage2=true;
 
-            let num=0;
+            let num=page3*10+0;
             data.dtoList.forEach(x=>{
                 const LDTO=x.materLDTO;
                 const MDTO=x.materMDTO;

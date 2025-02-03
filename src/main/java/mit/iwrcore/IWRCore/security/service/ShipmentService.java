@@ -6,7 +6,6 @@ import mit.iwrcore.IWRCore.entity.Shipment;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageRequestDTO2;
 import mit.iwrcore.IWRCore.security.dto.PageDTO.PageResultDTO;
-import mit.iwrcore.IWRCore.security.dto.PartnerDTO;
 import mit.iwrcore.IWRCore.security.dto.ShipmentDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.InvoiceContractDTO;
 import mit.iwrcore.IWRCore.security.dto.multiDTO.InvoicePartnerDTO;
@@ -34,7 +33,7 @@ public interface ShipmentService {
     Shipment getShipmentEntity(Long shipNo);
     List<ShipmentDTO> getShipmentByBalju(Long baljuNo);
     List<ShipmentDTO> getShipmentByInvoice(Long tranNO);
-
+    Long getSavedShipNum(Long baljuNo);
 
     ShipmentReturnDTO findShipment(Long shipNo);
 

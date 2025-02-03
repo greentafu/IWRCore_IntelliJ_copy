@@ -201,7 +201,7 @@ function updateMaterCode2(changedSelect){
     const selectMaterS = document.getElementById('selectMaterS2');
 
     if(selectMaterL) {
-        const tempL=selectMaterL2.value;
+        const tempL=selectMaterL.value;
         if(tempL==='') showMaterLCode2=null;
         else showMaterLCode2=tempL;
     }

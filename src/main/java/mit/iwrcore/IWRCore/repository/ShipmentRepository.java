@@ -62,4 +62,8 @@ public interface ShipmentRepository extends JpaRepository<Shipment,Long>, Shipme
             "left join Returns r on (s.shipNO=r.shipment.shipNO) " +
             "where s.receiveCheck=0 and r is null")
     Long mainShipment();
+
+    @Query("select sum(s.shipNum) from Shipment s " +
+            "where s.balju.baljuNo=:baljuNo and s.receiveCheck=1")
+    Long savedShipNumByBalju(Long baljuNo);
 }

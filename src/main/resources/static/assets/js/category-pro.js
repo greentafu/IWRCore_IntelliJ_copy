@@ -201,7 +201,7 @@ function updateProCode2(changedSelect){
     const selectProS = document.getElementById('selectProS2');
 
     if(selectProL) {
-        const tempL=selectProL2.value;
+        const tempL=selectProL.value;
         if(tempL==='') showProLCode2=null;
         else showProLCode2=tempL;
     }

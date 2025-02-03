@@ -46,6 +46,10 @@ public class BaljuServiceImpl implements BaljuService {
         Balju savedBalju=baljuRepository.save(balju);
         return entityToDTO(savedBalju);
     }
+    @Override
+    public void updateBaljuFin(Long baljuNo){
+        baljuRepository.updateBaljuFin(baljuNo);
+    }
 
     // 변환
     @Override

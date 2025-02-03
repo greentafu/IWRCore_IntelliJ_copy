@@ -77,8 +77,10 @@
                 </div>
                 <div>
                   <button type="button" class="btn btn-primary" onclick="setSaveMember()">수정</button>
-                  <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" onclick="setDeleteMember()">삭제</button>
-                </div>
+                  <th:block th:if="${member.mno!=1}">
+                    <button class="btn btn-secondary" data-bs-toggle="modal" href="#modalToggle" onclick="setDeleteMember()">삭제</button>
+                  </th:block>
+                  </div>
               </div>
             </div>
             <!-- /Account -->

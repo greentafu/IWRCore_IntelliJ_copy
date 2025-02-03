@@ -6,13 +6,14 @@ import mit.iwrcore.IWRCore.entity.Product;
 import mit.iwrcore.IWRCore.repositoryDSL.BaljuRepositoryCustom;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface BaljuRepository extends JpaRepository<Balju, Long>, BaljuRepositoryCustom {
     @EntityGraph(attributePaths = {"contract"})
-    @Query("select b from Balju b where b.contract.partner.pno=:pno")
+    @Query("select b from Balju b where b.contract.partner.pno=:pno and b.finCheck=0")
     List<Balju> partListBalju(Long pno);
 
     @Transactional
@@ -42,4 +43,9 @@ public interface BaljuRepository extends JpaRepository<Balju, Long>, BaljuReposi
             "and b.finCheck!=1 " +
             "group by b")
     List<Object[]> notFinBaljuByProMater(Long proplanNo, Long materCode);
+
+    @Modifying
+    @Transactional
+    @Query("update Balju b set b.finCheck=1 where b.baljuNo=:baljuNo")
+    void updateBaljuFin(Long baljuNo);
 }

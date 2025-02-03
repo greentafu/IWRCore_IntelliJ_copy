@@ -41,10 +41,11 @@
             />
             <label class="form-label">제품명</label>
             <input
+                    type="text"
                     class="form-control"
                     id="productName"
                     placeholder="등록할 제품 명"
-                    th:value=${product.name}
+                    th:value="${product.name}"
             />
             <label class="form-label">카테고리 선택</label>
             <input type="number" style="display:none;" th:value="${product.proSDTO.proScode}" id="selectedProS">

@@ -185,7 +185,6 @@
           method:'GET',
           data:{page:page, selectProL:selectProL, selectProM:selectProM, selectProS:selectProS, productSearch:productSearch, productImsiCheck:productImsiCheck},
           success:function(data){
-            console.log(data);
             if(data.totalPage<page) finPage=true;
 
             data.dtoList.forEach(x=>{
