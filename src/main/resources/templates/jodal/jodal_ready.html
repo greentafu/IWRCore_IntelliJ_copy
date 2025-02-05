@@ -81,7 +81,12 @@
                     [[${list.sumShip-list.sumRequest}]]
                   </td>
                   <td th:id="'needNum'+${list.jodalPlanDTO.joNo}">
-                    [[${(list.structureDTO.quantity*list.proplanDTO.pronum)-(list.sumShip-list.sumRequest)}]]
+                    <th:block th:if="${(list.structureDTO.quantity*list.proplanDTO.pronum)-(list.sumShip-list.sumRequest)}<0">
+                      0
+                    </th:block>
+                    <th:block th:if="${(list.structureDTO.quantity*list.proplanDTO.pronum)-(list.sumShip-list.sumRequest)}>=0">
+                      [[${(list.structureDTO.quantity*list.proplanDTO.pronum)-(list.sumShip-list.sumRequest)}]]
+                    </th:block>
                   </td>
                   <th:block th:if="${list.jodalChasuDateDTOList != null}">
                     <td>[[${list.jodalChasuDateDTOList[0].juNum}]]</td>

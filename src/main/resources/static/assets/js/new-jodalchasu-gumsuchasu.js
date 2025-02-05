@@ -47,7 +47,8 @@ function autoFillNum(number){
     if(checkbox && checkbox.checked){
         const totalNum=document.getElementById('totalNum'+no).innerText;
         const stockNum=document.getElementById('stockNum'+no).innerText;
-        const quantity=totalNum-stockNum;
+        let quantity=totalNum-stockNum;
+        if(quantity<0) quantity=0;
 
         const eachQuantity=Math.floor(quantity/3);
         const remainder=quantity%3;
@@ -129,11 +130,15 @@ function saveChasu(){
             const twoColor = getComputedStyle(twoNumInput).color;
             const threeColor = getComputedStyle(threeNumInput).color;
 
-            if(oneNum<0 || oneNum===null || oneNum=='') trueNum=true;
-            if(twoNum<0 || twoNum===null || twoNum=='') trueNum=true;
-            if(threeNum<0 || threeNum===null || threeNum=='') trueNum=true;
+            if(oneNum<0 || oneNum===null || oneNum==='') trueNum=true;
+            console.log('1: ', oneNum, trueNum);
+            if(twoNum<0 || twoNum===null || twoNum==='') trueNum=true;
+            console.log('2: ', twoNum, trueNum);
+            if(threeNum<0 || threeNum===null || threeNum==='') trueNum=true;
+            console.log('3: ', threeNum, trueNum);
 
             if(!Number.isInteger(oneNum) || !Number.isInteger(twoNum) || !Number.isInteger(threeNum)) trueNum=true;
+            console.log('isInteger: ', trueNum);
 
             if(oneDate===null || twoDate===null || threeDate===null) trueDate=true;
             if(oneDate>=twoDate || twoDate>=threeDate) trueDate=true;
